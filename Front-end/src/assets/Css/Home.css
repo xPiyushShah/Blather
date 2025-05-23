@@ -1,0 +1,220 @@
+:root {
+  --glass-effect: rgba(0, 0, 0, 0.3);
+  --radius-val: 16px;
+}
+.root-start {
+  background: transparent;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  color: black;
+  display: flex;
+  flex-direction: row;
+  padding: 12px 22px;
+}
+.root-element {
+  /* background-color: rgba(0, 0, 0, 0.6); */
+  width: 100%;
+  height: 100%;
+  color: white;
+  border-radius: 12px 0px 0px 12px;
+}
+.lest-main {
+  background-color: transparent;
+  background-color: rgba(0, 0, 0, 0.6);
+  width: calc(100% - 35%);
+  height: 100%;
+  border-right: 1px solid #dddddd35;
+}
+.header-lest {
+  background: var(--glass-effect);
+  width: 100%;
+  height: 11.6vh;
+  align-items: center;
+  text-align: center;
+  justify-content: space-between;
+  display: flex;
+  flex-direction: row;
+  padding: 12px 16px;
+  /* border-radius: 12px 0px 0px 0px; */
+}
+.lest-apply {
+  width: fit-content;
+  height: 50px;
+  background: transparent;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 16px;
+  cursor: pointer;
+}
+.lest-3 {
+  display: flex;
+  /* gap: 2px; */
+  flex-direction: row-reverse;
+  justify-content: space-evenly;
+  align-items: center;
+  text-align: center;
+}
+.chat-show {
+  background: transparent;
+  width: 100%;
+  height: calc(100% - 25%);
+  padding: 12px 28px;
+}
+.chat-bubble {
+  padding: 8px;
+}
+.text-area {
+  /* background: rgb(42, 41, 41); */
+  width: 100%;
+  min-height: 13%;
+  max-height: fit-content;
+  height: calc(100% - 75%);
+  padding: 8px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-align: center;
+  border-top: 1px solid #dddddd35;
+  /* border-radius: ; */
+}
+
+.file-box {
+  display: flex;
+  flex-direction: row;
+  height: auto;
+  background: #7b747429;
+  padding: 2px 0px;
+  gap: 2px;
+}
+.icon-wrapper {
+  display: inline-block;
+  padding: 8px;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.icon-wrapper:hover {
+  background-color: #7b7474fc;
+  color: #ffffff;
+}
+
+.icon-wrapper svg {
+  transition: transform 0.3s;
+}
+
+.opt:hover svg {
+  transform: scale(1.1);
+}
+.opt {
+  background: #7b747429;
+  display: block;
+  padding: 8px;
+  transition: background-color 0.3s, color 0.3s;
+}
+.opts {
+  background: #7b7474a9;
+  display: inline-block;
+  padding: 10px 18px;
+  transition: background-color 0.3s, color 0.3s;
+  text-align: center;
+}
+
+.opt:hover {
+  background-color: #7b7474fc;
+  color: #ffffff;
+}
+.emoji:hover {
+  outline: black;
+  background-color: rgba(185, 179, 169, 0.759);
+  opacity: 1;
+  cursor: pointer;
+}
+
+.opt svg {
+  transition: transform 0.3s;
+}
+
+.opt:hover svg {
+  transform: scale(1.1);
+}
+.text-box {
+  background: rgb(42, 41, 41);
+  width: calc(100% - 25%);
+  border-radius: 22px;
+  /* border: 1px solid whitesmoke; */
+}
+.text-box-input {
+  width: 100%;
+  height: 100%;
+  padding: 8px 18px;
+  border: none;
+  outline: none;
+  word-break: break-word;
+  line-height: 22px;
+  white-space: break-spaces;
+  overflow: hidden auto;
+  box-sizing: border-box;
+  font-size: 16px;
+  caret-color: rgb(245, 239, 239);
+  flex: 1;
+  text-overflow: ellipsis;
+  scrollbar-width: none;
+}
+.pest-main {
+  /* background-color: rgb(0, 255, 26); */
+  width: calc(100% - 60%);
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+}
+.pest-header {
+  /* background: var(--glass-effect); */
+  border-bottom: 1px solid #dddddd35;
+  padding: 12px 16px;
+  width: 100%;
+  height: calc(100% - 88%);
+  /* height: 11.6vh; */
+  align-items: center;
+  text-align: center;
+  justify-content: space-between;
+  display: flex;
+  flex-direction: row-reverse;
+  position: sticky;
+}
+.all {
+  width: calc(100% - 10%);
+  height: calc(100%);
+}
+.avatar {
+  opacity: 0.6;
+  transition: all 0.3s, color 0.3s;
+  cursor: pointer;
+  &:hover {
+    opacity: 1;
+  }
+}
+.part {
+  width: 100%;
+  height: 80%;
+}
+.valup {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.2);
+  height: calc(15%);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #dddddd35;
+  padding: 12px 16px;
+}
+.part-cont {
+  width: 100%;
+  height: calc(88%);
+  overflow: auto;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  scrollbar-color: #e6dcdc rgba(0, 0, 0, 0.6);
+}

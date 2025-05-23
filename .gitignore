@@ -1,0 +1,45 @@
+# Node.js dependencies
+/node_modules/
+
+# Vite build output
+/dist/
+build/
+
+# Vite and environment config
+.env
+.env.* 
+.vite/
+
+# Optional Vite cache
+/.cache/
+/.vitepress/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# IDEs and editors
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# OS metadata
+*.log
+
+# Misc
+*.local
+*.lock
+
+# Prevent package manager files
+package-lock.json
+pnpm-lock.yaml
+yarn.lock

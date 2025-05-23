@@ -1,0 +1,29 @@
+.profile-header :first-child {
+  display: flex;
+  flex-direction: row;
+  /* align-items: flex-end; */
+}
+.profile-header {
+  color: white;
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  justify-content: space-between;
+  width: 100%;
+  height: fit-content;
+  margin-top: 12px;
+  padding: 12px;
+}
+.jkl{
+    padding: 0px  12px;
+}
+.btn {
+  padding: 12px 28px;
+  margin-top: 12px;
+}
+.profile-cont {
+  padding: 12px 28px;
+}
+.baseliner {
+  border-bottom: 1px solid #dddddd36;
+}
