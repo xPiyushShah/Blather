@@ -1,0 +1,20 @@
+{
+  "name": "blather",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/xPiyushShah/Blather#readme",
+  "bugs": {
+    "url": "https://github.com/xPiyushShah/Blather/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xPiyushShah/Blather.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "app.js",
+  "scripts": {
+    "test": "npm run"
+  }
+}
