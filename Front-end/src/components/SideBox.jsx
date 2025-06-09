@@ -1,28 +1,23 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "../assets/Css/Home.css";
 import ToolSide from "./ToolSide";
 import Lister from "./Messages/Lister";
 import Star from "./Star";
+import { functionStore } from "../store/functionStore";
 
-export default function SideBox({ another }) {
+export default function SideBox() {
   const [activeComponent, setActiveComponent] = useState("Lister");
+  const { isStar } = functionStore();
 
-  const handleClick = (name) => {
-    if (activeComponent === name) setActiveComponent("Lister");
-    else setActiveComponent(name);
-  };
-  const handleOpen = (data) => {
-    if (data.address == "Profile") another(data);
-    else console.log("From Lister:", data);
-  };
   return (
-    <div className="pest-main   flex justify-between">
-      <div className="all">
-        {activeComponent === "Lister" && <Lister onOpen={handleOpen} />}
-        {activeComponent === "Star" && <Star />}
+    <div className="flex justify-between flex-row bg-[rgba(0,0,0,0.6)] w-2/5 h-screen">
+      <div className="h-full w-[90%]">
+        {!isStar ? <Lister /> : <Star />}
       </div>
-      <div className="ball rounded-r-lg flex-column ">
-        <ToolSide onClicked={handleClick} />
+      <div
+        className="flex flex-column relative h-full w-[10%] border-l-[1px] border-l-[#dddddd35]"
+        style={{ padding: "13px" }}>
+        <ToolSide />
       </div>
     </div>
   );

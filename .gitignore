@@ -43,3 +43,45 @@ pnpm-debug.log*
 package-lock.json
 pnpm-lock.yaml
 yarn.lock
+
+# === Node.js ===
+**/node_modules/
+**/dist/
+**/build/
+
+# === Environment Files ===
+**/.env
+
+# === Logs ===
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# === OS-specific ===
+.DS_Store
+Thumbs.db
+
+# === IDEs ===
+.vscode/
+*.swp
+
+# === Backup or Temp Files ===
+*.bak
+*.tmp
+*.backup
+backup.jsx
+
+# === Front-end Specific ===
+Front-end/.gitignore
+Front-end/package-lock.json
+Front-end/package.json
+
+# === Backend Specific ===
+Back-end/package-lock.json
+Back-end/package.json
+
+# Optional: ignore compiled files
+*.out
+*.class
+*.exe

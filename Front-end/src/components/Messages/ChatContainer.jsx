@@ -1,140 +1,68 @@
-import React, { useState, useRef } from "react";
+import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faVideoCamera,
   faPhone,
-  faSmile,
-  faPaperPlane,
-  faPlusCircle,
+  faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 import Message from "./Message";
-export default function ChatContainer({ data }) {
-  const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState([]); // Store all chat messages
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const fileInputRef = useRef(null);
+import { useChatStore } from "../../store/useChatStore.js";
+import { authStore } from "../../store/authStore.js";
+import { callStore } from "../../store/callStore.js";
+import ProfileAvatar from "../ProfileAvatar";
+import InputArea from "./InputArea";
+import CallProfile from "../Extra/CallProfile.jsx";
 
-  const handleEmojiClick = (emojiData) => {
-    setMessage((prev) => prev + emojiData.emoji);
-  };
+export default function ChatContainer() {
+  const { selectedUser, setSelctedUser } = useChatStore();
+  const { onlineUser } = authStore();
+  const { callModal, setModal, incomingCall } = callStore();
 
-  const handleInputFocus = () => {
-    setShowEmojiPicker(false);
-  };
-
-  const sendMsg = () => {
-    if (!message.trim()) return;
-    const newMessage = {
-      id: Date.now(),
-      sender: "me",
-      text: message,
-      time: new Date(),
-    };
-    setMessages((prev) => [...prev, newMessage]);
-    setMessage("");
-    setShowEmojiPicker(false);
-  };
-
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const isImage = file.type.startsWith("image/");
-    if (!isImage) {
-      alert("Only image files are allowed!");
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const newMessage = {
-        id: Date.now(),
-        sender: "me",
-        text: (
-          <img src={reader.result} alt="sent" className="max-w-xs max-h-40" />
-        ),
-        time: new Date(),
-      };
-      setMessages((prev) => [...prev, newMessage]);
-    };
-    reader.readAsDataURL(file);
-  };
+  // Show CallProfile if audio or video call is active
+  if (callModal || incomingCall) {
+    return <CallProfile />;
+  }
 
   return (
-    <>
-      {/* Header for Chat Box Start */}
-      <div className="header-lest ">
-        <div className="lest-1 lest-apply avatar">
-          <div className="w-10 rounded-full">
-            <img alt={data.name} src={data.src} />
-          </div>
+    <div className="flex flex-col h-screen w-full justify-between ">
+      <div className="flex flex-row justify-between w-full border-b-[1px] border-b-[#dddddd35]  align-center text-center header-lest">
+        <div
+          className={`hidden md:flex mt-15 w-20 rounded-full hover:cursor-pointer  avatar  align-center justify-center text-center
+           ${onlineUser.includes(selectedUser._id)  ? "bg-base-300 ring-1 ring-base-300" : ""}
+          `}>
+          {selectedUser.profile_url ? (
+            <img
+              alt={selectedUser.first_name}
+              src={selectedUser.profile_url}
+              className="object-cover "
+            />
+          ) : (
+            <ProfileAvatar onGen={selectedUser} />
+          )}
         </div>
-        <div className="lest-2 lest-apply">{data.name}</div>
+        <div className="flex items-center  align-center text-center opacity-85  ">
+          {`${selectedUser.first_name} ${selectedUser.last_name}`}
+        </div>
         <div className="lest-3 lest-apply">
           <div className="opt rounded-r-lg">
-            <FontAwesomeIcon icon={faVideoCamera} />
+            <FontAwesomeIcon
+              icon={faXmark}
+              onClick={() => setSelctedUser(null)}
+            />
+          </div>
+          <div className="opt">
+            <FontAwesomeIcon
+              icon={faVideoCamera}
+              onClick={() => setModal("video")}
+            />
           </div>
           <div className="opt rounded-l-lg">
-            <FontAwesomeIcon icon={faPhone} />
+            <FontAwesomeIcon icon={faPhone} onClick={() => setModal("audio")} />
           </div>
         </div>
       </div>
-      {/* Header for Chat Box End  */}
-      {/* MiddleBox Start */}
-      <div className="chat-show content-end scroll-smooth snap-proximity snap-both snap-y overflow-y-auto h-screen">
-        <Message messages={messages} />
-      </div>
-      {/* MiddleBox End */}
-      {/* Text Area Start */}
-      <div className="text-area ">
-        <div className="emoji opt hover:rounded-lg rounded-lg">
-          {showEmojiPicker && (
-            <div style={{ position: "absolute", bottom: "70px", zIndex: 100 }}>
-              <EmojiPicker onEmojiClick={handleEmojiClick} />
-            </div>
-          )}
-          <FontAwesomeIcon
-            icon={faSmile}
-            size="lg"
-            style={{ cursor: "pointer" }}
-            onClick={() => setShowEmojiPicker((prev) => !prev)}
-          />
-        </div>
-        <div className="text-box">
-          <input
-            type="text"
-            placeholder="Type a message..."
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            onFocus={handleInputFocus}
-            className="text-box-input"
-          />
-        </div>
-        <div className="file-box rounded-lg ">
-          <div className="icon-wrapper rounded-l-lg">
-            <FontAwesomeIcon
-              icon={faPlusCircle}
-              style={{ cursor: "pointer" }}
-              onClick={() => fileInputRef.current.click()}
-            />
-          </div>
-          <input
-            type="file"
-            ref={fileInputRef}
-            style={{ display: "none" }}
-            accept="image/*"
-            onChange={handleFileChange}
-          />
-          <div className="icon-wrapper  rounded-r-lg">
-            <FontAwesomeIcon
-              icon={faPaperPlane}
-              onClick={sendMsg}
-              style={{ cursor: "pointer" }}
-            />
-          </div>
-        </div>
-      </div>
-      {/* Text Area End */}
-    </>
+      <Message />
+      <InputArea />
+    </div>
   );
 }

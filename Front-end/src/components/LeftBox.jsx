@@ -1,39 +1,26 @@
-import React from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMessage } from "@fortawesome/free-solid-svg-icons";
-import Profile from "./Profile/Profile";
-import ChatContainer from "./Messages/ChatContainer";
+import React, { useState, useEffect } from "react";
 
-const LeftBox = ({ onShow }) => {
-  const data = [
-    {
-      id: 1,
-      name: "Piyush Shah",
-      src: "https://img.daisyui.com/images/profile/demo/anakeen@192.webp",
-    },
-  ];
+import Profile from "./Profile/Profile";
+
+import ChatContainer from "./Messages/ChatContainer";
+import BlankMessage from "./Messages/BlankMessage";
+import { useChatStore } from "../store/useChatStore";
+import CallProfile from "./Extra/CallProfile";
+import { callStore } from "../store/callStore";
+import { functionStore } from "../store/functionStore";
+
+const LeftBox = () => {
+  const { selectedUser } = useChatStore();
+  const { isProfile,isRoom } = functionStore();
+
   return (
-    <div className="lest-main flex-col">
-      {onShow === "none" && (
-        <div className="flex flex-col justify-center items-center h-full text-white-400 gap-4">
-          <div className="rounded-xl align-center">
-            <FontAwesomeIcon
-              icon={faMessage}
-              size="2x"
-              className="flex space-x-4 bg-white-400"
-            />
-          </div>
-          <p className="mt-4 text-sm">
-            Start Your Conversation With Your Friends...
-          </p>
-        </div>
-      )}
-      {onShow === "text" && (
+    <div className="flex flex-col max-h-screen w-4/5  bg-[rgba(0,0,0,0.6)]  border-r-[1px] border-r-[#dddddd35]">
+      {!isProfile  && (
         <>
-          <ChatContainer data={data} />
+          {!selectedUser ? <BlankMessage /> : <ChatContainer />}
         </>
       )}
-      {onShow === "Profile" && <Profile data={data} />}
+      {isProfile && <Profile />}
     </div>
   );
 };
