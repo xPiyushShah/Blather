@@ -1,4 +1,4 @@
-// models/Friend.js
+
 import mongoose from "mongoose";
 
 const FriendSchema = new mongoose.Schema(
