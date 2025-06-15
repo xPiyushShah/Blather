@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
+import Friend from "../Models/friends.model.js";
 import User from "../Models/user.model.js";
-import Friend from "../Models/Friend.model.js";
 import { gToken } from "../libs/utils.js";
 import cloudinary from "../libs/cloudinary.js";
 
