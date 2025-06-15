@@ -15,7 +15,7 @@ const PORT = process.env.PORT;
 
 app.use(
   cors({
-    origin: "https://blather.onrender.com",
+    origin: "https://blather-psi.vercel.app",
     credentials: true,
   })
 );
@@ -35,6 +35,7 @@ app.get("/api/auth", (req, res) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`Server started on http://localhost:${PORT}`);
+  // console.log(`Server started on http://localhost:${PORT}`);
+  console.log(`Server started on https://blather.onrender.com`);
   connectDB();
 });
