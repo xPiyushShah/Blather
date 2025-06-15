@@ -6,6 +6,8 @@ import {
   updateProfile,
   checkUser,
   addFriend,
+  friendlist,
+  acceptRequest,
 } from "../Controllers/auth.controller.js";
 import { protectAuth } from "../middleware/auth.middleware.js"; // Your protected route
 
@@ -21,6 +23,9 @@ router.put("/update-profile", protectAuth, updateProfile);
 
 router.get("/check-auth", protectAuth, checkUser);
 
-router.get("/addfriend/:id", protectAuth, addFriend);
+router.post("/addfriend/:id", protectAuth, addFriend);
 
+router.get("/friendlist", protectAuth, friendlist);
+
+router.get("/accept_reqst/:id", protectAuth, acceptRequest);
 export default router;

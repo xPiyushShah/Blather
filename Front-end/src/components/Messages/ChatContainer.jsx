@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faVideoCamera,
@@ -12,11 +12,17 @@ import { callStore } from "../../store/callStore.js";
 import ProfileAvatar from "../ProfileAvatar";
 import InputArea from "./InputArea";
 import CallProfile from "../Extra/CallProfile.jsx";
+import { functionStore } from "../../store/functionStore.js";
+import ContextMenu from "../../utils/contextMenu.jsx";
 
 export default function ChatContainer() {
+  const [context, setContext] = useState(false);
+  const [contextPos, setContextPos] = useState({ x: 0, y: 0 });
+
   const { selectedUser, setSelctedUser } = useChatStore();
   const { onlineUser } = authStore();
   const { callModal, setModal, incomingCall } = callStore();
+  const { setUsrId } = functionStore();
 
   // Show CallProfile if audio or video call is active
   if (callModal || incomingCall) {
@@ -25,10 +31,20 @@ export default function ChatContainer() {
 
   return (
     <div className="flex flex-col h-screen w-full justify-between ">
-      <div className="flex flex-row justify-between w-full border-b-[1px] border-b-[#dddddd35]  align-center text-center header-lest">
+      <div
+        className="relative flex flex-row justify-between w-full border-b-[1px] border-b-[#dddddd35]  align-center text-center header-lest"
+        onContextMenu={(e) => {
+          e.preventDefault();
+          setContext(true);
+          setContextPos({ x: e.pageX, y: e.pageY });
+        }}>
         <div
           className={`hidden md:flex mt-15 w-20 rounded-full hover:cursor-pointer  avatar  align-center justify-center text-center
-           ${onlineUser.includes(selectedUser._id)  ? "bg-base-300 ring-1 ring-base-300" : ""}
+           ${
+             onlineUser.includes(selectedUser._id)
+               ? "bg-base-300 ring-1 ring-base-300"
+               : ""
+           }
           `}>
           {selectedUser.profile_url ? (
             <img
@@ -60,9 +76,15 @@ export default function ChatContainer() {
             <FontAwesomeIcon icon={faPhone} onClick={() => setModal("audio")} />
           </div>
         </div>
+        {context && <ContextMenu x={contextPos.x} y={contextPos.y} />}
       </div>
       <Message />
-      <InputArea />
+      <InputArea
+        onContextMenu={(e) => {
+          e.preventDefault();
+          setContext(true);
+        }}
+      />
     </div>
   );
 }

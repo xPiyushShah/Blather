@@ -1,30 +1,19 @@
 import React, { useState, useEffect } from "react";
 import "../../assets/Css/profile.css";
+import { functionStore } from "../../store/functionStore";
+import { authStore } from "../../store/authStore";
+import { useChatStore } from "../../store/useChatStore";
 
-export default function Profile({ data }) {
-  const [formData, setFormData] = useState({
-    username: "Piyush Shah",
-    userid: "USR-2455",
-    dob: "",
-    profile: null,
-  });
+export default function Profile() {
+  const { usrID } = functionStore();
+  const { selectedUser } = useChatStore();
+  const { authUser } = authStore();
+  const [formData, setFormData] = useState([]);
+  useEffect(() => {
+    setFormData(usrID ?? authUser);
+  }, []);
 
   const [preview, setPreview] = useState(null);
-
-  // Load initial data from props
-  useEffect(() => {
-    if (data) {
-      setFormData({
-        username: data.username || "Piyush Shah",
-        userid: data.userid || "USR-2455",
-        dob: data.dob || "15-08-2025",
-        profile: null, // File cannot be prefilled, only image preview
-      });
-      if (data.profile) {
-        setPreview(data.profile); // assuming data.profile is a URL
-      }
-    }
-  }, [data]);
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -69,7 +58,7 @@ export default function Profile({ data }) {
               minlength="3"
               maxlength="30"
               title="Only letters, numbers or dash"
-              value={formData.userid}
+              value={formData._id}
               onChange={handleChange}
             />
           </label>
@@ -78,6 +67,7 @@ export default function Profile({ data }) {
             <br />
             containing only letters, numbers or dash
           </p>
+          <div></div>
           <div className="avatar">
             <div className="w-32 h-32 rounded overflow-hidden border shadow">
               <img
@@ -97,7 +87,7 @@ export default function Profile({ data }) {
             name="username"
             className="input input-borderedw-80"
             placeholder="Enter username"
-            value={formData.username}
+            value={formData.first_name}
             onChange={handleChange}
             required
           />
@@ -118,14 +108,16 @@ export default function Profile({ data }) {
             </svg>
             <input type="email" placeholder="mail@site.com" />
           </label>
-          <div className="validator jkl-hint hidden">Enter valid email address</div>
+          <div className="validator jkl-hint hidden">
+            Enter valid email address
+          </div>
         </div>
         <div className="profile-header baseliner mt-6 date">
           <input
             type="date"
             name="dob"
             className="input input-borderedw-80"
-            value={formData.dob}
+            value={""}
             onChange={handleChange}
             required
           />
@@ -133,12 +125,12 @@ export default function Profile({ data }) {
             type="date"
             name="doj"
             className="input input-borderedw-80"
-            value={formData.doj}
+            value={""}
             onChange={handleChange}
             required
           />
         </div>
-        <div className="profile-header baseliner mt-6 file">
+        {/* <div className="profile-header baseliner mt-6 file">
           <input
             type="file"
             name="profile"
@@ -174,7 +166,7 @@ export default function Profile({ data }) {
             />
           </label>
           <p className="validator jkl-hint hidden">Must be 10 digits</p>
-        </div>
+        </div> */}
         <div className="col-span-1 md:col-span-2 flex justify-end mt-4">
           <button type="submit" className="btn btn-primary px-6">
             Submit

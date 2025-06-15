@@ -1,2 +1,12 @@
-# .gitattributes
+# Treat all files as text and normalize
 * text=auto eol=lf
+
+# Exclude binary files from normalization
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.pdf binary

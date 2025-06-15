@@ -1,21 +1,46 @@
 import User from "../Models/user.model.js";
 import Message from "../Models/message.model.js";
+import Friend from "../Models/Friend.model.js";
 import { io, getReceiverSocketId } from "../socket.js";
 
 export const getSideBarUsers = async (req, res) => {
-  console.log("req.user:", req.user);
   try {
     const userID = req.user._id;
 
-    const users = await User.find({ _id: { $ne: userID } }).select("-password");
+    const friends = await Friend.find({
+      $or: [{ userId: userID }, { friendId: userID }],
+    });
 
-    res.status(200).json(users);
+    const friendIds = friends
+      .filter((f) => f.status === "accepted")
+      .map((f) =>
+        f.userId.toString() === userID.toString() ? f.friendId : f.userId
+      );
+
+    const excludedIds = [userID, ...friendIds];
+
+    const users = await User.find({
+      _id: { $nin: excludedIds },
+    }).select("-password");
+
+    const pendingRequests = friends.filter(
+      (f) =>
+        f.status === "pending" && f.friendId.toString() === userID.toString()
+    );
+
+    const pendingUserIds = pendingRequests.map((f) => f.userId);
+    const waitUsers = await User.find({
+      _id: { $in: pendingUserIds },
+    }).select("-password");
+
+    res.status(200).json({ main_user: users, wait_user: waitUsers });
   } catch (error) {
     console.error("Error fetching users:", error.message);
-
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
+
 export const getMessages = async (req, res) => {
   try {
     const myId = req.user._id;
@@ -34,6 +59,7 @@ export const getMessages = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
 export const sendMessage = async (req, res) => {
   try {
     const senderId = req.user._id;

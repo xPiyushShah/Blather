@@ -76,15 +76,21 @@ export const authStore = create((set, get) => ({
 
   addfriend: async (id) => {
     try {
-
       const res = await axiosInstance.post(`/auth/addfriend/${id}`);
-      toast.success("Friend added successfully");
-
+      toast.success(res.message);
     } catch (error) {
-
       toast.error("Failed to add friend");
       console.error("Error adding friend:", error.message);
-      
+    }
+  },
+  
+  acceptfriend: async (id) => {
+    try {
+      const res = await axiosInstance.post(`/auth/accept_reqst/${id}`);
+      toast.success(res.message);
+    } catch (error) {
+      toast.error("Failed to add friend");
+      console.error("Error adding friend:", error.message);
     }
   },
 

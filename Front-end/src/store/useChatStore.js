@@ -6,20 +6,37 @@ import { authStore } from "./authStore.js";
 export const useChatStore = create((set, get) => ({
   messages: [],
   users: [],
+  pend_users: [],
   selectedUser: null,
   isUserLoading: false,
   isMessageLoading: false,
+  friendList: [],
+  isFriendLoading: false,
   count: 0,
 
   getUsers: async () => {
+    // this is for load frnd rqst and send rqst - gloabl user
     set({ isUserLoading: true });
     try {
-      const response = await axiosInstance.get("/messages/users");
-      set({ users: response.data });
+      const res = await axiosInstance.post("/messages/users");
+      set({ users: res.data.main_user });
+      set({ pend_users: res.data.wait_user });
     } catch (error) {
       toast.error("Failed to fetch user");
     } finally {
       set({ isUserLoading: false });
+    }
+  },
+
+  getfriend: async () => {
+    set({ isFriendLoading: true });
+    try {
+      const response = await axiosInstance.get("/auth/friendlist");
+      set({ friendList: response.data });
+    } catch (error) {
+      toast.error("Failed to fetch user");
+    } finally {
+      set({ isFriendLoading: false });
     }
   },
 
@@ -49,6 +66,20 @@ export const useChatStore = create((set, get) => ({
     }
   },
 
+  deleteMessage: async (messageId) => {
+    const { selectedUser, messages } = get();
+    try {
+      await fetch(`/messages/${messageId}`, {
+        method: "DELETE",
+      });
+      set((state) => ({
+        messages: state.messages.filter((msg) => msg._id !== messageId),
+      }));
+    } catch (error) {
+      console.error("Failed to delete message:", error);
+    }
+  },
+
   setSelctedUser: (selectedUser) => {
     set({ selectedUser });
     // getMessages(selectedUser._id);
@@ -71,4 +102,6 @@ export const useChatStore = create((set, get) => ({
   subScribeToUser: (userId) => {
     set({ selectedUser: userId });
   },
+
+  setUserLoading: (value) => set({ isUserLoading: value }),
 }));

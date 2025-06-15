@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEnvelope } from "@fortawesome/free-solid-svg-icons";
+import { faEnvelope, faStar } from "@fortawesome/free-solid-svg-icons";
 
 import { useChatStore } from "../../store/useChatStore.js";
 import { authStore } from "../../store/authStore.js";
+import { functionStore } from "../../store/functionStore.js";
 
 const formatTimeAgo = (timestamp) => {
   const now = new Date();
@@ -28,7 +29,10 @@ export default function Message() {
     getMessages,
     unSubscribeMessages,
     subScribeMessages,
+    deleteMessage,
   } = useChatStore();
+  const { starMessage, starredMessages , saveStarMessae } = functionStore();
+
   const { authUser } = authStore();
 
   const bottomRef = useRef(null);
@@ -50,11 +54,11 @@ export default function Message() {
   }, []);
 
   const [messageOption, setMessageOption] = useState(null);
-  const [messagedata, setMessagedata] = useState(null);
+
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (!e.target.closest(".message-options")) {
-        setMessageOption(null); // Hide the menu if click is outside
+        setMessageOption(null);
       }
     };
 
@@ -62,10 +66,39 @@ export default function Message() {
     return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
+  const handleStarMessage = (messageId) => {
+    const message = messages.find((msg) => msg._id === messageId);
+    if (!message) return;
+
+    const isStarred = starredMessageIds.has(messageId);
+
+    if (isStarred) {
+      functionStore.setState((state) => ({
+        starredMessages: state.starredMessages.filter(
+          (m) => m._id !== messageId
+        ),
+      }));
+    } else {
+      functionStore.setState((state) => ({
+        starredMessages: [...state.starredMessages, message],
+      }));
+    }
+
+    setMessageOption(null);
+    saveStarMessae(message);    
+  };
+
+  const handleDeleteMessage = (messageId) => {
+    deleteMessage(messageId);
+    setMessageOption(null);
+  };
+
   const isNearBottom = (index) => {
     const threshold = 2;
     return messages.length - index <= threshold;
   };
+
+  const starredMessageIds = new Set(starredMessages.map((msg) => msg._id));
 
   if (!messages || messages.length === 0) {
     return (
@@ -95,29 +128,23 @@ export default function Message() {
                 e.preventDefault();
                 setMessageOption((prev) => (prev === msg._id ? null : msg._id));
               }}>
-              {/* <div className="chat-image avatar">
-                <div className="w-8 rounded-full border">
-                  <img
-                    src={
-                      isSender
-                        ? authUser.profile_url ||
-                          "https://img.daisyui.com/images/profile/demo/superperson@192.webp"
-                        : selectedUser.profile_url ||
-                          "https://img.daisyui.com/images/profile/demo/superperson@192.webp"
-                    }
-                    alt="profile pic"
-                  />
-                </div>
-              </div> */}
-              <div className="chat-footer mb-18">
+              <div className="chat-footer mb-18 flex items-center gap-1">
                 <time dateTime="" className="text-xs opacity-50 ml-1">
                   {isSender
                     ? `Sent ${formatTimeAgo(msg.createdAt)}`
                     : `Received ${formatTimeAgo(msg.createdAt)}`}
                 </time>
+
+                {starredMessageIds.has(msg._id) && (
+                  <FontAwesomeIcon
+                    icon={faStar}
+                    className="text-yellow-400 text-xs ml-1"
+                    title="Starred message"
+                  />
+                )}
               </div>
               <div
-                className={`chat-bubble bg-base-300 text-white max-w-xs flex flex-col gap-2 p-4 relative `}>
+                className={`chat-bubble bg-base-300 text-white max-w-xs flex flex-col gap-2 p-4 relative`}>
                 {msg.image && (
                   <div className="chat-image">
                     <img
@@ -133,16 +160,18 @@ export default function Message() {
                   <div
                     className={`absolute ${
                       isNearBottom(index) ? "bottom-full mb-2" : "top-full mt-2"
-                    } 
-                    ${
-                      !isSender ? "absolute left-12" : "absolute right-12"
-                    } not-only-of-type:right-0 bg-base-100 text-white border-0 shadow-md w-22 h-22 rounded z-50 text-sm message-options`}>
-                    {" "}
+                    } ${
+                      !isSender ? "left-12" : "right-12"
+                    } bg-base-100 text-white border-0 shadow-md w-22 h-22 rounded z-50 text-sm message-options`}>
                     <ul className="flex flex-col justify-evenly w-full h-full gap-1">
-                      <li className="hover:bg-base-content px-4 py-2 cursor-pointer">
-                        Star
+                      <li
+                        className="hover:bg-base-content hover:text-black px-4 py-2 cursor-pointer"
+                        onClick={() => handleStarMessage(msg._id)}>
+                        {starredMessageIds.has(msg._id) ? "Unstar" : "Star"}
                       </li>
-                      <li className="hover:bg-red-100 px-4 py-2 cursor-pointer text-red-500">
+                      <li
+                        className="hover:bg-red-100 px-4 py-2 cursor-pointer text-red-500"
+                        onClick={() => handleDeleteMessage(msg._id)}>
                         Delete
                       </li>
                     </ul>

@@ -1,8 +1,8 @@
 import bcrypt from "bcryptjs";
-import User from "../Models/user.model.js"; // Correctly imported model
-import Friend from "../Models/friend.model.js"; // Correctly imported model
-import { gToken } from "../libs/utils.js"; // Your custom token utility
-import cloudinary from "../libs/cloudinary.js"; // Your custom cloudinary utility
+import User from "../Models/user.model.js";
+import Friend from "../Models/Friend.model.js";
+import { gToken } from "../libs/utils.js";
+import cloudinary from "../libs/cloudinary.js";
 
 export const signup = async (req, res) => {
   const { first_name, last_name, email, password, profile_url } = req.body;
@@ -138,8 +138,84 @@ export const addFriend = async (req, res) => {
   const userID = req.user._id;
   const friendID = req.params.id;
   try {
+    if (userID.toString() === friendID.toString()) {
+      return res
+        .status(400)
+        .json({ message: "You cannot add yourself as a friend." });
+    }
+    const existingFriend = await Friend.findOne({
+      $or: [
+        { userId: userID, friendId: friendID },
+        { userId: friendID, friendId: userID },
+      ],
+    });
+
+    if (existingFriend) {
+      return res.status(409).json({ message: "Friendship already exists." });
+    }
+
+    const newFriend = new Friend({
+      userId: userID,
+      friendId: friendID,
+      createdBy: userID,
+      status: "pending",
+    });
+
+    await newFriend.save();
+
+    res.status(201).json({ message: "Friend added successfully." });
   } catch (err) {
     console.error("Error to Integrate with data:", err.message);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const friendlist = async (req, res) => {
+  try {
+    const myId = req.user._id;
+
+    const friends = await Friend.find({
+      $and: [
+        {
+          $or: [{ userId: myId }, { friendId: myId }],
+        },
+        { status: "accepted" },
+      ],
+    });
+
+    const friendIds = friends.map((f) =>
+      f.userId.toString() === myId.toString() ? f.friendId : f.userId
+    );
+
+    const friendDetails = await User.find({ _id: { $in: friendIds } });
+
+    res.status(200).json(friendDetails);
+  } catch (error) {
+    console.error("Error fetching friend list:", error.message);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const acceptRequest = async (req, res) => {
+  try {
+    const myId = req.user._id;
+    const { rqstID } = req.body;
+
+    const updatedRequest = await Friend.findOneAndUpdate(
+      { userId: rqstID, friendId: myId, status: "pending" },
+      { status: "accepted" },
+      { new: true }
+    );
+
+    if (!updatedRequest) {
+      return res
+        .status(404)
+        .json({ message: "Friend request not found or already accepted." });
+    }
+
+    res.status(200).json({ message: "Friend request accepted." });
+  } catch (error) {
+    console.error("Error accepting friend request:", error.message);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };

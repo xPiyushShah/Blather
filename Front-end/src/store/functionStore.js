@@ -1,37 +1,19 @@
 import { create } from "zustand";
+import { useChatStore } from "./useChatStore";
+import toast from "react-hot-toast";
 
-export const functionStore = create((set) => ({
+export const functionStore = create((set, get) => ({
   isNotify: false,
   isProfile: false,
   isStar: false,
   isSetting: false,
   isRoom: false,
   isFriend: false,
+  isUsrProfile: false,
 
-  // setStar: (isStar) =>
-  //   set({
-  //     isStar,
-  //     isNotify: false,
-  //     isProfile: false,
-  //     isSetting: false,
-  //     isRoom: false,
-  //   }),
-  // setSetting: (isSetting) =>
-  //   set({
-  //     isSetting,
-  //     isNotify: false,
-  //     isProfile: false,
-  //     isStar: false,
-  //     isRoom: false,
-  //   }),
-  // setRoom: (isRoom) =>
-  //   set({
-  //     isRoom,
-  //     isNotify: false,
-  //     isProfile: false,
-  //     isStar: false,
-  //     isSetting: false,
-  //   }),
+  usrID: null,
+  starredMessages: [],
+
   setNotify: () =>
     set((state) => ({
       isNotify: !state.isNotify,
@@ -40,14 +22,23 @@ export const functionStore = create((set) => ({
       isSetting: false,
       isRoom: false,
       isNotify: false,
+      isFriend: false,
     })),
+
+  setUsrId: (usrID) => {
+    set({ usrID: usrID });
+    get().setProfile();
+  },
+
   setProfile: () =>
     set((state) => ({
       isProfile: !state.isProfile,
+      isUsrProfile: false,
       isStar: false,
       isSetting: false,
       isRoom: false,
       isNotify: false,
+      isFriend: false,
     })),
   setStar: () =>
     set((state) => ({
@@ -56,6 +47,8 @@ export const functionStore = create((set) => ({
       isSetting: false,
       isRoom: false,
       isNotify: false,
+      isFriend: false,
+      usrID: null,
     })),
   setSetting: () =>
     set((state) => ({
@@ -64,6 +57,8 @@ export const functionStore = create((set) => ({
       isStar: false,
       isRoom: false,
       isNotify: false,
+      isFriend: false,
+      usrID: null,
     })),
   setRoom: () =>
     set((state) => ({
@@ -71,14 +66,38 @@ export const functionStore = create((set) => ({
       isProfile: false,
       isStar: false,
       isSetting: false,
+      isFriend: false,
       isNotify: false,
+      usrID: null,
     })),
-  setFriend: () =>
+  setFriend: () => {
+    const { setUserLoading } = useChatStore.getState();
+    setUserLoading(false);
     set((state) => ({
       isFriend: !state.isFriend,
       isProfile: false,
       isStar: false,
       isSetting: false,
       isNotify: false,
-    })),
+      usrID: null,
+    }));
+  },
+
+  saveStarMessae: async (messageData) => {
+    // try {
+    //   const res = await axiosInstance.post(
+    //     `/messages/star_message`,
+    //     messageData
+    //   );
+    // } catch (error) {
+    //   toast.error("Failed to save message");
+    // }
+  },
+
+  starMessage: (message) => {
+    set((state) => ({
+      starredMessages: [...state.starredMessages, message],
+    }));
+    get().saveStarMessae(message);
+  },
 }));
