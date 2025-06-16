@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 export const gToken = (userId, res) => {
-  const token = jwt.sign({ userId }, process.env.JWT_PVTKEY, {
+  const token = jwt.sign({ userId }, "MYSHARKTANK", {
     expiresIn: "7d",
   });
   res.cookie("auth_token", token, {
