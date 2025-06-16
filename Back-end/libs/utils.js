@@ -6,8 +6,8 @@ export const gToken = (userId, res) => {
   res.cookie("auth_token", token, {
     maxAge: 7 * 24 * 60 * 60 * 1000,
     httpOnly: true,
-    sameSite: "strict",
+    sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
     secure: process.env.NODE_ENV === "production",
   });
-  consol.log("token for user:", userId, "is generated successfully", token);
+  console.log("token for user:", userId, "is generated successfully", token);
 };
