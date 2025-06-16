@@ -9,4 +9,5 @@ export const gToken = (userId, res) => {
     sameSite: "strict",
     secure: process.env.NODE_ENV === "production",
   });
+  consol.log("token for user:", userId, "is generated successfully", token);
 };
