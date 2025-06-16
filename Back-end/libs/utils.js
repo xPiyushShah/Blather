@@ -5,7 +5,7 @@ export const gToken = (userId, res) => {
   });
   res.cookie("auth_token", token, {
     maxAge: 7 * 24 * 60 * 60 * 1000,
-    httpOnly: true,
+    httpOnly: false,
     sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
     secure: process.env.NODE_ENV === "production",
   });
