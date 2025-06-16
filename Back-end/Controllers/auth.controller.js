@@ -61,18 +61,18 @@ export const login = async (req, res) => {
 
     // Compare password
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch)
-      return res.status(400).json({ message: "Invalid email or password" });
+    if (!isMatch) return res.status(400).json({ message: "Invalid email or password" });
 
     // Generate token
     gToken(user._id, res);
 
-    res.status(200).json({
-      _id: user._id,
-      first_name: user.first_name,
-      last_name: user.last_name,
-      email: user.email,
-    });
+    res.status(200).json({ message: "You are logged In..!" });
+    // res.status(200).json({
+    //   _id: user._id,
+    //   first_name: user.first_name,
+    //   last_name: user.last_name,
+    //   email: user.email,
+    // });
   } catch (err) {
     console.error("Login Error:", err.message);
     res.status(500).json({ message: "Server error" });
