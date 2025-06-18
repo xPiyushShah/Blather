@@ -75,7 +75,7 @@ export const login = async (req, res) => {
     //   email: user.email,
     // });
   } catch (err) {
-    console.error("Login Error:", err.message);
+    // console.error("Login Error:", err.message);
     res.status(500).json({ message: "Server error" });
   }
 };

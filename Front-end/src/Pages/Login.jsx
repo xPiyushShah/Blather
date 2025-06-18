@@ -44,9 +44,9 @@ const Login = () => {
     if (!validateForm()) return;
 
     const res = await logIn(formData);
-    window.location.href = "/";
     // navigate("/");
     if (res) {
+      window.location.href = "/";
     }
 
     setFormData({
