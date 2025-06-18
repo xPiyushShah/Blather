@@ -66,11 +66,8 @@ export const login = async (req, res) => {
     // Generate token
     gToken(user._id, res);
 
-<<<<<<< HEAD
     res.status(200).json({ message: "You are logged in..!" });
-=======
-    res.status(200).json({ message: "You are logged In..!" });
->>>>>>> 978b61b564376cc5e8ff075dcc93680a89f70576
+
     // res.status(200).json({
     //   _id: user._id,
     //   first_name: user.first_name,
