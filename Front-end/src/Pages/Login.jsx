@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import "../assets/Css/Home.css";
 import "../assets/Css/profile.css";
 import { authStore } from "../store/authStore";
-import Footer from "../utils/footer";
+import Footer from "../utils/Footer";
 
 const Login = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });

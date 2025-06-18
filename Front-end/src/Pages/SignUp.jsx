@@ -4,7 +4,7 @@ import "../assets/Css/Home.css";
 import "../assets/Css/profile.css";
 import { authStore } from "../store/authStore";
 import toast from "react-hot-toast";
-import Footer from "../utils/footer";
+import Footer from "../utils/Footer";
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
