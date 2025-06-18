@@ -9,41 +9,40 @@ import "../../assets/Css/profile.css";
 import { functionStore } from "../../store/functionStore";
 import { authStore } from "../../store/authStore";
 import { useChatStore } from "../../store/useChatStore";
-import ImageModal from "./ImageModal";
 import Webcam from "react-webcam";
 
 export default function Profile() {
   const { usrID } = functionStore();
   const { selectedUser } = useChatStore();
   const { authUser, updateProfile, updateImage } = authStore();
-  const [formData, setFormData] = useState([]);
+
+  const [formData, setFormData] = useState({});
   const [chng, setChng] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
-  const webcamRef = useRef(null);
-  useEffect(() => {
-    setFormData(usrID ?? authUser);
-  }, []);
-
   const [preview, setPreview] = useState(null);
+  const webcamRef = useRef(null);
 
-  const handleChange = async (e) => {
+  useEffect(() => {
+    if (authUser) {
+      setFormData({ ...authUser });
+    }
+  }, [authUser]);
+
+  const handleChange = (e) => {
     const { name, value, files } = e.target;
+
     if (name === "profile") {
       const file = files[0];
-      setFormData({ ...formData, profile_url: file });
+      setFormData((prev) => ({ ...prev, profile_url: file }));
       setPreview(URL.createObjectURL(file));
-      await uploadServer();
+      uploadServer(file);
     } else {
-      setFormData({ ...formData, [name]: value });
-      handleSubmit(e);
+      setFormData((prev) => ({ ...prev, [name]: value }));
     }
-    setChng(false);
   };
 
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // console.log("Submitted Data:", formData);
-    // alert("Form submitted!");
     await updateProfile(formData);
   };
 
@@ -53,22 +52,22 @@ export default function Profile() {
       .then((res) => res.blob())
       .then((blob) => {
         const file = new File([blob], "captured.png", { type: "image/png" });
-        setFormData({ ...formData, profile_url: file });
+        setFormData((prev) => ({ ...prev, profile_url: file }));
         setPreview(imageSrc);
         setShowCamera(false);
         setChng(false);
-        uploadServer();
+        uploadServer(file);
       });
   };
 
-  const uploadServer = async () => {
-    if (!formData.profile_url) {
+  const uploadServer = async (file) => {
+    if (!file) {
       console.error("No image selected for upload");
       return;
     }
 
     const data = new FormData();
-    data.append("image", formData.profile_url);
+    data.append("image", file);
 
     try {
       await updateImage(data);
@@ -84,11 +83,17 @@ export default function Profile() {
           <div className="avatar">
             <div
               className="w-32 h-32 rounded overflow-hidden border shadow relative group"
-              onClick={() => setChng(!chng)}>
+              onClick={() => setChng(!chng)}
+            >
               <img
-                src={preview || formData.profile_url}
+                src={
+                  preview ||
+                  (formData.profile_url instanceof File
+                    ? URL.createObjectURL(formData.profile_url)
+                    : formData.profile_url)
+                }
                 alt="Profile Preview"
-                className="object-coverw-80 h-full"
+                className="object-cover w-32 h-32"
               />
               <div className="absolute bottom-2 left-2 z-50 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
                 <FontAwesomeIcon
@@ -100,10 +105,10 @@ export default function Profile() {
           </div>
           {chng && (
             <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-              {/* Close button */}
               <button
                 className="absolute top-2 right-2 btn btn-sm btn-circle"
-                onClick={() => setChng(false)}>
+                onClick={() => setChng(false)}
+              >
                 ✕
               </button>
               <div className="flex flex-col items-center p-6 rounded-lg shadow-lg relative">
@@ -111,7 +116,8 @@ export default function Profile() {
                   <button
                     type="button"
                     onClick={() => setShowCamera(!showCamera)}
-                    className="btn">
+                    className="btn"
+                  >
                     <FontAwesomeIcon icon={faCamera} />
                   </button>
 
@@ -138,7 +144,8 @@ export default function Profile() {
                     <button
                       type="button"
                       onClick={handleCapture}
-                      className="btn mt-2">
+                      className="btn mt-2"
+                    >
                       Capture
                     </button>
                   </div>
@@ -153,7 +160,7 @@ export default function Profile() {
             type="text"
             name="first_name"
             placeholder="First Name"
-            value={formData.first_name}
+            value={formData.first_name || ""}
             onChange={handleChange}
             className="input input-bordered"
             required
@@ -162,7 +169,7 @@ export default function Profile() {
             type="text"
             name="last_name"
             placeholder="Last Name"
-            value={formData.last_name}
+            value={formData.last_name || ""}
             onChange={handleChange}
             className="input input-bordered"
             required
@@ -171,7 +178,7 @@ export default function Profile() {
             type="email"
             name="email"
             placeholder="Email"
-            value={formData.email}
+            value={formData.email || ""}
             onChange={handleChange}
             className="input input-bordered"
             required
@@ -179,7 +186,7 @@ export default function Profile() {
           <input
             type="date"
             name="dob"
-            value={formData.dob}
+            value={formData.dob || ""}
             onChange={handleChange}
             className="input input-bordered"
             required
