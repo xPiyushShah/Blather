@@ -7,6 +7,7 @@ import { authStore } from "../../store/authStore.js";
 import { functionStore } from "../../store/functionStore.js";
 import ImagePreview from "./extra/ImagePreview.jsx";
 
+
 const formatTimeAgo = (timestamp) => {
   const now = new Date();
   const sent = new Date(timestamp);
