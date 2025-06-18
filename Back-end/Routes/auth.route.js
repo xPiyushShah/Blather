@@ -20,7 +20,7 @@ router.post("/login", login);
 
 router.post("/register", signup);
 
-router.get("/logout", logout);
+router.get("/logout", protectAuth, logout);
 
 router.get("/cookie", cookie);
 

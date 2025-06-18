@@ -45,6 +45,8 @@ export const signup = async (req, res) => {
     // Generate token
     const token = gToken(newUser._id, res);
 
+    await User.findByIdAndUpdate(newUser._id, { token: token }, { new: true });
+
     res.status(201).json({ message: "User created successfully", token });
   } catch (err) {
     // console.error("Error to Integrate with data:", err.message);
@@ -52,6 +54,7 @@ export const signup = async (req, res) => {
   }
 };
 export const login = async (req, res) => {
+  
   const { email, password } = req.body;
 
   try {
@@ -63,6 +66,8 @@ export const login = async (req, res) => {
       return res.status(400).json({ message: "Invalid email or password" });
 
     const token = gToken(user._id, res);
+
+    await User.findByIdAndUpdate(user._id, { token: token }, { new: true });
 
     res.status(200).json({ message: "You are logged in..!", token });
 
@@ -77,11 +82,15 @@ export const login = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
-export const logout = (req, res) => {
-  res.cookie("auth_token", "", {
-    httpOnly: true,
-    expires: new Date(0),
-  });
+export const logout = async (req, res) => {
+
+  const userID = req.user._id;
+  await User.findByIdAndUpdate(userID, { token: null }, { new: true });
+
+  // res.cookie("auth_token", "", {
+  //   httpOnly: true,
+  //   expires: new Date(0),
+  // });
   res.status(200).json({ message: "Logged out successfully" });
 };
 export const updateImage = async (req, res) => {

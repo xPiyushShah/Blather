@@ -10,6 +10,8 @@ const userSchema = new mongoose.Schema(
     dob: { type: Date },
     doj: { type: Date, default: Date.now },
     user_id: { type: String, unique: true },
+    last_login: { type: String },
+    token: { type: String, unique: true },
   },
   { timestamps: true }
 );
