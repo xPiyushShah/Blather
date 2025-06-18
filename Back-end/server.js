@@ -40,8 +40,8 @@ app.get("/api/auth", (req, res) => {
 
 server.listen(PORT, () => {
 
-  console.log(`Server started on http://localhost:${PORT}`);
-  // console.log(`Server started on https://blather.onrender.com`);
+  // console.log(`Server started on http://localhost:${PORT}`);
+  console.log(`Server started on https://blather.onrender.com`);
   connectDB();
 
 });

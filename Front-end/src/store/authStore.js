@@ -51,12 +51,12 @@ export const authStore = create((set, get) => ({
     set({ isLogIn: true });
     try {
       const res = await axiosInstance.post("/auth/login", data);
-      toast.success(res.message);
+      toast.success("You are logged in");
       set({ authUser: res.data.user });
       get().connectSocket();
     } catch (error) {
       toast.error("Login failed: " + error.message);
-      console.error("Error logging in:", error.message);
+      // console.error("Error logging in:", error.message);
     } finally {
       set({ isLogIn: false });
     }
@@ -99,7 +99,7 @@ export const authStore = create((set, get) => ({
       toast.success("You have logged out");
     } catch (error) {
       toast.error("Logout failed: " + error.message);
-      console.error("Error logging out:", error.message);
+      // console.error("Error logging out:", error.message);
     }
   },
 
@@ -109,7 +109,7 @@ export const authStore = create((set, get) => ({
       toast.success(res.message);
     } catch (error) {
       toast.error("Failed to add friend");
-      console.error("Error adding friend:", error.message);
+      // console.error("Error adding friend:", error.message);
     }
   },
   
@@ -119,7 +119,7 @@ export const authStore = create((set, get) => ({
       toast.success(res.message);
     } catch (error) {
       toast.error("Failed to add friend");
-      console.error("Error adding friend:", error.message);
+      // console.error("Error adding friend:", error.message);
     }
   },
 

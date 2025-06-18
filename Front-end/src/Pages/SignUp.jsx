@@ -54,13 +54,14 @@ const SignUp = () => {
 
     const success = await signUp(formData);
     if (success) {
+      localStorage.setItem("auth_token", success.token);
       toast.success("User registered successfully");
       window.location.href = "/"
     } else {
       toast.error("Failed to register user");
     }
 
-    
+
     setFormData({
       first_name: "",
       last_name: "",
@@ -69,10 +70,10 @@ const SignUp = () => {
     });
   };
 
-  
+
   const handleLock = () => toast.error("Not available");
 
-  
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));

@@ -43,17 +43,11 @@ export const signup = async (req, res) => {
     await newUser.save();
 
     // Generate token
-    gToken(newUser._id, res);
+    const token = gToken(newUser._id, res);
 
-    // Send response
-    res.status(201).json({
-      _id: newUser._id,
-      first_name: newUser.first_name,
-      last_name: newUser.last_name,
-      email: newUser.email,
-    });
+    res.status(201).json({ message: "User created successfully", token });
   } catch (err) {
-    console.error("Error to Integrate with data:", err.message);
+    // console.error("Error to Integrate with data:", err.message);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
@@ -61,19 +55,16 @@ export const login = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    // Check if user exists
     const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ message: "User not found" });
 
-    // Compare password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch)
       return res.status(400).json({ message: "Invalid email or password" });
 
-    // Generate token
-    gToken(user._id, res);
+    const token = gToken(user._id, res);
 
-    res.status(200).json({ message: "You are logged in..!" });
+    res.status(200).json({ message: "You are logged in..!", token });
 
     // res.status(200).json({
     //   _id: user._id,
