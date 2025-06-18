@@ -23,7 +23,7 @@ export const authStore = create((set, get) => ({
     } catch (error) {
       // toast.error("Auth check failed: " + error.message);
       set({ authUser: null });
-      // console.error("Error checking authentication:", error.message);
+      console.error("Error checking authentication:", error.message);
     } finally {
       set({ isCheckingAuth: false });
     }
