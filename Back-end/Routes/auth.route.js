@@ -8,7 +8,8 @@ import {
   addFriend,
   friendlist,
   acceptRequest,
-  updateImage
+  updateImage,
+  cookie
 } from "../Controllers/auth.controller.js";
 import upload  from "../middleware/multer.middleware.js";
 import { protectAuth } from "../middleware/auth.middleware.js"; 
@@ -20,6 +21,8 @@ router.post("/login", login);
 router.post("/register", signup);
 
 router.get("/logout", logout);
+
+router.get("/cookie", cookie);
 
 router.put("/update-profile", protectAuth, updateProfile);
 

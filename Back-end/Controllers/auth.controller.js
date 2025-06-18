@@ -3,7 +3,13 @@ import Friend from "../Models/friends.model.js";
 import User from "../Models/user.model.js";
 import { gToken } from "../libs/utils.js";
 import cloudinary from "../libs/cloudinary.js";
-
+export const cookie = (req, res) => {
+  const token = req.cookies.auth_token;
+  if (!token) {
+    return res.status(401).json({ message: "Not authenticated" });
+  }
+  res.status(200).json({ message: "Authenticated" });
+};
 export const signup = async (req, res) => {
   const { first_name, last_name, email, password, profile_url } = req.body;
 
@@ -61,7 +67,8 @@ export const login = async (req, res) => {
 
     // Compare password
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ message: "Invalid email or password" });
+    if (!isMatch)
+      return res.status(400).json({ message: "Invalid email or password" });
 
     // Generate token
     gToken(user._id, res);
@@ -91,12 +98,11 @@ export const updateImage = async (req, res) => {
     const file = req.file;
     const userID = req.user._id;
     if (file) {
-
       const streamUpload = (buffer) => {
         return new Promise((resolve, reject) => {
           const stream = cloudinary.uploader.upload_stream(
             {
-              folder: "profile_pics", 
+              folder: "profile_pics",
             },
             (error, result) => {
               if (result) resolve(result);
