@@ -61,13 +61,16 @@ export const login = async (req, res) => {
 
     // Compare password
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch)
-      return res.status(400).json({ message: "Invalid email or password" });
+    if (!isMatch) return res.status(400).json({ message: "Invalid email or password" });
 
     // Generate token
     gToken(user._id, res);
 
+<<<<<<< HEAD
     res.status(200).json({ message: "You are logged in..!" });
+=======
+    res.status(200).json({ message: "You are logged In..!" });
+>>>>>>> 978b61b564376cc5e8ff075dcc93680a89f70576
     // res.status(200).json({
     //   _id: user._id,
     //   first_name: user.first_name,
