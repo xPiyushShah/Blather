@@ -16,7 +16,7 @@ const PORT = process.env.PORT;
 
 app.use(
   cors({
-    origin: "https://blather-psi.vercel.app",
+    origin: "https://blather-cyan.vercel.app",
     // origin: "http://localhost:5173",
     credentials: true,
   })
