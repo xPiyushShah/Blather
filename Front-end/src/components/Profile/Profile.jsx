@@ -1,172 +1,210 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faPenToSquare,
+  faCamera,
+  faImage,
+} from "@fortawesome/free-solid-svg-icons";
 import "../../assets/Css/profile.css";
 import { functionStore } from "../../store/functionStore";
 import { authStore } from "../../store/authStore";
 import { useChatStore } from "../../store/useChatStore";
+import ImageModal from "./ImageModal";
+import Webcam from "react-webcam";
 
 export default function Profile() {
   const { usrID } = functionStore();
   const { selectedUser } = useChatStore();
-  const { authUser } = authStore();
+  const { authUser, updateProfile, updateImage } = authStore();
   const [formData, setFormData] = useState([]);
+  const [chng, setChng] = useState(false);
+  const [showCamera, setShowCamera] = useState(false);
+  const webcamRef = useRef(null);
   useEffect(() => {
     setFormData(usrID ?? authUser);
   }, []);
 
   const [preview, setPreview] = useState(null);
 
-  const handleChange = (e) => {
+  const handleChange = async (e) => {
     const { name, value, files } = e.target;
     if (name === "profile") {
       const file = files[0];
-      setFormData({ ...formData, profile: file });
+      setFormData({ ...formData, profile_url: file });
       setPreview(URL.createObjectURL(file));
+      await uploadServer();
     } else {
       setFormData({ ...formData, [name]: value });
+      handleSubmit(e);
     }
+    setChng(false);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
-    console.log("Submitted Data:", formData);
-    alert("Form submitted!");
+    // console.log("Submitted Data:", formData);
+    // alert("Form submitted!");
+    await updateProfile(formData);
+  };
+
+  const handleCapture = async () => {
+    const imageSrc = webcamRef.current.getScreenshot();
+    fetch(imageSrc)
+      .then((res) => res.blob())
+      .then((blob) => {
+        const file = new File([blob], "captured.png", { type: "image/png" });
+        setFormData({ ...formData, profile_url: file });
+        setPreview(imageSrc);
+        setShowCamera(false);
+        setChng(false);
+        uploadServer();
+      });
+  };
+
+  const uploadServer = async () => {
+    if (!formData.profile_url) {
+      console.error("No image selected for upload");
+      return;
+    }
+
+    const data = new FormData();
+    data.append("image", formData.profile_url);
+
+    try {
+      await updateImage(data);
+    } catch (err) {
+      console.error("Upload error:", err);
+    }
   };
 
   return (
     <div className="w-full h-full  profile-cont ">
       <form onSubmit={handleSubmit} className="items-start">
-        <div className="profile-header baseliner ">
-          <label className="input validator jkl ">
-            <svg
-              className="h-[1em] opacity-50"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24">
-              <g
-                strokeLinejoin="round"
-                strokeLinecap="round"
-                strokeWidth="2.5"
-                fill="none"
-                stroke="currentColor">
-                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
-                <circle cx="12" cy="7" r="4"></circle>
-              </g>
-            </svg>
-            <input
-              type="text"
-              placeholder="Username"
-              pattern="[A-Za-z][A-Za-z0-9\-]*"
-              minlength="3"
-              maxlength="30"
-              title="Only letters, numbers or dash"
-              value={formData._id}
-              onChange={handleChange}
-            />
-          </label>
-          <p className="validator-hint hidden">
-            Must be 3 to 30 characters
-            <br />
-            containing only letters, numbers or dash
-          </p>
-          <div></div>
+        <div className="profile-header baseliner mb-12">
           <div className="avatar">
-            <div className="w-32 h-32 rounded overflow-hidden border shadow">
+            <div
+              className="w-32 h-32 rounded overflow-hidden border shadow relative group"
+              onClick={() => setChng(!chng)}>
               <img
-                src={
-                  preview ||
-                  "https://img.daisyui.com/images/profile/demo/superperson@192.webp"
-                }
+                src={preview || formData.profile_url}
                 alt="Profile Preview"
                 className="object-coverw-80 h-full"
               />
+              <div className="absolute bottom-2 left-2 z-50 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                <FontAwesomeIcon
+                  icon={faPenToSquare}
+                  className="text-white bg-black/40 p-2 rounded"
+                />
+              </div>
             </div>
           </div>
+          {chng && (
+            <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+              {/* Close button */}
+              <button
+                className="absolute top-2 right-2 btn btn-sm btn-circle"
+                onClick={() => setChng(false)}>
+                ✕
+              </button>
+              <div className="flex flex-col items-center p-6 rounded-lg shadow-lg relative">
+                <div className="flex gap-4">
+                  <button
+                    type="button"
+                    onClick={() => setShowCamera(!showCamera)}
+                    className="btn">
+                    <FontAwesomeIcon icon={faCamera} />
+                  </button>
+
+                  <label className="btn cursor-pointer">
+                    <FontAwesomeIcon icon={faImage} />
+                    <input
+                      type="file"
+                      name="profile"
+                      accept="image/*"
+                      onChange={handleChange}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+
+                {showCamera && (
+                  <div className="mt-4">
+                    <Webcam
+                      audio={false}
+                      ref={webcamRef}
+                      screenshotFormat="image/jpeg"
+                      className="rounded shadow w-64 h-48"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleCapture}
+                      className="btn mt-2">
+                      Capture
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
-        <div className="profile-header baseliner mt-6 username">
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-12">
           <input
             type="text"
-            name="username"
-            className="input input-borderedw-80"
-            placeholder="Enter username"
+            name="first_name"
+            placeholder="First Name"
             value={formData.first_name}
             onChange={handleChange}
+            className="input input-bordered"
             required
           />
-          <label className="input validator jkl">
-            <svg
-              className="h-[1em] opacity-50"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24">
-              <g
-                strokeLinejoin="round"
-                strokeLinecap="round"
-                strokeWidth="2.5"
-                fill="none"
-                stroke="currentColor">
-                <rect width="20" height="16" x="2" y="4" rx="2"></rect>
-                <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
-              </g>
-            </svg>
-            <input type="email" placeholder="mail@site.com" />
-          </label>
-          <div className="validator jkl-hint hidden">
-            Enter valid email address
-          </div>
-        </div>
-        <div className="profile-header baseliner mt-6 date">
+          <input
+            type="text"
+            name="last_name"
+            placeholder="Last Name"
+            value={formData.last_name}
+            onChange={handleChange}
+            className="input input-bordered"
+            required
+          />
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            value={formData.email}
+            onChange={handleChange}
+            className="input input-bordered"
+            required
+          />
           <input
             type="date"
             name="dob"
-            className="input input-borderedw-80"
-            value={""}
+            value={formData.dob}
             onChange={handleChange}
+            className="input input-bordered"
             required
           />
           <input
-            type="date"
+            type="text"
+            name="user_id"
+            value={authUser?._id || ""}
+            disabled
+            className="input input-bordered"
+            placeholder="User ID"
+          />
+          <input
+            type="text"
             name="doj"
-            className="input input-borderedw-80"
-            value={""}
-            onChange={handleChange}
-            required
+            value={
+              authUser?.createdAt
+                ? new Date(authUser.createdAt).toLocaleDateString()
+                : ""
+            }
+            disabled
+            className="input input-bordered"
+            placeholder="Date of Joining"
           />
         </div>
-        {/* <div className="profile-header baseliner mt-6 file">
-          <input
-            type="file"
-            name="profile"
-            accept="image/*"
-            onChange={handleChange}
-            className="file-input  input  file-input-borderedw-80"
-          />
-          <label className="input validator jkl">
-            <svg
-              className="h-[1em] opacity-50"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 16 16">
-              <g fill="none">
-                <path
-                  d="M7.25 11.5C6.83579 11.5 6.5 11.8358 6.5 12.25C6.5 12.6642 6.83579 13 7.25 13H8.75C9.16421 13 9.5 12.6642 9.5 12.25C9.5 11.8358 9.16421 11.5 8.75 11.5H7.25Z"
-                  fill="currentColor"></path>
-                <path
-                  fillRule="evenodd"
-                  clipRule="evenodd"
-                  d="M6 1C4.61929 1 3.5 2.11929 3.5 3.5V12.5C3.5 13.8807 4.61929 15 6 15H10C11.3807 15 12.5 13.8807 12.5 12.5V3.5C12.5 2.11929 11.3807 1 10 1H6ZM10 2.5H9.5V3C9.5 3.27614 9.27614 3.5 9 3.5H7C6.72386 3.5 6.5 3.27614 6.5 3V2.5H6C5.44771 2.5 5 2.94772 5 3.5V12.5C5 13.0523 5.44772 13.5 6 13.5H10C10.5523 13.5 11 13.0523 11 12.5V3.5C11 2.94772 10.5523 2.5 10 2.5Z"
-                  fill="currentColor"></path>
-              </g>
-            </svg>
-            <input
-              type="tel"
-              className="tabular-nums"
-              required
-              placeholder="Phone"
-              pattern="[0-9]*"
-              minlength="10"
-              maxlength="10"
-              title="Must be 10 digits"
-            />
-          </label>
-          <p className="validator jkl-hint hidden">Must be 10 digits</p>
-        </div> */}
         <div className="col-span-1 md:col-span-2 flex justify-end mt-4">
           <button type="submit" className="btn btn-primary px-6">
             Submit

@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import Peer from "simple-peer";
+import { axiosInstance } from "../libs/axios.js";
 import { authStore } from "./authStore.js";
+import { useChatStore } from "./useChatStore.js";
 
 const ICE_SERVERS = {
   iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
@@ -19,6 +21,8 @@ export const callStore = create((set, get) => ({
 
   peerConnection: null,
   callInProgress: false,
+  callLogId: null,
+  setCallLogId: (id) => set({ callLogId: id }),
 
   setModal: (isOpen) => set({ callModal: isOpen }),
   setTargetSocketId: (id) => set({ targetSocketId: id?._id || id }),
@@ -44,9 +48,10 @@ export const callStore = create((set, get) => ({
     }
   },
 
-  makeCall: () => {
+  makeCall: async () => {
     const { targetSocketId, callModal, localStream } = get();
     const socket = authStore.getState().socket;
+    const selectedUser = useChatStore.getState().selectedUser;
 
     if (!socket) {
       console.error("Cannot make call: missing socket.");
@@ -61,11 +66,16 @@ export const callStore = create((set, get) => ({
       initiator: true,
       trickle: false,
       stream: localStream,
-      // config: ICE_SERVERS,
+      config: ICE_SERVERS,
     });
 
-    peer.on("signal", (signal) => {
+    peer.on("signal", async (signal) => {
       socket.emit("call-user", { signal, to: targetSocketId, type: callModal });
+      const response = await axiosInstance.post(`/calling/initialize`, {
+        receiverId: selectedUser._id,
+        callType: callModal,
+      });
+      set({ callLogId: response.data.callLogId });
     });
 
     peer.on("stream", (remoteStream) => {
@@ -73,17 +83,23 @@ export const callStore = create((set, get) => ({
     });
 
     socket.off("call-accepted");
-    socket.on("call-accepted", (data) => {
-      // console.log("✅ Call accepted:", data);
+    socket.on("call-accepted", async (data) => {
       peer.signal(data.signal);
       set({ callEstablished: true });
+      await axiosInstance.post(`/calling/accepted`, {
+        callLogId: get().callLogId,
+      });
     });
 
     socket.off("busy");
-    socket.on("busy", (data) => {
+    socket.on("busy", async (data) => {
+      await axiosInstance.post(`/calling/status`, {
+        callLogId: get().callLogId,
+        status: "missed", // or "cancelled"
+      });
       console.log("�� User is busy:", data);
       get().endCall();
-    })
+    });
 
     set({ peer, callInProgress: true, localStream: localStream });
   },
@@ -104,7 +120,7 @@ export const callStore = create((set, get) => ({
       initiator: false,
       trickle: false,
       stream: localStream,
-      // config: ICE_SERVERS,
+      config: ICE_SERVERS,
     });
 
     peer.on("signal", (signal) => {
@@ -115,19 +131,21 @@ export const callStore = create((set, get) => ({
       set({ remoteStream, callEstablished: true });
     });
 
-
-
     peer.signal(incomingSignal);
 
     set({ peer, callInProgress: true, callEstablished: true });
   },
 
-  endCall: () => {
+  endCall: async () => {
     const { peer, localStream, incomingCall } = get();
     const socket = authStore.getState().socket;
 
     if (socket && incomingCall?.from) {
       socket.emit("reject-call", { to: incomingCall.from });
+    }
+    const { callLogId } = get();
+    if (callLogId) {
+      await axiosInstance.post(`/calling/end`, { callLogId });
     }
 
     if (peer) peer.destroy();

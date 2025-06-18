@@ -67,12 +67,13 @@ export const login = async (req, res) => {
     // Generate token
     gToken(user._id, res);
 
-    res.status(200).json({
-      _id: user._id,
-      first_name: user.first_name,
-      last_name: user.last_name,
-      email: user.email,
-    });
+    res.status(200).json({ message: "You are logged in..!" });
+    // res.status(200).json({
+    //   _id: user._id,
+    //   first_name: user.first_name,
+    //   last_name: user.last_name,
+    //   email: user.email,
+    // });
   } catch (err) {
     console.error("Login Error:", err.message);
     res.status(500).json({ message: "Server error" });
@@ -85,13 +86,48 @@ export const logout = (req, res) => {
   });
   res.status(200).json({ message: "Logged out successfully" });
 };
+export const updateImage = async (req, res) => {
+  try {
+    const file = req.file;
+    const userID = req.user._id;
+    if (file) {
+
+      const streamUpload = (buffer) => {
+        return new Promise((resolve, reject) => {
+          const stream = cloudinary.uploader.upload_stream(
+            {
+              folder: "profile_pics", 
+            },
+            (error, result) => {
+              if (result) resolve(result);
+              else reject(error);
+            }
+          );
+          stream.end(buffer);
+        });
+      };
+
+      const result = await streamUpload(file.buffer);
+
+      const user = await User.findByIdAndUpdate(
+        userID,
+        {
+          profile_url: result.secure_url,
+        },
+        { new: true }
+      );
+      res.status(200).json({ message: "Profile picture updated successfully" });
+    }
+  } catch (err) {
+    console.error("Error to Integrate with data:", err.message);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
 export const updateProfile = async (req, res) => {
   try {
-    const { first_name, last_name, email, password, profile_url } = req.body;
+    const { first_name, last_name, email } = req.body;
     const userID = req.user._id;
-    if (profile_url) {
-      const uploadResult = await cloudinary.uploader.upload(profile_url);
-    }
+
     if (userID) {
       const user = await User.findByIdAndUpdate(
         userID,
@@ -99,17 +135,10 @@ export const updateProfile = async (req, res) => {
           first_name,
           last_name,
           email,
-          password,
-          profile_url: uploadResult.secure_url,
         },
         { new: true }
       );
-      res.status(200).json({
-        _id: user._id,
-        first_name: user.first_name,
-        last_name: user.last_name,
-        email: user.email,
-      });
+      res.status(200).json({ message: "Profile updated successfully" });
     }
   } catch (err) {
     console.error("Error to Integrate with data:", err.message);

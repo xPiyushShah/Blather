@@ -200,7 +200,7 @@ function CallProfile() {
       )}
 
       {/* Remote stream (picture-in-picture style) */}
-      {remoteStream && callModal === "video" ? (
+      {(remoteStream && callModal === "video") && (
         <div className="flex w-64 h-36 border border-white rounded-lg absolute top-4 right-4 z-10 overflow-hidden">
           <video
             ref={remoteVideoRef}
@@ -209,13 +209,14 @@ function CallProfile() {
             className="w-full h-full object-cover rounded-lg"
           />
         </div>
-      ) : (
-        <div className="flex w-64 h-36 border border-white rounded-lg absolute top-4 right-4 z-10 overflow-hidden">
-          <p className="absolute top-4 left-4 z-10 bg-black bg-opacity-60 text-white px-4 py-2 rounded">
-            Calling...
-          </p>
-        </div>
       )}
+      {/* //  : (
+      //   <div className="flex w-64 h-36 border border-white rounded-lg absolute top-4 right-4 z-10 overflow-hidden">
+      //     <p className="absolute top-4 left-4 z-10 bg-black bg-opacity-60 text-white px-4 py-2 rounded">
+      //       Calling...
+      //     </p>
+      //   </div>
+      // )} */}
 
       {/* Controls */}
       <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-4 opacity-90 z-10">

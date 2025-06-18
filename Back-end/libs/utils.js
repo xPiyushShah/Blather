@@ -8,4 +8,5 @@ export const gToken = (userId, res) => {
     httpOnly: true,
     sameSite: "strict",
   });
+  console.log("token for user:", userId, "is generated successfully", token);
 };

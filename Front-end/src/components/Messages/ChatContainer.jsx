@@ -42,8 +42,8 @@ export default function ChatContainer() {
           className={`hidden md:flex mt-15 w-20 rounded-full hover:cursor-pointer  avatar  align-center justify-center text-center
            ${
              onlineUser.includes(selectedUser._id)
-               ? "bg-base-300 ring-1 ring-base-300"
-               : ""
+                  ? "avatar-online"
+                  : "avatar-offline"
            }
           `}>
           {selectedUser.profile_url ? (

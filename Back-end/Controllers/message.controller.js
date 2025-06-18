@@ -2,6 +2,9 @@ import User from "../Models/user.model.js";
 import Message from "../Models/message.model.js";
 import Friend from "../Models/friends.model.js";
 import { io, getReceiverSocketId } from "../socket.js";
+import cloudinary from "../libs/cloudinary.js";
+import streamifier from 'streamifier';
+
 
 export const getSideBarUsers = async (req, res) => {
   try {
@@ -40,7 +43,6 @@ export const getSideBarUsers = async (req, res) => {
   }
 };
 
-
 export const getMessages = async (req, res) => {
   try {
     const myId = req.user._id;
@@ -59,7 +61,6 @@ export const getMessages = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
-
 export const sendMessage = async (req, res) => {
   try {
     const senderId = req.user._id;
@@ -82,8 +83,62 @@ export const sendMessage = async (req, res) => {
     const receiverSocketId = getReceiverSocketId(receiverId);
     if (receiverSocketId) {
       io.to(receiverSocketId).emit("message", message);
-    } else {
-      console.log("Socket ID not found for receiver:", receiverId);
+    }
+
+    res.status(201).json(message);
+  } catch (error) {
+    console.error("Error to send message:", error.message);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+export const sendMedia = async (req, res) => {
+  try {
+    const senderId = req.user._id;
+    const receiverId = req.params.id;
+
+    const audioFile = req.files?.audio?.[0];
+    const videoFile = req.files?.video?.[0];
+
+    if (!audioFile && !videoFile) {
+      return res.status(400).json({ message: "No media provided" });
+    }
+
+    let audioUrl = "";
+    let videoUrl = "";
+
+    const uploadToCloudinary = (fileBuffer, resource_type) => {
+      return new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+          { resource_type },
+          (error, result) => {
+            if (error) return reject(error);
+            resolve(result.secure_url);
+          }
+        );
+        streamifier.createReadStream(fileBuffer).pipe(uploadStream);
+      });
+    };
+
+    if (audioFile) {
+      audioUrl = await uploadToCloudinary(audioFile.buffer, 'raw');
+    }
+
+    if (videoFile) {
+      videoUrl = await uploadToCloudinary(videoFile.buffer, 'video');
+    }
+
+    const message = new Message({
+      senderId,
+      receiverId,
+      audio: audioUrl,
+      video: videoUrl,
+    });
+
+    await message.save();
+
+    const receiverSocketId = getReceiverSocketId(receiverId);
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("message", message);
     }
 
     res.status(201).json(message);

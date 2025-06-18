@@ -4,6 +4,7 @@ import "../assets/Css/Home.css";
 import "../assets/Css/profile.css";
 import { authStore } from "../store/authStore";
 import toast from "react-hot-toast";
+import Footer from "../utils/footer";
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
@@ -46,7 +47,6 @@ const SignUp = () => {
     return true;
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -55,12 +55,12 @@ const SignUp = () => {
     const success = await signUp(formData);
     if (success) {
       toast.success("User registered successfully");
-      navigate("/");
+      window.location.href = "/"
     } else {
       toast.error("Failed to register user");
     }
 
-    // Reset form
+    
     setFormData({
       first_name: "",
       last_name: "",
@@ -69,10 +69,10 @@ const SignUp = () => {
     });
   };
 
-  // Placeholder for OAuth lock
+  
   const handleLock = () => toast.error("Not available");
 
-  // Handle input change
+  
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -80,8 +80,8 @@ const SignUp = () => {
 
   return (
     <div className="main-root">
-      <div className="root-start">
-        <div className="root-element flex">
+      <div className="w-full h-screen absolute text-white flex-row">
+        <div className="w-full h-full flex flex-col align-center bg-base-200">
           <div className="w-full h-full flex align-center justify-center bg-base-200">
             <section className="w-90 h-full">
               <form
@@ -191,6 +191,7 @@ const SignUp = () => {
               </form>
             </section>
           </div>
+          <Footer />
         </div>
       </div>
     </div>

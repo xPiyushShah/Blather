@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import "../assets/Css/Home.css";
 import "../assets/Css/profile.css";
 import { authStore } from "../store/authStore";
+import Footer from "../utils/footer";
 
 const Login = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -42,10 +43,10 @@ const Login = () => {
 
     if (!validateForm()) return;
 
-    const res = await logIn(formData); 
-    windows.location.href = "/";
+    const res = await logIn(formData);
+    window.location.href = "/";
+    // navigate("/");
     if (res) {
-      navigate("/");
     }
 
     setFormData({
@@ -57,7 +58,7 @@ const Login = () => {
   return (
     <div className="main-root">
       <div className="w-full h-screen absolute text-white flex-row">
-        <div className="w-full h-full flex flex-row align-center ">
+        <div className="w-full h-full flex flex-col align-center bg-base-100">
           <div className="w-full h-full flex align-center justify-center bg-base-100">
             <section>
               <form
@@ -180,6 +181,7 @@ const Login = () => {
               </form>
             </section>
           </div>
+          <Footer />
         </div>
       </div>
     </div>

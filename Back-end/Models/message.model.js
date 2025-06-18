@@ -19,6 +19,14 @@ const message = new mongoose.Schema({
     type: String,
     default: null,
   },
+  audio: {
+    type: String,
+    default: null,
+  },
+  video: {
+    type: String,
+    default: null,
+  },
   text: {
     type: String,
   },

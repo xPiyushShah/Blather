@@ -9,6 +9,7 @@ import Home from "./Pages/Home";
 import Login from "./Pages/Login";
 import Register from "./Pages/SignUp";
 import Room from "./Pages/Room";
+import Setting from "./Pages/Settings";
 import "./App.css";
 import { authStore } from "./store/authStore";
 import { Toaster } from "react-hot-toast";
@@ -31,7 +32,7 @@ function App() {
       </div>
     );
   }
-  // console.log("heyd", authUser);
+  // console.log("me", authUser._id);
 
   return (
     <>
@@ -51,13 +52,17 @@ function App() {
             element={!authUser ? <Register /> : <Navigate to="/" />}
           />
           <Route
+            path="/setting"
+            element={authUser ? <Setting /> : <Navigate to="/" />}
+          />
+          <Route
             path="/room/:id"
             element={authUser ? <Room /> : <Navigate to="/login" />}
           />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </Router>
-      <Toaster position="left-center" reverseOrder={true} />
+      <Toaster position="bottom-right" reverseOrder={true} />
     </>
   );
 }

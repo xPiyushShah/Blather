@@ -40,7 +40,7 @@ export default function Lister() {
             <div className="w-8 rounded-full">
               <img
                 alt="me"
-                src="https://img.daisyui.com/images/profile/demo/anakeen@192.webp"
+                src={authUser.profile_url || "https://img.daisyui.com/images/profile/demo/anakeen@192.webp"}
               />
             </div>
           </div>

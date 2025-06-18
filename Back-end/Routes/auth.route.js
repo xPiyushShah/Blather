@@ -8,8 +8,10 @@ import {
   addFriend,
   friendlist,
   acceptRequest,
+  updateImage
 } from "../Controllers/auth.controller.js";
-import { protectAuth } from "../middleware/auth.middleware.js"; // Your protected route
+import upload  from "../middleware/multer.middleware.js";
+import { protectAuth } from "../middleware/auth.middleware.js"; 
 
 const router = express.Router();
 
@@ -20,6 +22,8 @@ router.post("/register", signup);
 router.get("/logout", logout);
 
 router.put("/update-profile", protectAuth, updateProfile);
+
+router.put("/update-image", protectAuth, upload.single('image'), updateImage);
 
 router.get("/check-auth", protectAuth, checkUser);
 

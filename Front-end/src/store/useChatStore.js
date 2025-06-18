@@ -54,7 +54,9 @@ export const useChatStore = create((set, get) => ({
 
   sendMessage: async (messageData) => {
     const { selectedUser, messages } = get();
+
     try {
+      // console.log("Sending message to:", selectedUser);
       const res = await axiosInstance.post(
         `/messages/send-msg/${selectedUser._id}`,
         messageData
@@ -63,6 +65,24 @@ export const useChatStore = create((set, get) => ({
       toast.success("Message sent successfully");
     } catch (error) {
       toast.error("Failed to send message");
+    }
+  },
+
+  sendMedia: async (messageData) => {
+    const { selectedUser, messages } = get();
+    const formData = new FormData();
+    if (messageData.audio) formData.append("audio", messageData.audio);
+    if (messageData.video) formData.append("video", messageData.video);
+    try {
+      // console.log("Sending message to:", selectedUser);
+      const res = await axiosInstance.post(
+        `/messages/send-media/${selectedUser._id}`,
+        formData
+      );
+      set({ messages: [...messages, res.data] });
+      toast.success("Message sent successfully");
+    } catch (error) {
+      toast.error("Not Sent");
     }
   },
 

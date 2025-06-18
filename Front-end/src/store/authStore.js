@@ -21,9 +21,9 @@ export const authStore = create((set, get) => ({
       set({ authUser: res.data.user });
       get().connectSocket();
     } catch (error) {
-      toast.error("Auth check failed: " + error.message);
+      // toast.error("Auth check failed: " + error.message);
       set({ authUser: null });
-      console.error("Error checking authentication:", error.message);
+      // console.error("Error checking authentication:", error.message);
     } finally {
       set({ isCheckingAuth: false });
     }
@@ -59,6 +59,35 @@ export const authStore = create((set, get) => ({
       console.error("Error logging in:", error.message);
     } finally {
       set({ isLogIn: false });
+    }
+  },
+
+  updateProfile: async (data) => {
+    set({ isUpdatingProfile: true });
+    try {
+      const res = await axiosInstance.put("/auth/update-profile", data);
+      toast.success("Profile updated successfully");
+      set({ authUser: res.data.user });
+      
+      get().connectSocket();
+    } catch (error) {
+      toast.error("Profile update failed: " + error.message);
+      console.error("Error updating profile:", error.message);
+    } finally {
+      set({ isUpdatingProfile: false });
+    }
+  },
+
+  updateImage: async (data) => {
+    set({ isUpdatingProfile: true });
+    try {
+      const res = await axiosInstance.put("/auth/update-image", data);
+      toast.success("Image updated successfully");
+    } catch (error) {
+      toast.error("Image update failed: " + error.message);
+      console.error("Error updating image:", error.message);
+    } finally {
+      set({ isUpdatingProfile: false });
     }
   },
 
