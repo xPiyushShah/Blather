@@ -64,6 +64,70 @@ export const getSideBarUsers = async (req, res) => {
   try {
     const userID = req.user._id;
 
+    // Get all users (excluding current user)
+    const allUsers = await User.find({ _id: { $ne: userID } }).select("first_name last_name profile_url");
+
+    // Get all friend relationships for this user
+    const friends = await Friend.find({
+      $or: [{ userId: userID }, { friendId: userID }],
+    });
+
+    // Build a map of friend statuses by userId
+    const friendStatusMap = new Map();
+
+    for (const f of friends) {
+      const friendId =
+        f.userId.toString() === userID.toString()
+          ? f.friendId.toString()
+          : f.userId.toString();
+
+      // Prioritize accepted > pending
+      if (f.status === "accepted") {
+        friendStatusMap.set(friendId, "accepted");
+      } else if (!friendStatusMap.has(friendId)) {
+        friendStatusMap.set(friendId, "pending");
+      }
+    }
+
+    // Find pending requests sent TO current user (for pend_user)
+    const pendFriendUsers = friends
+      .filter(
+        (f) =>
+          f.status === "pending" && f.friendId.toString() === userID.toString()
+      )
+      .map((f) => f.userId.toString());
+
+    const pendUsers = await User.find({
+      _id: { $in: pendFriendUsers },
+    }).select("first_name last_name profile_url");
+
+    // main_user = all users + relationship status
+    const mainUsers = allUsers.map((user) => {
+      const userIdStr = user._id.toString();
+      const status = friendStatusMap.get(userIdStr) || "none";
+      return {
+        _id: user._id,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        profile_url: user.profile_url,
+        status,
+      };
+    });
+
+    res.status(200).json({
+      main_user: mainUsers,
+      pend_user: pendUsers,
+    });
+  } catch (error) {
+    console.error("Error fetching sidebar users:", error.message);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const getSideBarUserss = async (req, res) => {
+  try {
+    const userID = req.user._id;
+
     const friends = await Friend.find({
       $or: [{ userId: userID }, { friendId: userID }],
     });
