@@ -84,7 +84,7 @@ export const login = async (req, res) => {
 };
 export const logout = async (req, res) => {
   const userID = req.user._id;
-  await User.findByIdAndUpdate(userID, { token: null }, { new: true });
+  await User.findByIdAndUpdate(userID, { token: "" }, { new: true });
 
   // res.cookie("auth_token", "", {
   //   httpOnly: true,

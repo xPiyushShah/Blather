@@ -9,9 +9,9 @@ const userSchema = new mongoose.Schema(
     profile_url: { type: String },
     dob: { type: Date },
     doj: { type: Date, default: Date.now },
-    user_id: { type: String, unique: true },
+    user_id: { type: String },
     last_login: { type: String },
-    token: { type: String, unique: true },
+    token: { type: String },
   },
   { timestamps: true }
 );
