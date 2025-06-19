@@ -14,7 +14,7 @@ const LeftBox = () => {
   const { isProfile , isRoom , usrID} = functionStore();
 
   return (
-    <div className="flex flex-col max-h-screen w-4/5  bg-[rgba(0,0,0,0.6)]  border-r-[1px] border-r-[#dddddd35]">
+    <div className="flex flex-col max-h-full w-4/5  bg-[rgba(0,0,0,0.6)]  border-r-[1px] border-r-[#dddddd35]">
       {!isProfile  && (
         <>
           {!selectedUser ? <BlankMessage /> : <ChatContainer />}
