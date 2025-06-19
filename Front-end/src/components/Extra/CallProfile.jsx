@@ -27,11 +27,11 @@ function CallProfile() {
     incomingCall,
     getModal,
     peer,
-    setGetModal
+    setGetModal,
   } = callStore();
 
   const { selectedUser } = useChatStore();
-  const { socket } = authStore();
+  const { socket, authUser } = authStore();
 
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
@@ -41,6 +41,42 @@ function CallProfile() {
   const [isMicOn, setIsMicOn] = useState(true);
   const [isSpeakerOn, setIsSpeakerOn] = useState(true);
 
+  // For dragging the local video
+  const [position, setPosition] = useState({ x: 20, y: 20 });
+  const dragRef = useRef(null);
+  const [dragging, setDragging] = useState(false);
+  const [rel, setRel] = useState(null);
+
+  const handleMouseDown = (e) => {
+    if (e.button !== 0) return;
+    const pos = dragRef.current.getBoundingClientRect();
+    setDragging(true);
+    setRel({ x: e.pageX - pos.left, y: e.pageY - pos.top });
+    e.stopPropagation();
+    e.preventDefault();
+  };
+
+  const handleMouseUp = () => setDragging(false);
+
+  const handleMouseMove = (e) => {
+    if (!dragging) return;
+    setPosition({
+      x: e.pageX - rel.x,
+      y: e.pageY - rel.y,
+    });
+    e.stopPropagation();
+    e.preventDefault();
+  };
+
+  useEffect(() => {
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+    };
+  });
+
   useEffect(() => {
     if (!incomingCall && !callEstablished) {
       startMedia();
@@ -49,7 +85,6 @@ function CallProfile() {
     return () => stopAllMedia();
   }, []);
 
-  // Call media setup for receiver
   useEffect(() => {
     if (incomingCall && callEstablished) {
       setModal(incomingCall.type);
@@ -67,7 +102,6 @@ function CallProfile() {
       setGetModal(false);
     };
 
-    // socket.off("call-accepted");
     socket.on("call-accepted", (data) => {
       if (peer) peer.signal(data.signal);
     });
@@ -76,7 +110,6 @@ function CallProfile() {
     return () => socket.off("reject-call", onReject);
   }, [socket]);
 
-  // Attach remote stream to remote video element
   useEffect(() => {
     if (localVideoRef.current && localStream) {
       localVideoRef.current.srcObject = localStream;
@@ -92,13 +125,11 @@ function CallProfile() {
   const startMedia = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: callModal === "video" ? true : false,
+        video: callModal === "video",
         audio: true,
       });
-
-      // mediaStreamRef.current.srcObject = stream;
-
-      // setlocalStream(stream);
+      mediaStreamRef.current = stream;
+      setlocalStream(stream);
       if (!incomingCall) {
         setTargetSocketId(selectedUser);
       }
@@ -108,11 +139,6 @@ function CallProfile() {
   };
 
   const stopAllMedia = () => {
-    // if (localVideoRef.current) {
-    //   localVideoRef.current.getTracks().forEach((track) => track.stop());
-    //   localVideoRef.current = null;
-    // }
-
     if (mediaStreamRef.current) {
       mediaStreamRef.current.getTracks().forEach((track) => track.stop());
       mediaStreamRef.current = null;
@@ -121,7 +147,6 @@ function CallProfile() {
 
   const toggleCamera = async () => {
     if (!mediaStreamRef.current) return;
-
     const videoTrack = mediaStreamRef.current.getVideoTracks()[0];
 
     if (isCameraOn && videoTrack) {
@@ -129,15 +154,10 @@ function CallProfile() {
       setIsCameraOn(false);
     } else {
       try {
-        const newStream = await navigator.mediaDevices.getUserMedia({
-          video: true,
-        });
+        const newStream = await navigator.mediaDevices.getUserMedia({ video: true });
         const newVideoTrack = newStream.getVideoTracks()[0];
         if (newVideoTrack) {
           mediaStreamRef.current.addTrack(newVideoTrack);
-          if (localVideoRef.current) {
-            localVideoRef.current.srcObject = mediaStreamRef.current;
-          }
           setIsCameraOn(true);
         }
       } catch (err) {
@@ -172,61 +192,74 @@ function CallProfile() {
   return (
     <div className="w-full h-full relative bg-black overflow-hidden">
       {getModal && <CallModal />}
-      
 
-      {/* Local video stream (full screen) */}
-      {callModal === "video" && (
-        <>
-          <video
-            ref={localVideoRef || mediaStreamRef}
-            autoPlay
-            playsInline
-            muted
-            className="absolute top-0 left-0 w-full h-full object-cover z-0"
-          />
-          <p className="z-99 relative left-6 font-bold ">Me</p>
-        </>
+      {/* Full Screen Remote Stream */}
+      {callModal === "video" && remoteStream && (
+        <video
+          ref={remoteVideoRef}
+          autoPlay
+          playsInline
+          className="absolute top-0 left-0 w-full h-full object-cover z-0"
+        />
       )}
 
-      {/* Audio call profile image */}
-      {callModal !== "video" && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black z-0">
+      {/* Fallback UI if audio call */}
+      {callModal === "audio" && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center z-0 text-white">
           <img
             src={selectedUser?.profile_url}
             alt="User profile"
-            className="w-32 h-32 rounded-full border-4 border-white object-cover"
+            className="w-32 h-32 rounded-full border-4 border-white object-cover mb-4"
+          />
+          <img
+            src={authUser?.profile_url}
+            alt="My profile"
+            className="w-20 h-20 rounded-full border-4 border-gray-300 object-cover"
           />
         </div>
       )}
 
-      {/* Remote stream (picture-in-picture style) */}
-      {(remoteStream && callModal === "video") && (
-        <div className="flex w-64 h-36 border border-white rounded-lg absolute top-4 right-4 z-10 overflow-hidden">
+      {/* Draggable Local Video */}
+      {callModal === "video" && localStream && (
+        <div
+          ref={dragRef}
+          onMouseDown={handleMouseDown}
+          style={{
+            position: "absolute",
+            top: position.y,
+            left: position.x,
+            width: "160px",
+            height: "120px",
+            cursor: "move",
+            zIndex: 10,
+          }}
+          className="border border-white rounded-lg overflow-hidden shadow-md"
+        >
           <video
-            ref={remoteVideoRef}
+            ref={localVideoRef}
             autoPlay
+            muted
             playsInline
-            className="w-full h-full object-cover rounded-lg"
+            className="w-full h-full object-cover"
           />
         </div>
       )}
-      {/* //  : (
-      //   <div className="flex w-64 h-36 border border-white rounded-lg absolute top-4 right-4 z-10 overflow-hidden">
-      //     <p className="absolute top-4 left-4 z-10 bg-black bg-opacity-60 text-white px-4 py-2 rounded">
-      //       Calling...
-      //     </p>
-      //   </div>
-      // )} */}
+
+      {/* Audio Call Fallback Call Status */}
+      {!remoteStream && callModal === "audio" && (
+        <div className="absolute top-4 right-4 bg-black bg-opacity-60 px-4 py-2 text-white rounded-lg z-10">
+          Calling...
+        </div>
+      )}
 
       {/* Controls */}
-      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-4 opacity-90 z-10">
+      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-4 opacity-90 z-20">
         <button
           onClick={toggleMic}
           className={`p-3 rounded-lg shadow-md w-16 border h-10 ${
-            isMicOn
-              ? "bg-transparent hover:bg-green-600 border-white text-white"
-              : "bg-red-800 border-red-500 text-white"
-          }`}>
+            isMicOn ? "bg-transparent hover:bg-green-600 border-white text-white" : "bg-red-800 border-red-500 text-white"
+          }`}
+        >
           <FontAwesomeIcon icon={faMicrophone} />
         </button>
 
@@ -234,10 +267,9 @@ function CallProfile() {
           <button
             onClick={toggleCamera}
             className={`p-3 rounded-lg shadow-md w-16 border h-10 ${
-              isCameraOn
-                ? "bg-transparent hover:bg-blue-600 border-white text-white"
-                : "bg-red-800 border-red-500 text-white"
-            }`}>
+              isCameraOn ? "bg-transparent hover:bg-blue-600 border-white text-white" : "bg-red-800 border-red-500 text-white"
+            }`}
+          >
             <FontAwesomeIcon icon={faVideo} />
           </button>
         )}
@@ -245,16 +277,16 @@ function CallProfile() {
         <button
           onClick={toggleSpeaker}
           className={`p-3 rounded-lg shadow-md w-16 border h-10 ${
-            isSpeakerOn
-              ? "bg-transparent hover:bg-purple-600 border-white text-white"
-              : "bg-red-800 border-red-500 text-white"
-          }`}>
+            isSpeakerOn ? "bg-transparent hover:bg-purple-600 border-white text-white" : "bg-red-800 border-red-500 text-white"
+          }`}
+        >
           <FontAwesomeIcon icon={isSpeakerOn ? faVolumeUp : faVolumeMute} />
         </button>
 
         <button
           onClick={handleEndCall}
-          className="bg-transparent hover:bg-red-700 text-white p-3 rounded-lg shadow-md w-16 border border-white h-10">
+          className="bg-transparent hover:bg-red-700 text-white p-3 rounded-lg shadow-md w-16 border border-white h-10"
+        >
           <FontAwesomeIcon icon={faPhoneSlash} />
         </button>
       </div>

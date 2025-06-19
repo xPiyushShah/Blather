@@ -45,7 +45,10 @@ const Login = () => {
 
     const res = await logIn(formData);
     // navigate("/");
-    window.location.href = "/";
+    if (res.data) {
+      window.location.href = "/";
+    }
+    // window.location.href = "/";
 
 
     setFormData({

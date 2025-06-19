@@ -151,9 +151,10 @@ export default function Message() {
               <div
                 className={`chat-bubble bg-base-300 text-white max-w-xs flex flex-col gap-2 p-14 relative`}>
                 {msg.text && <p>{msg.text}</p>}
+                
                 {msg.image && (
                   <div
-                    className={`chat-image ${imgload ? "skeleton" : ""
+                    className={`chat-image bg-red-300 ${imgload ? "skeleton" : ""
                       } w-[200px] h-[200px]`}>
                     <img
                       src={msg.image}
