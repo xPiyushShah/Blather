@@ -98,6 +98,7 @@ export const authStore = create((set, get) => ({
       await axiosInstance.get("/auth/logout");
       set({ authUser: null });
       get().disconnectSocket();
+      localStorage.removeItem("auth_token");
       toast.success("You have logged out");
     } catch (error) {
       toast.error("Logout failed: " + error.message);
