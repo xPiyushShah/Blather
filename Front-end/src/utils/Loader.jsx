@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 const Loader = () => {
-  const texts = ["Welcome", "Blather", "To"];
+  const texts = ["Welcome", "To","Blather"];
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
   const [visibleLetters, setVisibleLetters] = useState(0);
   const [isSlidingOut, setIsSlidingOut] = useState(false);
