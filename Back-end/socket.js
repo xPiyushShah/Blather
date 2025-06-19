@@ -4,6 +4,9 @@ import http from "http";
 
 import express from "express";
 
+import { config } from "dotenv";
+config();
+
 const app = express();
 
 const server = http.createServer(app);
@@ -15,7 +18,7 @@ export function getReceiverSocketId(userId) {
 
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:5173"],
+    origin: [process.env.FRONTEND_URL_R],
   },
 });
 io.on("connection", (socket) => {
@@ -46,7 +49,6 @@ io.on("connection", (socket) => {
   });
 
   socket.on("answer-call", ({ signal, to, type }) => {
-
     userStatusMap[userId] = to;
     io.emit("statusList", Object.keys(userStatusMap));
 
@@ -58,7 +60,6 @@ io.on("connection", (socket) => {
   });
 
   socket.on("reject-call", ({ to }) => {
-
     delete userStatusMap[socket.id];
     io.emit("statusList", Object.keys(userStatusMap));
 
