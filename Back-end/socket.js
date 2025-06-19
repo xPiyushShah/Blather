@@ -18,7 +18,7 @@ export function getReceiverSocketId(userId) {
 
 const io = new Server(server, {
   cors: {
-    origin: ["https://blathers.onrender.com/"],
+    origin: ["https://blathers.onrender.com"],
   },
 });
 io.on("connection", (socket) => {
