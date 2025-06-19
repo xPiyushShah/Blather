@@ -19,6 +19,7 @@ function App() {
   const { isCheckingAuth, authUser, checkAuth, onlineUser } = authStore();
   const [minDelayPassed, setMinDelayPassed] = useState(false);
   const [shouldShowLoader, setShouldShowLoader] = useState(true);
+  
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);

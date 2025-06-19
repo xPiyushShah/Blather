@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
+import { authStore } from "../store/authStore";
 
 const Loader = () => {
-  const texts = ["Welcome", "To","Blather"];
+  const { authUser } = authStore();
+  const texts = ["Welcome", "To", "Blather"];
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
   const [visibleLetters, setVisibleLetters] = useState(0);
   const [isSlidingOut, setIsSlidingOut] = useState(false);
@@ -63,11 +65,10 @@ const Loader = () => {
           {currentText.split("").map((letter, index) => (
             <span
               key={index}
-              className={`text-4xl font-bold transition-all duration-300 ease-out transform ${
-                index < visibleLetters
+              className={`text-4xl font-bold transition-all duration-300 ease-out transform ${index < visibleLetters
                   ? "translate-y-0 opacity-100 scale-100"
                   : "-translate-y-10 opacity-0 scale-50"
-              } ${getLetterColor(index, currentText)}`}
+                } ${getLetterColor(index, currentText)}`}
               style={{ transitionDelay: `${index * 100}ms` }}
             >
               {letter}
@@ -91,6 +92,13 @@ const Loader = () => {
                 : "translateX(0)",
             }}
           ></div>
+        )}
+        {authUser.status === false && (
+          <div>
+            <span className="text-2xl mt-4">
+              {authUser ? `Hello, ${authUser.first_name}!` : "Loading..."}
+            </span>
+          </div>
         )}
       </div>
 

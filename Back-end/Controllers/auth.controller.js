@@ -43,7 +43,7 @@ export const signup = async (req, res) => {
     await newUser.save();
 
     // Generate token
-    const token =  gToken(newUser._id, res);
+    const token = gToken(newUser._id, res);
 
     await User.findByIdAndUpdate(newUser._id, { token: token }, { new: true });
 
@@ -55,7 +55,6 @@ export const signup = async (req, res) => {
   }
 };
 export const login = async (req, res) => {
-  
   const { email, password } = req.body;
 
   try {
@@ -85,7 +84,6 @@ export const login = async (req, res) => {
   }
 };
 export const logout = async (req, res) => {
-
   const userID = req.user._id;
   await User.findByIdAndUpdate(userID, { token: null }, { new: true });
 
@@ -162,7 +160,7 @@ export const checkUser = async (req, res) => {
       if (user) {
         res.status(200).json({ user });
       } else {
-        res.status(404).json({ message: "User not found" });
+        res.status(404).json({ message: "User not found", status: false });
       }
     }
   } catch (err) {
