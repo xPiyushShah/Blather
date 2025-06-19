@@ -16,7 +16,7 @@ const PORT = process.env.PORT;
 
 app.use(
   cors({
-    origin: "https://blathers.onrender.com/",
+    origin: "https://blathers.onrender.com",
     credentials: true,
   })
 );
