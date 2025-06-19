@@ -40,7 +40,7 @@ const Home = () => {
 
   return (
     <div className="main-root">
-      <div className="hidden sm:flex w-full h-dvh absolute text-white flex-row">
+      <div className="hidden sm:flex w-full max-h-svh h-full absolute text-white flex-row">
         <div className="w-full h-full flex flex-row align-center ">
           <LeftBox />
           <SideBox />
