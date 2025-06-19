@@ -93,10 +93,10 @@ const Loader = () => {
             }}
           ></div>
         )}
-        {authUser.status === false && (
+        {(authUser != "" && authUser.status) === false && (
           <div>
             <span className="text-2xl mt-4">
-              {authUser ? `Hello, ${authUser.first_name}!` : "Loading..."}
+              {authUser ? `Hello, !` : "Loading..."}
             </span>
           </div>
         )}
