@@ -30,7 +30,7 @@ export default function ChatContainer() {
   }
 
   return (
-    <div className="flex flex-col h-screen w-full justify-between ">
+    <div className="flex flex-col h-full w-full justify-between ">
       <div
         className="relative flex flex-row justify-between w-full border-b-[1px] border-b-[#dddddd35]  align-center text-center header-lest"
         onContextMenu={(e) => {
