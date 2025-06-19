@@ -37,7 +37,7 @@ export default function ChatContainer() {
           e.preventDefault();
           setContext(true);
           setContextPos({ x: e.pageX, y: e.pageY });
-        }}>
+        }} >
         <div
           className={`hidden md:flex mt-15 w-20 rounded-full hover:cursor-pointer  avatar  align-center justify-center text-center
            ${
