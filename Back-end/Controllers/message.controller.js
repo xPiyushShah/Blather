@@ -22,7 +22,7 @@ export const getSideBarUsers = async (req, res) => {
 
     const users = await User.find({
       _id: { $nin: excludedIds },
-    }).select("-password doj email updatedAt createdAt __v");
+    }).select("-password");
 
     const main_user = users.map((user) => {
       return {
