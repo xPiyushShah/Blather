@@ -26,8 +26,7 @@ function App() {
   useEffect(() => {
     const delayTimer = setTimeout(() => {
       setMinDelayPassed(true);
-    }, 10000); // 10 seconds
-
+    }, 8000);
     return () => clearTimeout(delayTimer);
   }, []);
 
