@@ -11,7 +11,7 @@ export const cookie = (req, res) => {
   res.status(200).json({ message: "Authenticated" });
 };
 export const signup = async (req, res) => {
-  const { first_name, last_name, email, password, profile_url } = req.body;
+  const { first_name, last_name, email, password } = req.body;
 
   try {
     // Validate password length
@@ -37,7 +37,6 @@ export const signup = async (req, res) => {
       last_name,
       email,
       password: hashedPassword,
-      profile_url,
     });
 
     await newUser.save();
@@ -50,7 +49,7 @@ export const signup = async (req, res) => {
     // res.status(201).json({ message: "User created successfully"});
     res.status(201).json({ message: "User created successfully", token });
   } catch (err) {
-    // console.error("Error to Integrate with data:", err.message);
+    console.error("Error to Integrate with data:", err.message);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
