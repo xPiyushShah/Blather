@@ -16,7 +16,7 @@ function FriendUi() {
               key={item._id}
               className={`h-[4rem] border-b-[1px] border-b-[#dddddd35] w-full flex flex-row justify-between items-center text-center ${
                 selectedUser === item._id
-                  ? "bg-base-300 ring-1 ring-base-300"
+                  ? "bg-base-300 ring-1 ring-base-300 "
                   : ""
               } mb-4`}
               style={{ cursor: "pointer", padding: "2px 16px" }}
@@ -29,7 +29,7 @@ function FriendUi() {
                       : "avatar-offline"
                   }`}>
                   <div className="w-8 mask mask-squircle">
-                    {item.avatar ? (
+                    {item.profile_url ? (
                       <img
                         alt={`${item.first_name} ${item.last_name}`}
                         src={item.avat}
@@ -39,7 +39,7 @@ function FriendUi() {
                     )}
                     <img
                       alt={`${item.first_name} ${item.last_name}`}
-                      src={item.avatar}
+                      src={item.profile_url}
                     />
                   </div>
                 </div>

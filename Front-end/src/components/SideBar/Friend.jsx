@@ -27,17 +27,17 @@ function Friend() {
                   : "avatar-offline"
               }`}>
               <div className="w-8 mask mask-squircle">
-                {item.avatar ? (
+                {item.profile_url ? (
                   <img
                     alt={`${item.first_name} ${item.last_name}`}
-                    src={item.avat}
+                    src={item.profile_url}
                   />
                 ) : (
                   <ProfileAvatar onGen={item} />
                 )}
                 <img
                   alt={`${item.first_name} ${item.last_name}`}
-                  src={item.avatar}
+                  src={item.profile_url}
                 />
               </div>
             </div>
@@ -70,17 +70,17 @@ function Friend() {
                   : "avatar-offline"
               }`}>
               <div className="w-8 mask mask-squircle">
-                {item.avatar ? (
+                {item.profile_url ? (
                   <img
                     alt={`${item.first_name} ${item.last_name}`}
-                    src={item.avat}
+                    src={item.profile_url}
                   />
                 ) : (
                   <ProfileAvatar onGen={item} />
                 )}
                 <img
                   alt={`${item.first_name} ${item.last_name}`}
-                  src={item.avatar}
+                  src={item.profile_url}
                 />
               </div>
             </div>

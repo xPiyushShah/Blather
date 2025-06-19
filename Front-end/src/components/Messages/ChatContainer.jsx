@@ -50,7 +50,7 @@ export default function ChatContainer() {
             <img
               alt={selectedUser.first_name}
               src={selectedUser.profile_url}
-              className="object-cover "
+              className="object-cover mask mask-squircle rounded-full w-16 h-16"
             />
           ) : (
             <ProfileAvatar onGen={selectedUser} />
