@@ -32,11 +32,7 @@ function FriendUi() {
                     {item.profile_url ? (
                       <img
                         alt={`${item.first_name} ${item.last_name}`}
-<<<<<<< HEAD
                         src={item.profile_url}
-=======
-                        src={item.profile_url}
->>>>>>> 23f6cffcf94da4a415bbe2c7f59a5efec44b885e
                       />
                     ) : (
                       <ProfileAvatar onGen={item} />
