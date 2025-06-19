@@ -56,6 +56,7 @@ export const authStore = create((set, get) => ({
       toast.success("You are logged in");
       set({ authUser: res.data.user });
       get().connectSocket();
+      window.location.href = "/";
     } catch (error) {
       toast.error("Login failed: " + error.message);
       // console.error("Error logging in:", error.message);
