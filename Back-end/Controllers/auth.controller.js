@@ -158,7 +158,7 @@ export const checkUser = async (req, res) => {
     if (userID) {
       const user = await User.findById(userID).select("-password");
       if (user) {
-        res.status(200).json({ user });
+        res.status(200).json({ user, status: true });
       } else {
         res.status(404).json({ message: "User not found", status: false });
       }
