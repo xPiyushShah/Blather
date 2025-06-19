@@ -45,10 +45,8 @@ const Login = () => {
 
     const res = await logIn(formData);
     // navigate("/");
-    localStorage.setItem("auth_token", res.token);
     window.location.href = "/";
-    if (res.token) {
-    }
+
 
     setFormData({
       email: "",

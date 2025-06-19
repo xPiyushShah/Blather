@@ -54,7 +54,6 @@ const SignUp = () => {
 
     const success = await signUp(formData);
     if (success) {
-      localStorage.setItem("auth_token", success.token);
       toast.success("User registered successfully");
       window.location.href = "/"
     } else {

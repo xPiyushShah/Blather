@@ -33,6 +33,7 @@ export const authStore = create((set, get) => ({
     set({ isSigninUp: true });
     try {
       const res = await axiosInstance.post("/auth/register", data);
+      localStorage.setItem("auth_token", res.data.token);
       toast.success("User registered successfully");
       set({
         authUser: res.data.user,
@@ -51,6 +52,7 @@ export const authStore = create((set, get) => ({
     set({ isLogIn: true });
     try {
       const res = await axiosInstance.post("/auth/login", data);
+      localStorage.setItem("auth_token", res.data.token);
       toast.success("You are logged in");
       set({ authUser: res.data.user });
       get().connectSocket();
