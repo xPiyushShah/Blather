@@ -35,6 +35,7 @@ export const authStore = create((set, get) => ({
       const res = await axiosInstance.post("/auth/register", data);
       localStorage.setItem("auth_token", res.data.token);
       toast.success("User registered successfully");
+      window.location.href = "/";
       set({
         authUser: res.data.user,
         isLogIn: true,
@@ -71,7 +72,7 @@ export const authStore = create((set, get) => ({
       const res = await axiosInstance.put("/auth/update-profile", data);
       toast.success("Profile updated successfully");
       set({ authUser: res.data.user });
-      
+
       get().connectSocket();
     } catch (error) {
       toast.error("Profile update failed: " + error.message);
@@ -116,7 +117,7 @@ export const authStore = create((set, get) => ({
       // console.error("Error adding friend:", error.message);
     }
   },
-  
+
   acceptfriend: async (id) => {
     try {
       const res = await axiosInstance.post(`/auth/accept_reqst/${id}`);

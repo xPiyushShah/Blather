@@ -54,10 +54,10 @@ const SignUp = () => {
 
     const success = await signUp(formData);
     if (success) {
-      toast.success("User registered successfully");
-      window.location.href = "/"
+      // toast.success("User registered successfully");
+      // window.location.href = "/"
     } else {
-      toast.error("Failed to register user");
+      // toast.error("Failed to register user");
     }
 
 
