@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { authStore } from "../store/authStore";
+import { Link, useNavigate } from "react-router-dom";
 
 const Loader = () => {
   const { authUser } = authStore();
@@ -66,8 +67,8 @@ const Loader = () => {
             <span
               key={index}
               className={`text-4xl font-bold transition-all duration-300 ease-out transform ${index < visibleLetters
-                  ? "translate-y-0 opacity-100 scale-100"
-                  : "-translate-y-10 opacity-0 scale-50"
+                ? "translate-y-0 opacity-100 scale-100"
+                : "-translate-y-10 opacity-0 scale-50"
                 } ${getLetterColor(index, currentText)}`}
               style={{ transitionDelay: `${index * 100}ms` }}
             >
@@ -94,10 +95,18 @@ const Loader = () => {
           ></div>
         )}
         {(authUser != null && authUser.status) === false && (
-          <div>
-            <span className="text-2xl mt-4">
-              {authUser ? `Hello, !` : "Loading..."}
-            </span>
+          <div className="text-end align-base absolute bottom-0 right-2 w-full mt-4">
+            <div className="text-[12px] mt-4">
+              <ul className="list-none list-inside flex flex-row justify-center space-x-4
+              *:hover:cursor-pointer text-white">
+                <li>
+                  <Link to="/login">Login</Link>
+                </li>
+                <li>
+                  <Link to="/register">Signup</Link>
+                </li>
+              </ul>
+            </div>
           </div>
         )}
       </div>
