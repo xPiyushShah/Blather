@@ -17,22 +17,30 @@ import { Toaster } from "react-hot-toast";
 
 function App() {
   const { isCheckingAuth, authUser, checkAuth, onlineUser } = authStore();
-  const [loading, setLoading] = useState(true);
-  const [minDelayPassed, setMinDelayPassed] = useState(false);
-  useEffect(() => {
-    checkAuth();
-  }, [checkAuth]);
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setMinDelayPassed(true);
-    }, 8000); 
+    const [minDelayPassed, setMinDelayPassed] = useState(false);
+  const [shouldShowLoader, setShouldShowLoader] = useState(true);
 
-    return () => clearTimeout(timer);
+  useEffect(() => {
+    // Start 10-second minimum loader timer
+    const delayTimer = setTimeout(() => {
+      setMinDelayPassed(true);
+    }, 10000); // 10 seconds
+
+    return () => clearTimeout(delayTimer);
   }, []);
 
-  if ((isCheckingAuth || !authUser) && !minDelayPassed) {
+  useEffect(() => {
+    // Check if both auth is done and 10 seconds have passed
+    if (!isCheckingAuth && authUser && minDelayPassed) {
+      setShouldShowLoader(false);
+    }
+  }, [isCheckingAuth, authUser, minDelayPassed]);
+
+  if (shouldShowLoader) {
     return <Loader />;
   }
+
+
 
 
 
