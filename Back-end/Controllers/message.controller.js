@@ -62,49 +62,41 @@ import streamifier from "streamifier";
 
 export const getSideBarUsers = async (req, res) => {
   try {
-    const userID = req.user._id;
+    const userID = req.user._id.toString();
 
-    // Get all users (excluding current user)
-    const allUsers = await User.find({ _id: { $ne: userID } }).select("first_name last_name profile_url");
-
-    // Get all friend relationships for this user
+    // Get all friend relationships involving the user
     const friends = await Friend.find({
       $or: [{ userId: userID }, { friendId: userID }],
     });
 
-    // Build a map of friend statuses by userId
-    const friendStatusMap = new Map();
+    // Track accepted friends to exclude from main_user
+    const acceptedFriendIds = new Set();
+    const pendingStatusMap = new Map(); // userId <-> status "pending"
 
+    // Determine status for each friend relation
     for (const f of friends) {
-      const friendId =
-        f.userId.toString() === userID.toString()
+      const otherId =
+        f.userId.toString() === userID
           ? f.friendId.toString()
           : f.userId.toString();
 
-      // Prioritize accepted > pending
       if (f.status === "accepted") {
-        friendStatusMap.set(friendId, "accepted");
-      } else if (!friendStatusMap.has(friendId)) {
-        friendStatusMap.set(friendId, "pending");
+        acceptedFriendIds.add(otherId); // exclude from sidebar
+      } else if (f.status === "pending") {
+        pendingStatusMap.set(otherId, "pending");
       }
     }
 
-    // Find pending requests sent TO current user (for pend_user)
-    const pendFriendUsers = friends
-      .filter(
-        (f) =>
-          f.status === "pending" && f.friendId.toString() === userID.toString()
-      )
-      .map((f) => f.userId.toString());
-
-    const pendUsers = await User.find({
-      _id: { $in: pendFriendUsers },
+    // Get all users except the current user and accepted friends
+    const excludedIds = [userID, ...Array.from(acceptedFriendIds)];
+    const allUsers = await User.find({
+      _id: { $nin: excludedIds },
     }).select("first_name last_name profile_url");
 
-    // main_user = all users + relationship status
+    // Format main_user list with status
     const mainUsers = allUsers.map((user) => {
-      const userIdStr = user._id.toString();
-      const status = friendStatusMap.get(userIdStr) || "none";
+      const uid = user._id.toString();
+      const status = pendingStatusMap.has(uid) ? "pending" : "none";
       return {
         _id: user._id,
         first_name: user.first_name,
@@ -113,6 +105,16 @@ export const getSideBarUsers = async (req, res) => {
         status,
       };
     });
+
+    // Get users who sent you a friend request (pend_user)
+    const pendRequests = friends.filter(
+      (f) => f.status === "pending" && f.friendId.toString() === userID
+    );
+    const pendSenderIds = pendRequests.map((f) => f.userId);
+
+    const pendUsers = await User.find({
+      _id: { $in: pendSenderIds },
+    }).select("first_name last_name profile_url");
 
     res.status(200).json({
       main_user: mainUsers,
