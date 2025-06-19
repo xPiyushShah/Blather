@@ -75,6 +75,7 @@ export default function Profile() {
       console.error("Upload error:", err);
     }
   };
+  let img_url = preview ? preview : formData.profile_url;
 
   return (
     <div className="w-full h-full  profile-cont ">
@@ -86,12 +87,7 @@ export default function Profile() {
               onClick={() => setChng(!chng)}
             >
               <img
-                src={
-                  preview ||
-                  (formData.profile_url instanceof File
-                    ? URL.createObjectURL(formData.profile_url)
-                    : formData.profile_url)
-                }
+                src={img_url}
                 alt="Profile Preview"
                 className="object-cover w-32 h-32"
               />
