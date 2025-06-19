@@ -18,7 +18,7 @@ export function getReceiverSocketId(userId) {
 
 const io = new Server(server, {
   cors: {
-    origin: [process.env.FRONTEND_URL_R],
+    origin: ["http://localhost:5173"],
   },
 });
 io.on("connection", (socket) => {

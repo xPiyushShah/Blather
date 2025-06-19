@@ -16,7 +16,7 @@ const PORT = process.env.PORT;
 
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL_R,
+    origin: "http://localhost:5173",
     credentials: true,
   })
 );
@@ -38,7 +38,7 @@ app.get("/api/auth", (req, res) => {
 });
 
 server.listen(PORT, () => {
-  // console.log(`Server started on http://localhost:${PORT}`);
-  console.log(`Server started on &#34;${process.env.BACKEND_URL}&#34;`);
+  console.log(`Server started on http://localhost:${PORT}`);
+  // console.log(`Server started on &#34;${process.env.BACKEND_URL}&#34;`);
   connectDB();
 });

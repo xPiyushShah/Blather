@@ -4,7 +4,7 @@ import User from "../Models/user.model.js";
 
 
 
-export const protectAuth = async (req, res, next) => {
+export const protectAuths = async (req, res, next) => {
   try {
     const token = req.headers.authorization;
 
@@ -31,28 +31,28 @@ export const protectAuth = async (req, res, next) => {
 };
 
 // this one for cookie
-// export const protectAuth = async (req, res, next) => {
-//   try {
-//     const token = req.cookies.auth_token;
+export const protectAuth = async (req, res, next) => {
+  try {
+    const token = req.cookies.auth_token;
 
-//     if (!token) {
-//       return res.status(401).json({ message: "Not authorized, token missing" });
-//     }
+    if (!token) {
+      return res.status(401).json({ message: "Not authorized, token missing" });
+    }
 
-//     const decoded = jwt.verify(token, process.env.JWT_PVTKEY);
+    const decoded = jwt.verify(token, process.env.JWT_PVTKEY);
     
-//     const user = await User.findById(decoded.userId).select("-password");
-//     if (!user) {
-//       return res.status(404).json({ message: "User not found" });
-//     }
+    const user = await User.findById(decoded.userId).select("-password");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
-//     req.user = user;
-//     // res.status(200).json(user);
+    req.user = user;
+    // res.status(200).json(user);
     
-//     next();
+    next();
     
-//   } catch (err) {
-//     console.error("Auth middleware error:", err.message);
-//     res.status(401).json({ message: "Not authorized, token failed" });
-//   }
-// };
+  } catch (err) {
+    console.error("Auth middleware error:", err.message);
+    res.status(401).json({ message: "Not authorized, token failed" });
+  }
+};
