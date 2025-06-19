@@ -3,9 +3,7 @@ import Message from "../Models/message.model.js";
 import Friend from "../Models/friends.model.js";
 import { io, getReceiverSocketId } from "../socket.js";
 import cloudinary from "../libs/cloudinary.js";
-import streamifier from 'streamifier';
-
-
+import streamifier from "streamifier";
 export const getSideBarUsers = async (req, res) => {
   try {
     const userID = req.user._id;
@@ -26,22 +24,77 @@ export const getSideBarUsers = async (req, res) => {
       _id: { $nin: excludedIds },
     }).select("-password");
 
+    const main_user = users.map((user) => {
+      return {
+        ...user._doc,
+        status: "none",
+      };
+    });
+
     const pendingRequests = friends.filter(
       (f) =>
         f.status === "pending" && f.friendId.toString() === userID.toString()
     );
 
-    const pendingUserIds = pendingRequests.map((f) => f.userId);
-    const waitUsers = await User.find({
-      _id: { $in: pendingUserIds },
+    const waitUserIds = pendingRequests.map((f) => f.userId);
+
+    const waitUsersRaw = await User.find({
+      _id: { $in: waitUserIds },
     }).select("-password");
 
-    res.status(200).json({ main_user: users, wait_user: waitUsers });
+    const wait_user = waitUsersRaw.map((user) => {
+      const friendData = pendingRequests.find(
+        (f) => f.userId.toString() === user._id.toString()
+      );
+      return {
+        ...user._doc,
+        status: friendData?.status || "pending",
+      };
+    });
+
+    res.status(200).json({ main_user, wait_user });
   } catch (error) {
     console.error("Error fetching users:", error.message);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
+// export const getSideBarUsers = async (req, res) => {
+//   try {
+//     const userID = req.user._id;
+
+//     const friends = await Friend.find({
+//       $or: [{ userId: userID }, { friendId: userID }],
+//     });
+
+//     const friendIds = friends
+//       .filter((f) => f.status === "accepted")
+//       .map((f) =>
+//         f.userId.toString() === userID.toString() ? f.friendId : f.userId
+//       );
+
+//     const excludedIds = [userID, ...friendIds];
+
+//     const users = await User.find({
+//       _id: { $nin: excludedIds },
+//     }).select("-password");
+
+//     const pendingRequests = friends.filter(
+//       (f) =>
+//         f.status === "pending" && f.friendId.toString() === userID.toString()
+//     );
+
+//     const pendingUserIds = pendingRequests.map((f) => f.userId);
+//     const waitUsers = await User.find({
+//       _id: { $in: pendingUserIds },
+//     }).select("-password");
+
+//     res.status(200).json({ main_user: users, wait_user: waitUsers });
+//   } catch (error) {
+//     console.error("Error fetching users:", error.message);
+//     res.status(500).json({ message: "Internal Server Error" });
+//   }
+// };
 
 export const getMessages = async (req, res) => {
   try {
@@ -120,11 +173,11 @@ export const sendMedia = async (req, res) => {
     };
 
     if (audioFile) {
-      audioUrl = await uploadToCloudinary(audioFile.buffer, 'raw');
+      audioUrl = await uploadToCloudinary(audioFile.buffer, "raw");
     }
 
     if (videoFile) {
-      videoUrl = await uploadToCloudinary(videoFile.buffer, 'video');
+      videoUrl = await uploadToCloudinary(videoFile.buffer, "video");
     }
 
     const message = new Message({
