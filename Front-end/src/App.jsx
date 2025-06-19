@@ -18,23 +18,36 @@ import { Toaster } from "react-hot-toast";
 function App() {
   const { isCheckingAuth, authUser, checkAuth, onlineUser } = authStore();
   const [loading, setLoading] = useState(true);
-
+  const [minDelayPassed, setMinDelayPassed] = useState(false);
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setMinDelayPassed(true);
+    }, 8000); 
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if ((isCheckingAuth || !authUser) && !minDelayPassed) {
+    return <Loader />;
+  }
+
+
 
   // console.log("On", {onlineUser});
   // console.log("Otn", {authUser});
 
-  if (isCheckingAuth && !authUser) {
-    // if (true) {
-    return (
-      <Loader  />
-      // <div className="fixed inset-0 flex items-center justify-center bg-white/30 backdrop-blur z-50">
-      //   <span className="loading loading-spinner loading-xl text-accent"></span>
-      // </div>
-    );
-  }
+  // if (isCheckingAuth && !authUser) {
+  //   // if (true) {
+  //   return (
+  //     <Loader />
+  //     // <div className="fixed inset-0 flex items-center justify-center bg-white/30 backdrop-blur z-50">
+  //     //   <span className="loading loading-spinner loading-xl text-accent"></span>
+  //     // </div>
+  //   );
+  // }
   // console.log("me", authUser._id);
 
   return (
@@ -44,7 +57,7 @@ function App() {
           <Route
             path="/"
             element={authUser ? <Home /> : <Navigate to="/login" />}
-            // element={<Home />}
+          // element={<Home />}
           />
           <Route
             path="/login"
