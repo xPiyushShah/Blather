@@ -10,12 +10,14 @@ import Login from "./Pages/Login";
 import Register from "./Pages/SignUp";
 import Room from "./Pages/Room";
 import Setting from "./Pages/Settings";
+import Loader from "./utils/Loader";
 import "./App.css";
 import { authStore } from "./store/authStore";
 import { Toaster } from "react-hot-toast";
 
 function App() {
   const { isCheckingAuth, authUser, checkAuth, onlineUser } = authStore();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     checkAuth();
@@ -27,9 +29,10 @@ function App() {
   if (isCheckingAuth && !authUser) {
     // if (true) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center bg-white/30 backdrop-blur z-50">
-        <span className="loading loading-spinner loading-xl text-accent"></span>
-      </div>
+      <Loader  />
+      // <div className="fixed inset-0 flex items-center justify-center bg-white/30 backdrop-blur z-50">
+      //   <span className="loading loading-spinner loading-xl text-accent"></span>
+      // </div>
     );
   }
   // console.log("me", authUser._id);
