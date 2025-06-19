@@ -94,7 +94,7 @@ const Loader = () => {
             }}
           ></div>
         )}
-        {(authUser != null && authUser.status) === false && (
+        {/* {(authUser != null && authUser.status) === false && (
           <div className="text-end align-base absolute bottom-0 right-2 w-full mt-4">
             <div className="text-[12px] mt-4">
               <ul className="list-none list-inside flex flex-row justify-center space-x-4
@@ -108,7 +108,7 @@ const Loader = () => {
               </ul>
             </div>
           </div>
-        )}
+        )} */}
       </div>
 
       {/* Message for small screens */}

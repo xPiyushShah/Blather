@@ -37,9 +37,16 @@ function App() {
     }
   }, [isCheckingAuth, authUser, minDelayPassed]);
 
-  if (shouldShowLoader) {
+  useEffect(() => {
+    if (authUser.status == false) {
+      setShouldShowLoader(false);
+    }
+  }, [authUser.status]);
+
+  if (shouldShowLoader ) {
     return <Loader />;
   }
+  
 
 
 
