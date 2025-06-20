@@ -68,10 +68,9 @@ export const getSideBarUsers = async (req, res) => {
       $or: [{ userId: userID }, { friendId: userID }],
     });
 
-    // Step 2: Categorize friend relationships
     const acceptedFriendIds = new Set();
-    const pendingSentIds = new Set(); // sent by me
-    const pendingReceivedIds = new Set(); // sent to me
+    const pendingSentIds = new Set();
+    const pendingReceivedIds = new Set();
 
     for (const f of friends) {
       const userIdStr = f.userId.toString();
@@ -82,30 +81,56 @@ export const getSideBarUsers = async (req, res) => {
         acceptedFriendIds.add(otherId);
       } else if (f.status === "pending") {
         if (userIdStr === userID) {
-          pendingSentIds.add(friendIdStr); // I sent
+          pendingSentIds.add(friendIdStr);
         } else if (friendIdStr === userID) {
-          pendingReceivedIds.add(userIdStr); // They sent to me
+          pendingReceivedIds.add(userIdStr);
         }
       }
     }
 
-    // Step 3: Get pend_user data from User model
-    const pend_user = await User.find({
-      _id: { $in: Array.from(pendingReceivedIds) },
-    }).select("first_name last_name profile_url");
-
-    // Step 4: Get main_user data (aka wait_user)
+    // Step 2: Determine main_user (wait_user) IDs
     const excludedIds = new Set([
       userID,
       ...acceptedFriendIds,
       ...pendingSentIds,
     ]);
 
-    const main_user = await User.find({
-      _id: { $nin: Array.from(excludedIds) },
+    // Get all user IDs excluding current user and relevant friend statuses
+    const allUserIds = await User.find({ _id: { $ne: userID } }).select("_id");
+
+    const waitUserIds = allUserIds
+      .map((u) => u._id.toString())
+      .filter((uid) => !excludedIds.has(uid));
+
+    // Step 3: Combine both ID sets
+    const userIdsToFetch = [
+      ...new Set([...pendingReceivedIds, ...waitUserIds]),
+    ];
+
+    const usersMeta = await User.find({
+      _id: { $in: userIdsToFetch },
     }).select("first_name last_name profile_url");
 
-    // Step 5: Send both lists
+    // Step 4: Organize into pend_user and main_user
+    const usersMap = new Map();
+    usersMeta.forEach((user) => {
+      usersMap.set(user._id.toString(), {
+        _id: user._id,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        profile_url: user.profile_url,
+      });
+    });
+
+    const pend_user = Array.from(pendingReceivedIds)
+      .map((uid) => usersMap.get(uid))
+      .filter(Boolean);
+
+    const main_user = waitUserIds
+      .map((uid) => usersMap.get(uid))
+      .filter(Boolean);
+
+    // Step 5: Send response
     res.status(200).json({
       pend_user,
       main_user,
