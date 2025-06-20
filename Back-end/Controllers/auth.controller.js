@@ -163,7 +163,7 @@ export const checkUser = async (req, res) => {
       }
     }
   } catch (err) {
-    res.status(401).json({ message: "Not authenticated" });
+    res.status(401).json({ message: "Not authenticated" , status: false  });
     console.error("Error to Integrate with data:", err.message);
   }
 };

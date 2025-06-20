@@ -13,6 +13,7 @@ export const authStore = create((set, get) => ({
   isUpdatingProfile: false,
   isCheckingAuth: true,
   socket: null,
+  err:null,
 
   checkAuth: async () => {
     set({ isCheckingAuth: true });
@@ -22,7 +23,7 @@ export const authStore = create((set, get) => ({
       get().connectSocket();
     } catch (error) {
       // toast.error("Auth check failed: " + error.message);
-      set({ authUser: null });
+      set({ authUser: null , err : error.response?.data?.status });
       console.error("Error checking authentication:", error.message);
     } finally {
       set({ isCheckingAuth: false });
