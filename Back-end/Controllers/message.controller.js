@@ -59,62 +59,27 @@ import streamifier from "streamifier";
 //     res.status(500).json({ message: "Internal Server Error" });
 //   }
 // };
-export const getSideBarUsers = async (req, res) => {
-  try {
-    const userID = req.user._id.toString();
+{
+  "pend_user": [
+    {
+      "_id": "userId1",
+      "first_name": "John",
+      "last_name": "Doe",
+      "profile_url": "/profiles/johndoe.jpg"
+    },
+    ...
+  ],
+  "main_user": [
+    {
+      "_id": "userId2",
+      "first_name": "Jane",
+      "last_name": "Smith",
+      "profile_url": "/profiles/janesmith.jpg"
+    },
+    ...
+  ]
+}
 
-    // Get all friend relationships involving the user
-    const friends = await Friend.find({
-      $or: [{ userId: userID }, { friendId: userID }],
-    });
-
-    const acceptedFriendIds = new Set();
-    const pendingSentIds = new Set();
-    const pendingReceivedIds = new Set();
-
-    for (const f of friends) {
-      const userIdStr = f.userId.toString();
-      const friendIdStr = f.friendId.toString();
-
-      if (f.status === "accepted") {
-        // Friend is accepted — exclude both sides
-        acceptedFriendIds.add(userIdStr === userID ? friendIdStr : userIdStr);
-      } else if (f.status === "pending") {
-        if (userIdStr === userID) {
-          // Sent by me
-          pendingSentIds.add(friendIdStr);
-        } else if (friendIdStr === userID) {
-          // Received by me
-          pendingReceivedIds.add(userIdStr);
-        }
-      }
-    }
-
-    // === 1. pend_user ===
-    const pendUsers = await User.find({
-      _id: { $in: Array.from(pendingReceivedIds) },
-    }).select("first_name last_name profile_url");
-
-    // === 2. wait_user ===
-    const excludedIds = new Set([
-      userID,
-      ...acceptedFriendIds,
-      ...pendingSentIds,
-    ]);
-
-    const waitUsers = await User.find({
-      _id: { $nin: Array.from(excludedIds) },
-    }).select("first_name last_name profile_url");
-
-    res.status(200).json({
-      pend_user: pendUsers,
-      wait_user: waitUsers,
-    });
-  } catch (error) {
-    console.error("Error fetching sidebar users:", error.message);
-    res.status(500).json({ message: "Internal Server Error" });
-  }
-};
 
 export const getSideBarUsersd = async (req, res) => {
   try {
