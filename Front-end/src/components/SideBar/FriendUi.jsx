@@ -12,10 +12,11 @@ function FriendUi() {
     <>
       {friendList && (
         <div className="part-cont">
-          {friendList?.map((item) => (
+          {friendList.map((item) => (
             <div
               key={item._id}
-              className={`h-[4rem] border-b-[1px] border-b-[#dddddd35] w-full flex flex-row justify-between items-center text-center ${selctedID
+              className={`h-[4rem] border-b-[1px] border-b-[#dddddd35] w-full flex flex-row justify-between items-center text-center ${
+                 selectedUser?._id === item._id
                   ? "bg-base-300 ring-1 ring-base-300 "
                   : ""
                 } mb-4`}
