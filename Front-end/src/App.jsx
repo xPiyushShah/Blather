@@ -16,7 +16,7 @@ import { authStore } from "./store/authStore";
 import { Toaster } from "react-hot-toast";
 
 function App() {
-  const { isCheckingAuth, authUser, checkAuth, onlineUser } = authStore();
+  const { isCheckingAuth, authUser, checkAuth, onlineUser,err } = authStore();
   const [minDelayPassed, setMinDelayPassed] = useState(false);
   const [shouldShowLoader, setShouldShowLoader] = useState(true);
 
@@ -39,7 +39,7 @@ function App() {
       setShouldShowLoader(false);
     }
     // console.log(err);
-  }, [isCheckingAuth, authUser, minDelayPassed,]);
+  }, [isCheckingAuth, authUser, minDelayPassed,err]);
 
   useEffect(() => {
     if (authUser?.status === false) {
