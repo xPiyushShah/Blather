@@ -32,17 +32,17 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (!isCheckingAuth && authUser && minDelayPassed) {
+    if (isCheckingAuth && !authUser && minDelayPassed && err) {
       setShouldShowLoader(false);
     }
   }, [isCheckingAuth, authUser, minDelayPassed]);
 
-  useEffect(() => {
-    console.log(err);
-    // if (authUser?.status == false) {
-      setShouldShowLoader(false);
-    // }
-  }, [err]);
+  // useEffect(() => {
+  //   console.log(err);
+  //   // if (authUser?.status == false) {
+  //     setShouldShowLoader(false);
+  //   // }
+  // }, [err]);
 
   if (shouldShowLoader) {
     return <Loader />;
