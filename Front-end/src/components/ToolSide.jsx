@@ -55,13 +55,13 @@ export default function ToolSide() {
         {/* <div className=" pk rounded-xl ">
           <FontAwesomeIcon icon={faRadio} onClick={setRoom} style={{ color: isRoom ? "lightblue" : "" }} />
         </div> */}
-        <div className=" pk rounded-xl">
+        {/* <div className=" pk rounded-xl">
           <FontAwesomeIcon
             icon={faUserFriends}
             onClick={setFriend}
             style={{ color: isFriend ? "lightblue" : "" }}
           />
-        </div>
+        </div> */}
         <div className=" pk rounded-xl">
           <FontAwesomeIcon
             icon={faBell}

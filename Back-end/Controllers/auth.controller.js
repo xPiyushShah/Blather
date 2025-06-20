@@ -163,7 +163,7 @@ export const checkUser = async (req, res) => {
       }
     }
   } catch (err) {
-    res.status(401).json({ message: "Not authenticated" , status: false  });
+    res.status(401).json({ message: "Not authenticated", status: false });
     console.error("Error to Integrate with data:", err.message);
   }
 };
@@ -208,22 +208,27 @@ export const friendlist = async (req, res) => {
   try {
     const myId = req.user._id;
 
-    const friends = await Friend.find({
-      $and: [
-        {
-          $or: [{ userId: myId }, { friendId: myId }],
-        },
-        { status: "accepted" },
-      ],
-    });
+    // const friends = await Friend.find({
+    //   $and: [
+    //     {
+    //       $or: [{ userId: myId }, { friendId: myId }],
+    //     },
+    //     { status: "accepted" },
+    //   ],
+    // });
 
-    const friendIds = friends.map((f) =>
-      f.userId.toString() === myId.toString() ? f.friendId : f.userId
+    // const friendIds = friends.map((f) =>
+    //   f.userId.toString() === myId.toString() ? f.friendId : f.userId
+    // );
+
+    // const friendDetails = await User.find({ _id: { $in: friendIds } });
+
+    const users = await User.find(
+      { _id: { $ne: myId } },
+      "first_name last_name profile_url"
     );
 
-    const friendDetails = await User.find({ _id: { $in: friendIds } });
-
-    res.status(200).json(friendDetails);
+    res.status(200).json(users);
   } catch (error) {
     console.error("Error fetching friend list:", error.message);
     res.status(500).json({ message: "Internal Server Error" });

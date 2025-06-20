@@ -28,7 +28,7 @@ export default function Lister() {
     getUsers();
     getfriend();
   }, [getUsers, getfriend]);
-  useEffect(() => {}, [socket]);
+  useEffect(() => { }, [socket]);
   return (
     <>
       <div
@@ -46,15 +46,15 @@ export default function Lister() {
           </div>
         </div>
         <div className="icom">
-          {isFriend
-            ? "Add friend's"
-            : `${authUser.first_name} ${authUser.last_name}`}
+          {authUser.first_name} {authUser.last_name}
         </div>
       </div>
 
       {isUserLoading && <ListSkelecton />}
 
-      {!isFriend ? <FriendUi /> : <Friend />}
+
+      {/* {!isFriend ? <FriendUi /> : <Friend />} */}
+      {!isUserLoading && <FriendUi />}
     </>
   );
 }
