@@ -14,14 +14,7 @@ export const signup = async (req, res) => {
   const { first_name, last_name, email, password } = req.body;
 
   try {
-    // Validate password length
-    if (!password || password.length < 6) {
-      return res
-        .status(400)
-        .json({ message: "Password length must be equal or greater than 6" });
-    }
 
-    // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: "User already exists" });
