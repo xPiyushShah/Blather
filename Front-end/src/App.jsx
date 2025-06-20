@@ -32,7 +32,7 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (isCheckingAuth && !authUser && minDelayPassed && err) {
+    if (!isCheckingAuth && authUser && minDelayPassed && err) {
       setShouldShowLoader(false);
     }
   }, [isCheckingAuth, authUser, minDelayPassed , err]);
