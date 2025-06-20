@@ -59,27 +59,62 @@ import streamifier from "streamifier";
 //     res.status(500).json({ message: "Internal Server Error" });
 //   }
 // };
-{
-  "pend_user": [
-    {
-      "_id": "userId1",
-      "first_name": "John",
-      "last_name": "Doe",
-      "profile_url": "/profiles/johndoe.jpg"
-    },
-    ...
-  ],
-  "main_user": [
-    {
-      "_id": "userId2",
-      "first_name": "Jane",
-      "last_name": "Smith",
-      "profile_url": "/profiles/janesmith.jpg"
-    },
-    ...
-  ]
-}
+export const getSideBarUsers = async (req, res) => {
+  try {
+    const userID = req.user._id.toString();
 
+    // Step 1: Fetch all friend relationships involving current user
+    const friends = await Friend.find({
+      $or: [{ userId: userID }, { friendId: userID }],
+    });
+
+    // Step 2: Categorize friend relationships
+    const acceptedFriendIds = new Set();
+    const pendingSentIds = new Set(); // sent by me
+    const pendingReceivedIds = new Set(); // sent to me
+
+    for (const f of friends) {
+      const userIdStr = f.userId.toString();
+      const friendIdStr = f.friendId.toString();
+
+      if (f.status === "accepted") {
+        const otherId = userIdStr === userID ? friendIdStr : userIdStr;
+        acceptedFriendIds.add(otherId);
+      } else if (f.status === "pending") {
+        if (userIdStr === userID) {
+          pendingSentIds.add(friendIdStr); // I sent
+        } else if (friendIdStr === userID) {
+          pendingReceivedIds.add(userIdStr); // They sent to me
+        }
+      }
+    }
+
+    // Step 3: Get pend_user data from User model
+    const pend_user = await User.find({
+      _id: { $in: Array.from(pendingReceivedIds) },
+    }).select("first_name last_name profile_url");
+
+    // Step 4: Get main_user data (aka wait_user)
+    const excludedIds = new Set([
+      userID,
+      ...acceptedFriendIds,
+      ...pendingSentIds,
+    ]);
+
+    const main_user = await User.find({
+      _id: { $nin: Array.from(excludedIds) },
+    }).select("first_name last_name profile_url");
+
+    // Step 5: Send both lists
+    res.status(200).json({
+      pend_user,
+      main_user,
+    });
+  } catch (error) {
+    console.error("Error fetching sidebar users:", error.message);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
 
 export const getSideBarUsersd = async (req, res) => {
   try {
