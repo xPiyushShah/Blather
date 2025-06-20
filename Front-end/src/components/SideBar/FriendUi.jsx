@@ -12,21 +12,21 @@ function FriendUi() {
     <>
       {friendList && (
         <div className="part-cont">
-          {friendList.map((item) => (
+          {friendList?.map((item) => (
             <div
               key={item._id}
-              className={`h-[4rem] border-b-[1px] border-b-[#dddddd35] w-full flex flex-row justify-between items-center text-center ${
-                 selectedUser?._id === item._id
+              className={`h-[4rem] border-b-[1px] border-b-[#dddddd35] w-full flex flex-row justify-between items-center text-center ${selectedUser?._id === item._id
                   ? "bg-base-300 ring-1 ring-base-300 "
                   : ""
                 } mb-4`}
               style={{ cursor: "pointer", padding: "2px 16px" }}
-              onClick={() => setSelctedUser(item)}>
+              onClick={() =>
+                setSelctedUser(item)}>
               <div>
                 <div
                   className={`avatar text-center align-center ${onlineUser.includes(item._id)
-                      ? "avatar-online"
-                      : "avatar-offline"
+                    ? "avatar-online"
+                    : "avatar-offline"
                     }`}>
                   <div className="w-8 mask mask-squircle">
                     {item.profile_url ? (
