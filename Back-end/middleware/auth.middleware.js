@@ -9,14 +9,14 @@ export const protectAuth = async (req, res, next) => {
     const token = req.headers.authorization;
 
     if (!token || !token.startsWith("Bearer ")) {
-      return res.status(401).json({ message: "Not authorized, token missing" });
+      return res.status(401).json({ message: "Not authorized, token missing", status : false });
     }
 
     const decoded = jwt.verify(token.split(" ")[1], process.env.JWT_PVTKEY);
 
     const user = await User.findById(decoded.userId).select("-password");
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ message: "User not found", status : false });
     }
 
     req.user = user;
@@ -26,7 +26,7 @@ export const protectAuth = async (req, res, next) => {
     
   } catch (err) {
     console.error("Auth middleware error:", err.message);
-    res.status(401).json({ message: "Not authorized, token failed" });
+    res.status(401).json({ message: "Not authorized, token failed", status : false  });
   }
 };
 
