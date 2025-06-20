@@ -29,14 +29,16 @@ export const useChatStore = create((set, get) => ({
   },
 
   getfriend: async () => {
-    set({ isFriendLoading: true });
+    // set({ isFriendLoading: true });
+    set({ isUserLoading: true });
     try {
       const response = await axiosInstance.get("/auth/friendlist");
       set({ friendList: response.data });
     } catch (error) {
       toast.error("Failed to fetch user");
     } finally {
-      set({ isFriendLoading: false });
+      // set({ isFriendLoading: false });
+      set({ isUserLoading: false });
     }
   },
 

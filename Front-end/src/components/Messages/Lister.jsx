@@ -60,7 +60,7 @@ export default function Lister() {
 
 
       {/* {!isFriend ? <FriendUi /> : <Friend />} */}
-      {!isFriendLoading && <FriendUi />}
+      {!isUserLoading && <FriendUi />}
     </>
   );
 }
