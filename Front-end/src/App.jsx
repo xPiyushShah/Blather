@@ -33,7 +33,7 @@ function App() {
 
   useEffect(() => {
     console.log(err);
-    if (isCheckingAuth && minDelayPassed && err) {
+    if (isCheckingAuth && minDelayPassed && (err === false)) {
       setShouldShowLoader(false);
     }
   }, [isCheckingAuth, authUser, minDelayPassed , err]);
