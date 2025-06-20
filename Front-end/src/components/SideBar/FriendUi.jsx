@@ -7,7 +7,7 @@ import ProfileAvatar from "../ProfileAvatar";
 function FriendUi() {
   const { users, friendList, selectedUser, setSelctedUser } = useChatStore();
   const { onlineUser, authUser, socket, addfriend } = authStore();
-  const selctedID = selectedUser ? selectedUser._id === item._id : false;
+  console.log(friendList);
   return (
     <>
       {friendList && (
