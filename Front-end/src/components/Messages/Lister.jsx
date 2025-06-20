@@ -28,7 +28,7 @@ export default function Lister() {
   useEffect(() => {
     // getUsers();
     getfriend();
-  }, [ getfriend]);
+  }, [getfriend]);
 
   // useEffect(() => {
   //   getUsers();
@@ -56,11 +56,24 @@ export default function Lister() {
         </div>
       </div>
 
-      {isUserLoading && <ListSkelecton />}
+      {!isUserLoading ? (
+        friendList.length > 0 ? (
+          <FriendUi />
+        ) : (
+          <ListSkelecton />
+        )
+      ) : (
+        <ListSkelecton />
+      )}
+
+
+      {/* {isUserLoading && <ListSkelecton />}
 
 
       {/* {!isFriend ? <FriendUi /> : <Friend />} */}
-      {!isUserLoading && <FriendUi />}
+      {/* {!isUserLoading && <FriendUi />}
+
+      {friendList.length == 0} */} 
     </>
   );
 }
