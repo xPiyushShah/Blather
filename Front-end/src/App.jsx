@@ -35,7 +35,7 @@ function App() {
     if (!isCheckingAuth && authUser && minDelayPassed) {
       setShouldShowLoader(false);
     }
-    if (err == false) {
+    if (err == false && minDelayPassed) {
       setShouldShowLoader(false);
     }
     // console.log(err);
