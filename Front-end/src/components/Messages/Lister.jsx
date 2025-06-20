@@ -56,24 +56,19 @@ export default function Lister() {
         </div>
       </div>
 
-      {!isUserLoading ? (
-        friendList.length > 0 ? (
-          <FriendUi />
-        ) : (
-          <ListSkelecton />
-        )
-      ) : (
-        <ListSkelecton />
-      )}
+      {isUserLoading && (<ListSkelecton />)}
+
+      {!isUserLoading && <FriendUi />}
+
+      {friendList.length == 0 && friendList.length < 0
+        && (<ListSkelecton />)}
 
 
       {/* {isUserLoading && <ListSkelecton />}
 
 
-      {/* {!isFriend ? <FriendUi /> : <Friend />} */}
-      {/* {!isUserLoading && <FriendUi />}
-
-      {friendList.length == 0} */} 
+      {/* {!isFriend ? <FriendUi /> : <Friend />}{friendList.length == 0} */} 
+      
     </>
   );
 }

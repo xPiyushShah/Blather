@@ -2,6 +2,7 @@ import { create } from "zustand";
 import toast from "react-hot-toast";
 import { axiosInstance } from "../libs/axios.js";
 import { authStore } from "./authStore.js";
+import CryptoJS from "crypto-js";
 
 export const useChatStore = create((set, get) => ({
   messages: [],
@@ -13,6 +14,7 @@ export const useChatStore = create((set, get) => ({
   friendList: [],
   isFriendLoading: false,
   count: 0,
+  key: "LUABI-BLATHER",
 
   getUsers: async () => {
     // this is for load frnd rqst and send rqst - gloabl user
@@ -45,8 +47,23 @@ export const useChatStore = create((set, get) => ({
   getMessages: async (userId) => {
     set({ isMessageLoading: true });
     try {
-      const response = await axiosInstance.get(`/messages/${userId}`);
-      set({ messages: response.data });
+      const response = await axiosInstance.post(`/messages/${userId}`);
+      const finalArray = response.data.map((msg) => {
+        if (msg.text) {
+          try {
+            const bytes = CryptoJS.AES.decrypt(msg.text, key.get());
+            const decptText = bytes.toString(CryptoJS.enc.Utf8);
+            return {
+              ...msg,
+              text: decptText,
+            };
+          } catch {
+            return msg;
+          }
+        }
+        return msg; 
+      });
+      set({ messages: finalArray });
     } catch (error) {
       toast.error("Failed to fetch messages");
     } finally {
@@ -58,10 +75,19 @@ export const useChatStore = create((set, get) => ({
     const { selectedUser, messages } = get();
 
     try {
-      // console.log("Sending message to:", selectedUser);
+      const eText = CryptoJS.AES.encrypt(
+        messageData.text.trim(),
+        key.get()
+      ).toString();
+
+      const encryptMsg = {
+        ...messageData,
+        text: eText,
+      };
+
       const res = await axiosInstance.post(
         `/messages/send-msg/${selectedUser._id}`,
-        messageData
+        encryptMsg
       );
       set({ messages: [...messages, res.data] });
       toast.success("Message sent successfully");

@@ -9,7 +9,7 @@ const router = express.Router();
 // Register routes
 router.post("/users", protectAuth, getSideBarUsers);
 
-router.get("/:id", protectAuth, getMessages); //getting conversations by user id
+router.post("/:id", protectAuth, getMessages); //getting conversations by user id
 
 router.post("/send-msg/:id", protectAuth, sendMessage);
 
