@@ -16,8 +16,8 @@ function FriendUi() {
             <div
               key={item._id}
               className={`h-[4rem] border-b-[1px] border-b-[#dddddd35] w-full flex flex-row justify-between items-center text-center ${selectedUser?._id === item._id
-                  ? "bg-base-300 ring-1 ring-base-300 "
-                  : ""
+                ? "bg-[#8ed4d2] opacity-80 border-0 outline-0"
+                : ""
                 } mb-4`}
               style={{ cursor: "pointer", padding: "2px 16px" }}
               onClick={() =>
