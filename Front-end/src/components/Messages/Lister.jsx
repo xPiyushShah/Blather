@@ -21,13 +21,19 @@ export default function Lister() {
     friendList,
     count,
     setUserLoading,
+    isFriendLoading
   } = useChatStore();
   const { onlineUser, authUser, socket, addfriend } = authStore();
   const { isFriend } = functionStore();
   useEffect(() => {
-    getUsers();
+    // getUsers();
     getfriend();
-  }, [getUsers, getfriend]);
+  }, [ getfriend]);
+
+  // useEffect(() => {
+  //   getUsers();
+  //   getfriend();
+  // }, [getUsers, getfriend]);
   useEffect(() => { }, [socket]);
   return (
     <>
@@ -54,7 +60,7 @@ export default function Lister() {
 
 
       {/* {!isFriend ? <FriendUi /> : <Friend />} */}
-      {!isUserLoading && <FriendUi />}
+      {!isFriendLoading && <FriendUi />}
     </>
   );
 }

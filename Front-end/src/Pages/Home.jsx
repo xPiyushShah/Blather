@@ -4,6 +4,7 @@ import LeftBox from "../components/LeftBox";
 import SideBox from "../components/SideBox";
 import { callStore } from "../store/callStore";
 import { authStore } from "../store/authStore";
+import Loader from "../utils/Loader"
 
 const Home = () => {
   const { setIncomingCall, setGetModal, setModal, setPeer } = callStore();
@@ -48,8 +49,9 @@ const Home = () => {
       </div>
       {/* Only visible on screens < 640px */}
       <div className="flex  flex-col  gap-6 sm:hidden justify-center items-center h-screen bg-black text-white text-center px-4">
-        <p className="text-lg font-semibold">Not available on this device</p>
-        <p className="text-lg font-semibold">Try in Mobile application</p>
+        <Loader />
+        {/* <p className="text-lg font-semibold">Not available on this device</p>
+        <p className="text-lg font-semibold">Try in Mobile application</p> */}
       </div>
     </div>
   );

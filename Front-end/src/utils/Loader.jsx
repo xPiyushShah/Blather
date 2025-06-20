@@ -55,7 +55,7 @@ const Loader = () => {
 
   return (
     <div className="w-full h-screen flex flex-col items-center justify-center bg-black text-white relative overflow-hidden">
-      <div className="hidden md:flex flex-col items-center">
+      <div className="flex flex-col items-center">
         {/* Word display */}
         <div
           className={`flex flex-row text-center transition-transform duration-500 ease-in-out`}
@@ -94,27 +94,12 @@ const Loader = () => {
             }}
           ></div>
         )}
-        {authUser?.status === false && (
-          <div className="text-end align-base absolute bottom-0 right-2 w-full mt-4">
-            <div className="text-[12px] mt-4">
-              <ul className="list-none list-inside flex flex-row justify-center space-x-4
-              *:hover:cursor-pointer text-white">
-                <li>
-                  <Link to="/login">Login</Link>
-                </li>
-                <li>
-                  <Link to="/register">Signup</Link>
-                </li>
-              </ul>
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Message for small screens */}
-      <div className="md:hidden absolute bottom-10 text-center text-white text-xl px-4">
+      {/* <div className="md:hidden absolute bottom-10 text-center text-white text-xl px-4">
         Please use a laptop or PC to view this application.
-      </div>
+      </div> */}
     </div>
   );
 };

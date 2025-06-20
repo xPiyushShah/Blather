@@ -223,10 +223,9 @@ export const friendlist = async (req, res) => {
 
     // const friendDetails = await User.find({ _id: { $in: friendIds } });
 
-    const users = await User.find(
-      { _id: { $ne: myId } },
-      "first_name last_name profile_url"
-    );
+    const users = await User.find({
+      _id: { $nin: myId },
+    }).select("-password");
 
     res.status(200).json(users);
   } catch (error) {
