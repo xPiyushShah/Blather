@@ -39,15 +39,15 @@ io.on("connection", (socket) => {
     const receiverId = getReceiverSocketId(to);
     console.log("msg get", data);
     io.to(receiverId).emit("receive-message", data);
-    await SendMessage({
-      senderId: from,
-      receiverId: to,
-      text: data.text,
-      image: data.image,
-      audio: data.audio,
-      video: data.video,
-      time,
-    });
+    if (data.text && data.audio) {
+      await SendMessage({
+        senderId: from,
+        receiverId: to,
+        text: data.text,
+        image: data.image,
+        time,
+      });
+    }
   });
 
   // call feature
