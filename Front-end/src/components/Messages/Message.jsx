@@ -6,7 +6,6 @@ import { useChatStore } from "../../store/useChatStore.js";
 import { authStore } from "../../store/authStore.js";
 import { functionStore } from "../../store/functionStore.js";
 import ImagePreview from "./extra/ImagePreview.jsx";
-import { Solver } from "../../libs/crypto.js";
 import CryptoJS from "crypto-js";
 import Text from "../../utils/Text.jsx";
 
