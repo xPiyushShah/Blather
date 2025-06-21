@@ -339,7 +339,7 @@ export const sendMedia = async (req, res) => {
 
     const receiverSocketId = getReceiverSocketId(receiverId);
     if (receiverSocketId) {
-      io.to(receiverSocketId).emit("message", message);
+      io.to(receiverSocketId).emit("receive-message", message);
     }
 
     res.status(201).json(message);

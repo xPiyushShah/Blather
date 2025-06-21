@@ -39,7 +39,7 @@ io.on("connection", (socket) => {
     const receiverId = getReceiverSocketId(to);
     console.log("msg get", data);
     io.to(receiverId).emit("receive-message", data);
-    if (data.text && data.audio) {
+    if (data.text || data.image) {
       await SendMessage({
         senderId: from,
         receiverId: to,

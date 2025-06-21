@@ -96,24 +96,24 @@ export const useChatStore = create((set, get) => ({
     if (messageData.video) formData.append("video", messageData.video);
     try {
       console.log("Sending message media:", messageData);
-      // const res = await axiosInstance.post(
-      //   `/messages/send-media/${selectedUser._id}`,
-      //   formData
-      // );
-      const msg = {
-        senderId: myId._id,
-        receiverId: selectedUser._id,
-        audio: formData.audio,
-        video: formData.video,
-        createdAt: new Date().toISOString(),
-      };
+      const res = await axiosInstance.post(
+        `/messages/send-media/${selectedUser._id}`,
+        formData
+      );
+      // const msg = {
+      //   senderId: myId._id,
+      //   receiverId: selectedUser._id,
+      //   audio: formData.audio,
+      //   video: formData.video,
+      //   createdAt: new Date().toISOString(),
+      // };
       socket.emit("send-message", {
         to: selectedUser._id,
-        data: msg,
+        data: res.data,
         from: myId._id,
         time: new Date().toISOString(),
       });
-      set({ messages: [...messages, msg] });
+      set({ messages: [...messages, res.data] });
       toast.success("Media sent successfully");
     } catch (error) {
       toast.error("Not Sent");
