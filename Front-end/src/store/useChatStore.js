@@ -62,16 +62,6 @@ export const useChatStore = create((set, get) => ({
     const socket = authStore.getState().socket;
 
     try {
-      // const eText = CryptoJS.AES.encrypt(
-      //   messageData.text.trim(),
-      //   key.get()
-      // ).toString();
-
-      // const encryptMsg = {
-      //   ...messageData,
-      //   text: eText,
-      // };
-
       // const res = await axiosInstance.post(
       //   `/messages/send-msg/${selectedUser._id}`,
       //   encryptMsg
@@ -105,7 +95,7 @@ export const useChatStore = create((set, get) => ({
     if (messageData.audio) formData.append("audio", messageData.audio);
     if (messageData.video) formData.append("video", messageData.video);
     try {
-      // console.log("Sending message to:", selectedUser);
+      console.log("Sending message media:", messageData);
       // const res = await axiosInstance.post(
       //   `/messages/send-media/${selectedUser._id}`,
       //   formData
