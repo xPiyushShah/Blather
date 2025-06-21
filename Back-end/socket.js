@@ -2,6 +2,8 @@ import { Server } from "socket.io";
 
 import http from "http";
 
+import { SendMessage } from "./helper/SaveMessage.js";
+
 import express from "express";
 
 import { config } from "dotenv";
@@ -12,6 +14,7 @@ const app = express();
 const server = http.createServer(app);
 const userSocketMap = {};
 const userStatusMap = {};
+
 export function getReceiverSocketId(userId) {
   return userSocketMap[userId];
 }
@@ -21,6 +24,7 @@ const io = new Server(server, {
     origin: ["https://blathers.onrender.com"],
   },
 });
+
 io.on("connection", (socket) => {
   console.log("User connected", socket.id);
 
@@ -29,6 +33,22 @@ io.on("connection", (socket) => {
   if (userId) userSocketMap[userId] = socket.id;
 
   io.emit("userList", Object.keys(userSocketMap));
+
+  //msg feature
+  socket.on("send-message", async ({ from, data, to, time }) => {
+    const receiverId = getReceiverSocketId(to);
+    // console.log("msg get", data);
+    io.to(receiverId).emit("receive-message", data);
+    await SendMessage({
+      senderId: from,
+      receiverId: to,
+      text: data.text,
+      image: data.image,
+      audio: data.audio,
+      video: data.video,
+      time,
+    });
+  });
 
   // call feature
   socket.on("call-user", ({ signal, to, type }) => {

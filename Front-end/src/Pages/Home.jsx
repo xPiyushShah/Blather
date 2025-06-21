@@ -7,7 +7,7 @@ import { authStore } from "../store/authStore";
 import Loader from "../utils/Loader"
 
 const Home = () => {
-  const { setIncomingCall, setGetModal, setModal, setPeer } = callStore();
+  const { setIncomingCall, setGetModal, setModal, setPeer, endCall } = callStore();
   const { socket } = authStore();
   const [mainPart, setMainPart] = useState("none");
 
@@ -28,9 +28,7 @@ const Home = () => {
       if (peer) peer.signal(data.signal);
     });
 
-    socket.on("reject-call", () => {
-      callStore.getState().endCall();
-    });
+    socket.on("reject-call", endCall());
 
     return () => {
       socket.off("incoming-call");

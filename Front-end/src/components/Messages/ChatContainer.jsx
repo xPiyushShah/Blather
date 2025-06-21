@@ -40,26 +40,25 @@ export default function ChatContainer() {
         }} >
         <div
           className={`hidden md:flex mt-15 w-20 rounded-full hover:cursor-pointer  avatar  align-center justify-center text-center
-           ${
-             onlineUser.includes(selectedUser._id)
-                  ? "avatar-online"
-                  : "avatar-offline"
-           }
+           ${onlineUser.includes(selectedUser._id)
+              ? "avatar-online"
+              : "avatar-offline"
+            }
           `}>
           {selectedUser.profile_url ? (
             <img
               alt={selectedUser.first_name}
               src={selectedUser.profile_url}
-              className="object-cover mask mask-squircle rounded-full w-16 h-16"
+              className={`object-cover mask mask-squircle rounded-full w-16 h-16 ${!selectedUser ? "skeleton" : ""}`}
             />
           ) : (
             <ProfileAvatar onGen={selectedUser} />
           )}
         </div>
-        <div className="flex items-center  align-center text-center opacity-85  ">
+        <div className={`flex items-center  align-center text-center opacity-85 ${!selectedUser ? "skeleton" : ""}`}>
           {`${selectedUser.first_name} ${selectedUser.last_name}`}
         </div>
-        <div className="lest-3 lest-apply">
+        <div className={`lest-3 lest-apply ${!selectedUser ? "skeleton" : ""}`}>
           <div className="opt rounded-r-lg">
             <FontAwesomeIcon
               icon={faXmark}

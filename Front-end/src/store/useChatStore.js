@@ -48,22 +48,7 @@ export const useChatStore = create((set, get) => ({
     set({ isMessageLoading: true });
     try {
       const response = await axiosInstance.post(`/messages/${userId}`);
-      const finalArray = response.data.map((msg) => {
-        if (msg.text) {
-          try {
-            const bytes = CryptoJS.AES.decrypt(msg.text, key.get());
-            const decptText = bytes.toString(CryptoJS.enc.Utf8);
-            return {
-              ...msg,
-              text: decptText,
-            };
-          } catch {
-            return msg;
-          }
-        }
-        return msg; 
-      });
-      set({ messages: finalArray });
+      set({ messages: response.data });
     } catch (error) {
       toast.error("Failed to fetch messages");
     } finally {
@@ -75,22 +60,29 @@ export const useChatStore = create((set, get) => ({
     const { selectedUser, messages } = get();
 
     try {
-      const eText = CryptoJS.AES.encrypt(
-        messageData.text.trim(),
-        key.get()
-      ).toString();
+      // const eText = CryptoJS.AES.encrypt(
+      //   messageData.text.trim(),
+      //   key.get()
+      // ).toString();
 
-      const encryptMsg = {
-        ...messageData,
-        text: eText,
+      // const encryptMsg = {
+      //   ...messageData,
+      //   text: eText,
+      // };
+
+      // const res = await axiosInstance.post(
+      //   `/messages/send-msg/${selectedUser._id}`,
+      //   encryptMsg
+      // );
+      const msg = {
+        senderId: myId._id,
+        receiverId: selectedUser._id,
+        image: messageData.image,
+        text: messageData.text,
+        createdAt: new Date().toISOString(),
       };
-
-      const res = await axiosInstance.post(
-        `/messages/send-msg/${selectedUser._id}`,
-        encryptMsg
-      );
-      set({ messages: [...messages, res.data] });
-      toast.success("Message sent successfully");
+      set({ messages: [...messages, msg] });
+      // toast.success("Message sent successfully");
     } catch (error) {
       toast.error("Failed to send message");
     }
@@ -103,11 +95,18 @@ export const useChatStore = create((set, get) => ({
     if (messageData.video) formData.append("video", messageData.video);
     try {
       // console.log("Sending message to:", selectedUser);
-      const res = await axiosInstance.post(
-        `/messages/send-media/${selectedUser._id}`,
-        formData
-      );
-      set({ messages: [...messages, res.data] });
+      // const res = await axiosInstance.post(
+      //   `/messages/send-media/${selectedUser._id}`,
+      //   formData
+      // );
+      const msg = {
+        senderId: myId._id,
+        receiverId: selectedUser._id,
+        audio: formData.audio,
+        video: formData.video,
+        createdAt: new Date().toISOString(),
+      };
+      set({ messages: [...messages, msg] });
       toast.success("Message sent successfully");
     } catch (error) {
       toast.error("Not Sent");
@@ -137,9 +136,9 @@ export const useChatStore = create((set, get) => ({
     const { selectedUser, count } = get();
     if (!selectedUser) return;
     const socket = authStore.getState().socket;
-    socket.on("message", (msg) => {
-      set({ messages: [...get().messages, msg], count: count + 1 });
-    });
+    // socket.on("message", (msg) => {
+    //   set({ messages: [...get().messages, msg], count: count + 1 });
+    // });
   },
 
   unSubscribeMessages: () => {
@@ -152,4 +151,6 @@ export const useChatStore = create((set, get) => ({
   },
 
   setUserLoading: (value) => set({ isUserLoading: value }),
+
+  updateMessage: (data) => set({ messages: [...get().messages, data] }),
 }));

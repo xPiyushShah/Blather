@@ -1,10 +1,12 @@
 import React, { useEffect, useRef } from "react";
 import { callStore } from "../../store/callStore.js";
 import { authStore } from "../../store/authStore.js";
+import { useChatStore }  from "../../store/useChatStore.js";
 
 function CallModal() {
   const localVideoRef = useRef(null);
   const { socket } = authStore();
+  const { selectedUser } = useChatStore();
   const {
     answerCall,
     incomingCall,

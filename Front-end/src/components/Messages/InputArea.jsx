@@ -31,7 +31,7 @@ export default function InputArea() {
 
   const fileInputRef = useRef(null);
 
-  const { sendMessage } = useChatStore();
+  const { sendMessage , key } = useChatStore();
 
   const handleEmojiClick = (emojiData) => {
     settext((prev) => prev + emojiData.emoji + " ");
@@ -61,8 +61,13 @@ export default function InputArea() {
     if (!text.trim() && !imagePreview) return;
     // settexts((prev) => [...prev, newtext]);
 
+    const eText = CryptoJS.AES.encrypt(
+      text.trim(),
+      key
+    ).toString();
+
     await sendMessage({
-      text: text.trim(),
+      text: eText,
       image: imagePreview,
     });
     settext("");

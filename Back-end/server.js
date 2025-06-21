@@ -39,7 +39,7 @@ app.get("/api/auth", (req, res) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`Server started on http://localhost:${PORT}`);
-  // console.log(`Server started on &#34;${process.env.BACKEND_URL}&#34;`);
+  // console.log(`Server started on http://localhost:${PORT}`);
+  console.log(`Server started on ${process.env.BACKEND_URL}`);
   connectDB();
 });

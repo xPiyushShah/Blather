@@ -6,6 +6,9 @@ import { useChatStore } from "../../store/useChatStore.js";
 import { authStore } from "../../store/authStore.js";
 import { functionStore } from "../../store/functionStore.js";
 import ImagePreview from "./extra/ImagePreview.jsx";
+import { Solver } from "../../libs/crypto.js";
+import CryptoJS from "crypto-js";
+import Text from "../../utils/Text.jsx";
 
 
 const formatTimeAgo = (timestamp) => {
@@ -32,10 +35,12 @@ export default function Message() {
     unSubscribeMessages,
     subScribeMessages,
     deleteMessage,
+    updateMessage,
+    key
   } = useChatStore();
   const { starMessage, starredMessages, saveStarMessae } = functionStore();
 
-  const { authUser } = authStore();
+  const { authUser, socket } = authStore();
 
   const bottomRef = useRef(null);
 
@@ -45,9 +50,32 @@ export default function Message() {
 
   useEffect(() => {
     getMessages(selectedUser._id);
-    subScribeMessages();
-    return () => unSubscribeMessages();
-  }, [getMessages, selectedUser._id, subScribeMessages, unSubscribeMessages]);
+    // subScribeMessages();
+    // return () => unSubscribeMessages();
+  }, [getMessages, selectedUser._id]);
+
+  // useEffect(() => {
+  //   getMessages(selectedUser._id);
+  //   subScribeMessages();
+  //   return () => unSubscribeMessages();
+  // }, [getMessages, selectedUser._id, subScribeMessages, unSubscribeMessages]);
+
+  useEffect(() => {
+
+    if (!socket) return;
+
+    const handleReceiveMessage = (message) => {
+      // console.log("get", message);
+      updateMessage(message);
+    };
+
+    socket.on("receive-message", handleReceiveMessage);
+
+    return () => {
+      socket.off("receive-message", handleReceiveMessage); // clean up
+    };
+
+  }, [socket]);
 
   const [, setNow] = useState(Date.now());
   useEffect(() => {
@@ -55,10 +83,19 @@ export default function Message() {
     return () => clearInterval(interval);
   }, []);
 
+
+
   const [imgSrc, setImgSrc] = useState(true);
   const [imgload, setImgload] = useState(true);
   const [openImg, setOpenImg] = useState(false);
   const [messageOption, setMessageOption] = useState(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setImgload(false);
+    }, 4000);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -72,7 +109,7 @@ export default function Message() {
   }, []);
 
   const handleStarMessage = (messageId) => {
-    const message = messages.find((msg) => msg._id === messageId);
+    const message = messages.find((msg) => msgID === messageId);
     if (!message) return;
 
     const isStarred = starredMessageIds.has(messageId);
@@ -103,7 +140,22 @@ export default function Message() {
     return messages.length - index <= threshold;
   };
 
-  const starredMessageIds = new Set(starredMessages.map((msg) => msg._id));
+
+  //text messages
+  const msgCheck = (text) => {
+    try {
+      const bytes = CryptoJS.AES.decrypt(text, key);
+      const decrypted = bytes.toString(CryptoJS.enc.Utf8);
+      if (!decrypted) {
+        return text;
+      }
+      return decrypted;
+    } catch (error) {
+      return text;
+    }
+  };
+
+  const starredMessageIds = new Set(starredMessages.map((msg) => msgID));
 
   if (!messages || messages.length === 0) {
     return (
@@ -123,15 +175,16 @@ export default function Message() {
       <div className="flex-1 overflow-y-hidden p-4 space-y-4 flex flex-col gap-4">
         {messages.map((msg, index) => {
           const isSender = authUser._id == msg.senderId;
-          const isSelected = messageOption == msg._id;
+          const msgID = index;
+          const isSelected = messageOption == msgID;
           return (
             <div
-              key={msg._id}
+              key={msgID}
               className={`chat space-y-4 ${isSender ? "chat-end" : "chat-start"
                 } rounded-lg mb-8 relative ${isSelected ? "bg-[#1b34e129]" : ""}`}
               onContextMenu={(e) => {
                 e.preventDefault();
-                setMessageOption((prev) => (prev === msg._id ? null : msg._id));
+                setMessageOption((prev) => (prev === msgID ? null : msgID));
               }}>
               <div className="chat-footer mb-18 flex items-center gap-1">
                 <time dateTime="" className="text-xs opacity-50 ml-1">
@@ -140,7 +193,7 @@ export default function Message() {
                     : `Received ${formatTimeAgo(msg.createdAt)}`}
                 </time>
 
-                {starredMessageIds.has(msg._id) && (
+                {starredMessageIds.has(msgID) && (
                   <FontAwesomeIcon
                     icon={faStar}
                     className="text-yellow-400 text-xs ml-1"
@@ -149,17 +202,18 @@ export default function Message() {
                 )}
               </div>
               <div
-                className={`chat-bubble bg-base-300 text-white max-w-xs flex flex-col gap-2 p-14 relative`}>
-                {msg.text && <p>{msg.text}</p>}
-                
+                className={`chat-bubble bg-base-300 text-white max-w-xs w-full flex flex-col gap-2 p-14 relative truncate`}>
+
+                {msg.text && <p className><Text msg={msgCheck(msg.text)} /></p>}
+
                 {msg.image && (
                   <div
                     className={`chat-image bg-red-300 ${imgload ? "skeleton" : ""
-                      } w-[200px] h-[200px]`}>
+                      } w-[full] h-[full]`}>
                     <img
                       src={msg.image}
                       alt="sent file"
-                      className="mb-2 rounded-md sm:max-w-[200px] sm:max-h-[200px] object-cover w-full cursor-pointer"
+                      className="mb-2 rounded-md sm:max-w-[full] sm:max-h-[full] object-cover w-full cursor-pointer"
                       loading="lazy"
                       onClick={() => {
                         setOpenImg(true);
@@ -196,7 +250,7 @@ export default function Message() {
                   />
                 )}
 
-                {messageOption === msg._id && (
+                {messageOption === msgID && (
                   <div
                     className={`absolute ${isNearBottom(index) ? "bottom-full mb-2" : "top-full mt-2"
                       } ${!isSender ? "left-12" : "right-12"
@@ -204,12 +258,12 @@ export default function Message() {
                     <ul className="flex flex-col justify-evenly w-full h-full gap-1">
                       <li
                         className="hover:bg-base-content hover:text-black px-4 py-2 cursor-pointer"
-                        onClick={() => handleStarMessage(msg._id)}>
-                        {starredMessageIds.has(msg._id) ? "Unstar" : "Star"}
+                        onClick={() => handleStarMessage(msgID)}>
+                        {starredMessageIds.has(msgID) ? "Unstar" : "Star"}
                       </li>
                       <li
                         className="hover:bg-red-100 px-4 py-2 cursor-pointer text-red-500"
-                        onClick={() => handleDeleteMessage(msg._id)}>
+                        onClick={() => handleDeleteMessage(msgID)}>
                         Delete
                       </li>
                     </ul>
