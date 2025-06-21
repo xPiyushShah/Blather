@@ -67,7 +67,7 @@ function Mic({ close }) {
 
     const sendAudio = async (blob) => {
         //  stopRecording
-        console.log("Sending audio...", blob);
+        // console.log("Sending audio...", blob);
         if (!blob) {
             console.error("No audio data to send");
         }
@@ -75,7 +75,7 @@ function Mic({ close }) {
         // Convert blob to File if needed
         const file = new File([blob], "audio.webm", { type: "audio/webm" });
 
-        console.log("Sending file:", file);
+        // console.log("Sending file:", file);
         // Send the audio file using sendMedia function
 
         if (!file) {
