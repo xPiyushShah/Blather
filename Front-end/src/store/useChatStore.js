@@ -58,6 +58,8 @@ export const useChatStore = create((set, get) => ({
 
   sendMessage: async (messageData) => {
     const { selectedUser, messages } = get();
+    const myId = authStore.getState().authUser;
+    const socket = authStore.getState().socket;
 
     try {
       // const eText = CryptoJS.AES.encrypt(
@@ -81,15 +83,24 @@ export const useChatStore = create((set, get) => ({
         text: messageData.text,
         createdAt: new Date().toISOString(),
       };
+      socket.emit("send-message", {
+        to: selectedUser._id,
+        data: msg,
+        from: myId._id,
+        time: new Date().toISOString(),
+      });
       set({ messages: [...messages, msg] });
       // toast.success("Message sent successfully");
     } catch (error) {
       toast.error("Failed to send message");
+      console.log(err.message);
     }
   },
 
   sendMedia: async (messageData) => {
     const { selectedUser, messages } = get();
+    const myId = authStore.getState().authUser;
+    const socket = authStore.getState().socket;
     const formData = new FormData();
     if (messageData.audio) formData.append("audio", messageData.audio);
     if (messageData.video) formData.append("video", messageData.video);
@@ -106,10 +117,17 @@ export const useChatStore = create((set, get) => ({
         video: formData.video,
         createdAt: new Date().toISOString(),
       };
+      socket.emit("send-message", {
+        to: selectedUser._id,
+        data: msg,
+        from: myId._id,
+        time: new Date().toISOString(),
+      });
       set({ messages: [...messages, msg] });
-      toast.success("Message sent successfully");
+      toast.success("Media sent successfully");
     } catch (error) {
       toast.error("Not Sent");
+      console.log(err.message);
     }
   },
 
