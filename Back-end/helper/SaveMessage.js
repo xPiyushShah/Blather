@@ -20,7 +20,7 @@ export const SendMessage = async ({
       updatedAt: time,
     });
     await message.save();
-    // console.log("Message saved successfully");
+    console.log("from helper ", message);
   } catch (error) {
     console.error("Error saving message:", error);
   }

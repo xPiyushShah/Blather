@@ -37,7 +37,7 @@ io.on("connection", (socket) => {
   //msg feature
   socket.on("send-message", async ({ from, data, to, time }) => {
     const receiverId = getReceiverSocketId(to);
-    // console.log("msg get", data);
+    console.log("msg get", data);
     io.to(receiverId).emit("receive-message", data);
     await SendMessage({
       senderId: from,
