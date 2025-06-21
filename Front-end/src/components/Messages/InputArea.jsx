@@ -12,6 +12,7 @@ import {
 
 import EmojiPicker from "emoji-picker-react";
 import { Picker } from "emoji-mart";
+import CryptoJS from "crypto-js";
 // import "emoji-mart/css/emoji-mart.css";
 import toast from "react-hot-toast";
 import { useChatStore } from "../../store/useChatStore";

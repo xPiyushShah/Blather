@@ -32,7 +32,7 @@ export default function ChatContainer() {
   return (
     <div className="flex flex-col h-full w-full justify-between ">
       <div
-        className="relative flex flex-row justify-between w-full border-b-[1px] border-b-[#dddddd35]  align-center text-center header-lest"
+        className="relative flex flex-row justify-between w-full border-b-[1px] border-b-[#dddddd35] max-h-24 align-center text-center header-lest"
         onContextMenu={(e) => {
           e.preventDefault();
           setContext(true);
@@ -49,7 +49,7 @@ export default function ChatContainer() {
             <img
               alt={selectedUser.first_name}
               src={selectedUser.profile_url}
-              className={`object-cover mask mask-squircle rounded-full w-16 h-16 ${!selectedUser ? "skeleton" : ""}`}
+              className={`object-cover mask mask-squircle rounded-full w-8 h-8 ${!selectedUser ? "skeleton" : ""}`}
             />
           ) : (
             <ProfileAvatar onGen={selectedUser} />
