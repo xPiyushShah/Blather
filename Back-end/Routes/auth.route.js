@@ -13,6 +13,7 @@ import {
 } from "../Controllers/auth.controller.js";
 import upload  from "../middleware/multer.middleware.js";
 import { protectAuth } from "../middleware/auth.middleware.js"; 
+import { protectAuth } from "../middleware/session.middleware.js"; 
 
 const router = express.Router();
 

@@ -1,8 +1,9 @@
 import bcrypt from "bcryptjs";
 import Friend from "../Models/friends.model.js";
 import User from "../Models/user.model.js";
-import { gToken } from "../libs/utils.js";
+import { gToken, generateSession } from "../libs/utils.js";
 import cloudinary from "../libs/cloudinary.js";
+import redisClient from "../libs/redisClient.js";
 export const cookie = (req, res) => {
   const token = req.cookies.auth_token;
   if (!token) {
@@ -14,10 +15,9 @@ export const signup = async (req, res) => {
   const { first_name, last_name, email, password } = req.body;
 
   try {
-
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ message: "User already exists" });
+      return res.status(400).json({ message: "User already exists" , status: false });
     }
 
     // Hash password
@@ -34,16 +34,18 @@ export const signup = async (req, res) => {
 
     await newUser.save();
 
+    await generateSession(user._id, res);
+
     // Generate token
     const token = gToken(newUser._id, res);
 
     await User.findByIdAndUpdate(newUser._id, { token: token }, { new: true });
 
     // res.status(201).json({ message: "User created successfully"});
-    res.status(201).json({ message: "User created successfully", token });
+    res.status(201).json({ message: "User created successfully", token  , status: true  });
   } catch (err) {
     console.error("Error to Integrate with data:", err.message);
-    res.status(500).json({ message: "Internal Server Error" });
+    res.status(500).json({ message: "Internal Server Error"  , status: false  });
   }
 };
 export const login = async (req, res) => {
@@ -51,18 +53,20 @@ export const login = async (req, res) => {
 
   try {
     const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ message: "User not found" });
+    if (!user) return res.status(400).json({ message: "User not found"  , status: false  });
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch)
-      return res.status(400).json({ message: "Invalid email or password" });
+      return res.status(400).json({ message: "Invalid email or password"  , status: false  });
+
+    await generateSession(user._id, res);
 
     const token = gToken(user._id, res);
 
     await User.findByIdAndUpdate(user._id, { token: token }, { new: true });
 
     // res.status(200).json({ message: "You are logged in..!"});
-    res.status(200).json({ message: "You are logged in..!", token });
+    res.status(200).json({ message: "You are logged in..!", token   , status: false  });
 
     // res.status(200).json({
     //   _id: user._id,
@@ -72,10 +76,15 @@ export const login = async (req, res) => {
     // });
   } catch (err) {
     // console.error("Login Error:", err.message);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Server error" , status: false  });
   }
 };
 export const logout = async (req, res) => {
+  const sessionId = req.cookies.sessionId;
+
+  if (sessionId) {
+    await redisClient.del(sessionId); // delete session from Redis
+  }
   const userID = req.user._id;
   await User.findByIdAndUpdate(userID, { token: "" }, { new: true });
 
