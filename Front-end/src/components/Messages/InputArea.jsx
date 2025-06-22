@@ -62,10 +62,13 @@ export default function InputArea() {
     if (!text.trim() && !imagePreview) return;
     // settexts((prev) => [...prev, newtext]);
 
-    const eText = CryptoJS.AES.encrypt(
-      text.trim(),
-      key
-    ).toString();
+    let eText = null;
+    if (text) {
+      eText = CryptoJS.AES.encrypt(
+        text.trim(),
+        key
+      ).toString();
+    }
 
     await sendMessage({
       text: eText,

@@ -225,7 +225,7 @@ export default function Message() {
                   <audio
                     controls
                     controlsList="nodownload"
-                    className="w-65  bg-base-200 rounded-md p-2">
+                    className="w-full  bg-base-200 rounded-md p-2">
                     <source src={msg.audio} type="audio/mpeg" />
                     Your browser does not support the audio element.
                   </audio>
