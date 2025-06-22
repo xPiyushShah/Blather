@@ -34,7 +34,9 @@ export const signup = async (req, res) => {
 
     await newUser.save();
 
-    await generateSession(user._id, res);
+    const session = await generateSession(user._id, res);
+
+    console.log(session);
 
     // Generate token
     const token = gToken(newUser._id, res);
@@ -59,7 +61,9 @@ export const login = async (req, res) => {
     if (!isMatch)
       return res.status(400).json({ message: "Invalid email or password"  , status: false  });
 
-    await generateSession(user._id, res);
+    const session = await generateSession(user._id, res);
+
+    console.log(session);
 
     const token = gToken(user._id, res);
 
