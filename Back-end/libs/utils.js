@@ -11,9 +11,9 @@ export const gToken = (userId, res) => {
   res.cookie("auth_token", token, {
     httpOnly: true,
     secure: true,
-    sameSite: "none", 
+    sameSite: "none",
     maxAge: 7 * 24 * 60 * 60 * 1000,
-    domain: ".onrender.com", 
+    domain: ".onrender.com",
     path: "/",
   });
   return token;
@@ -36,10 +36,10 @@ export const generateSession = async (userId, res) => {
 
   res.cookie("sessionId", sessionId, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-    maxAge: 7 * 24 * 60 * 60 * 1000,
+    secure: true,
+    sameSite: "none",
     path: "/",
+    maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 
   return sessionId;
