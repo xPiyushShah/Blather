@@ -1,17 +1,11 @@
 import { create } from "zustand";
-// import Peer from "simple-peer";
 import Peer from "simple-peer/simplepeer.min.js";
 import { authStore } from "./authStore.js";
 import { handleCallAccepted, handleBusy } from "../helper/callhandler.js";
 
-// const ICE_SERVERS = {
-//   iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
-// };
 const ICE_SERVERS = {
   iceServers: [
-    {
-      urls: ["stun:bn-turn2.xirsys.com"],
-    },
+    { urls: ["stun:bn-turn2.xirsys.com"] },
     {
       username:
         "KOo7L3-HXfompS_KFnBUpL2zPDmkLE18D7lfVKqr1bexPhmECxYyB5rcOM9ZYcrmAAAAAGhY84BibGF0aGVyNDAyMQ==",
@@ -26,255 +20,192 @@ const ICE_SERVERS = {
   ],
 };
 
-export const callStore = create((set, get) => ({
-  localStream: null,
-  remoteStream: null,
-  peer: null,
-  callInProgress: false,
-  targetSocketId: null,
-  callModal: null,
-  callEstablished: false,
-  incomingCall: false,
-  getModal: false,
+export const callStore = create((set, get) => {
+  let callTimeout;
 
-  peerConnection: null,
-  callInProgress: false,
+  // Store event handler refs to properly off/on them
+  let onCallAcceptedHandler = null;
+  let onBusyHandler = null;
 
-  setModal: (isOpen) => set({ callModal: isOpen }),
-  setTargetSocketId: (id) => set({ targetSocketId: id?._id || id }),
-  setlocalStream: (stream) => set({ localStream: stream }),
-  setremoteStream: (stream) => set({ remoteStream: stream }),
-  setIncomingCall: (data) => set({ incomingCall: data }),
-  setGetModal: (data) => set({ getModal: data }),
-  setPeer: (peer) => set({ peer }),
+  return {
+    localStream: null,
+    remoteStream: null,
+    peer: null,
+    callInProgress: false,
+    targetSocketId: null,
+    callModal: null,
+    callEstablished: false,
+    incomingCall: false,
+    getModal: false,
 
-  initializeMedia: async () => {
-    const callModal = get().callModal;
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: callModal === "video" ? true : false,
-        audio: true,
-      });
-      set({ localStream: stream });
-    } catch (error) {
-      console.error("Error accessing media devices:", error);
-    } finally {
-      get().makeCall();
-      set({ callInProgress: true });
-    }
-  },
-  makeCall: () => {
-    const { targetSocketId, callModal, localStream } = get();
-    const socket = authStore.getState().socket;
+    peerConnection: null,
 
-    if (!socket) {
-      alert("❌ Socket not connected. Cannot make call.");
-      return;
-    }
+    setModal: (isOpen) => set({ callModal: isOpen }),
+    setTargetSocketId: (id) => set({ targetSocketId: id?._id || id }),
+    setlocalStream: (stream) => set({ localStream: stream }),
+    setremoteStream: (stream) => set({ remoteStream: stream }),
+    setIncomingCall: (data) => set({ incomingCall: data }),
+    setGetModal: (data) => set({ getModal: data }),
+    setPeer: (peer) => set({ peer }),
 
-    if (!localStream) {
-      alert("❌ Local media stream not available.");
-      return;
-    }
-
-    const peer = new Peer({
-      initiator: true,
-      trickle: false,
-      stream: localStream,
-      config: ICE_SERVERS,
-    });
-
-    peer.on("signal", (signal) => {
-      socket.emit("call-user", {
-        signal,
-        to: targetSocketId,
-        type: callModal,
-      });
-    });
-
-    peer.on("stream", (remoteStream) => {
-      set({ remoteStream, callEstablished: true });
-    });
-
-    peer.on("connect", () => {
-      console.log("✅ Peer connection established!");
-      clearTimeout(timeout);
-    });
-
-    peer.on("error", (err) => {
-      console.error("❌ Peer connection error:", err);
-      alert("Connection error. Check TURN server or network.");
-      get().endCall();
-    });
-
-    peer.on("close", () => {
-      console.log("🔌 Peer connection closed.");
-      get().endCall();
-    });
-
-    socket.off("call-accepted", (data) => handleCallAccepted(data, get, set));
-    socket.on("call-accepted", (data) => handleCallAccepted(data, get, set));
-
-    socket.off("busy", () => handleBusy(get));
-    socket.on("busy", () => handleBusy(get));
-
-    const timeout = setTimeout(() => {
-      if (!get().callEstablished) {
-        alert(
-          "Call failed to connect. Please check your network or TURN server."
-        );
-        get().endCall();
+    initializeMedia: async () => {
+      const callModal = get().callModal;
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: callModal === "video",
+          audio: true,
+        });
+        set({ localStream: stream });
+        get().makeCall();
+        set({ callInProgress: true });
+      } catch (error) {
+        console.error("Error accessing media devices:", error);
       }
-    }, 60000);
+    },
 
-    set({ peer, callInProgress: true });
-  },
+    makeCall: () => {
+      const { targetSocketId, callModal, localStream } = get();
+      const socket = authStore.getState().socket;
 
-  answerCall: async (incomingSignal, callerSocketId, type) => {
-    const socket = authStore.getState().socket;
-    const localStream = get().localStream;
+      if (!socket) {
+        alert("❌ Socket not connected. Cannot make call.");
+        return;
+      }
 
-    if (!socket) {
-      alert("Socket not connected.");
-      return;
-    }
-    if (!localStream) {
-      alert("No local stream. Can't answer call.");
-      return;
-    }
+      if (!localStream) {
+        alert("❌ Local media stream not available.");
+        return;
+      }
 
-    const peer = new Peer({
-      initiator: false,
-      trickle: false,
-      stream: localStream,
-      config: ICE_SERVERS,
-    });
+      const peer = new Peer({
+        initiator: true,
+        trickle: false,
+        stream: localStream,
+        config: ICE_SERVERS,
+      });
 
-    peer.on("signal", (signal) => {
-      socket.emit("answer-call", { signal, to: callerSocketId, type });
-    });
+      peer.on("signal", (signal) => {
+        socket.emit("call-user", {
+          signal,
+          to: targetSocketId,
+          type: callModal,
+        });
+      });
 
-    peer.on("connect", () => {
-      console.log("✅ Peer connection established!");
-    });
+      peer.on("stream", (remoteStream) => {
+        set({ remoteStream, callEstablished: true });
+      });
 
-    peer.on("stream", (remoteStream) => {
-      set({ remoteStream, callEstablished: true });
-    });
+      peer.on("connect", () => {
+        console.log("✅ Peer connection established!");
+        if (callTimeout) clearTimeout(callTimeout);
+      });
 
-    peer.on("error", (err) => {
-      console.error("❌ Peer error:", err);
-      alert("Failed to answer call due to connection issue.");
-      get().endCall();
-    });
+      peer.on("error", (err) => {
+        console.error("❌ Peer connection error:", err);
+        alert("Connection error. Check TURN server or network.");
+        get().endCall();
+      });
 
-    peer.on("close", () => {
-      console.log("🔌 Peer connection closed.");
-      get().endCall();
-    });
+      peer.on("close", () => {
+        console.log("🔌 Peer connection closed.");
+        get().endCall();
+      });
 
-    peer.signal(incomingSignal);
+      // Clean up old listeners before adding new ones
+      if (onCallAcceptedHandler) socket.off("call-accepted", onCallAcceptedHandler);
+      if (onBusyHandler) socket.off("busy", onBusyHandler);
 
-    set({ peer, callInProgress: true, callEstablished: true });
-  },
+      onCallAcceptedHandler = (data) => handleCallAccepted(data, get, set);
+      onBusyHandler = () => handleBusy(get);
 
-  // makeCall: () => {
-  //   const { targetSocketId, callModal, localStream } = get();
-  //   const socket = authStore.getState().socket;
+      socket.on("call-accepted", onCallAcceptedHandler);
+      socket.on("busy", onBusyHandler);
 
-  //   if (!socket) {
-  //     console.error("Cannot make call: missing socket.");
-  //     return;
-  //   }
-  //   if (!localStream) {
-  //     console.error("Missing localStream");
-  //     return;
-  //   }
+      callTimeout = setTimeout(() => {
+        if (!get().callEstablished) {
+          alert(
+            "Call failed to connect. Please check your network or TURN server."
+          );
+          get().endCall();
+        }
+      }, 60000);
 
-  //   const peer = new Peer({
-  //     initiator: true,
-  //     trickle: false,
-  //     stream: localStream,
-  //     config: ICE_SERVERS,
-  //   });
+      set({ peer, callInProgress: true });
+    },
 
-  //   peer.on("signal", (signal) => {
-  //     socket.emit("call-user", { signal, to: targetSocketId, type: callModal });
-  //   });
+    answerCall: async (incomingSignal, callerSocketId, type) => {
+      const socket = authStore.getState().socket;
+      const localStream = get().localStream;
 
-  //   peer.on("stream", (remoteStream) => {
-  //     set({ remoteStream, callEstablished: true });
-  //   });
+      if (!socket) {
+        alert("Socket not connected.");
+        return;
+      }
+      if (!localStream) {
+        alert("No local stream. Can't answer call.");
+        return;
+      }
 
-  //   socket.off("call-accepted");
-  //   socket.on("call-accepted", (data) => {
-  //     // console.log("✅ Call accepted:", data);
-  //     peer.signal(data.signal);
-  //     set({ callEstablished: true });
-  //   });
+      const peer = new Peer({
+        initiator: false,
+        trickle: false,
+        stream: localStream,
+        config: ICE_SERVERS,
+      });
 
-  //   socket.off("busy");
-  //   socket.on("busy", (data) => {
-  //     console.log("�� User is busy:", data);
-  //     get().endCall();
-  //   })
+      peer.on("signal", (signal) => {
+        socket.emit("answer-call", { signal, to: callerSocketId, type });
+      });
 
-  //   set({ peer, callInProgress: true, localStream: localStream });
-  // },
+      peer.on("connect", () => {
+        console.log("✅ Peer connection established!");
+      });
 
-  // answerCall: async (incomingSignal, callerSocketId, type) => {
-  //   const socket = authStore.getState().socket;
-  //   const localStream = get().localStream;
-  //   if (!socket) {
-  //     console.error("Cannot make call: missing socket reciver .");
-  //     return;
-  //   }
-  //   if (!localStream) {
-  //     console.error("Missing localStream reciver ");
-  //     return;
-  //   }
+      peer.on("stream", (remoteStream) => {
+        set({ remoteStream, callEstablished: true });
+      });
 
-  //   const peer = new Peer({
-  //     initiator: false,
-  //     trickle: false,
-  //     stream: localStream,
-  //     config: ICE_SERVERS,
-  //   });
+      peer.on("error", (err) => {
+        console.error("❌ Peer error:", err);
+        alert("Failed to answer call due to connection issue.");
+        get().endCall();
+      });
 
-  //   peer.on("signal", (signal) => {
-  //     socket.emit("answer-call", { signal, to: callerSocketId, type });
-  //   });
+      peer.on("close", () => {
+        console.log("🔌 Peer connection closed.");
+        get().endCall();
+      });
 
-  //   peer.on("stream", (remoteStream) => {
-  //     set({ remoteStream, callEstablished: true });
-  //   });
+      peer.signal(incomingSignal);
 
-  //   peer.signal(incomingSignal);
+      set({ peer, callInProgress: true, callEstablished: true });
+    },
 
-  //   set({ peer, callInProgress: true, callEstablished: true });
-  // },
+    endCall: () => {
+      const { peer, localStream, incomingCall } = get();
+      const socket = authStore.getState().socket;
 
-  endCall: () => {
-    const { peer, localStream, incomingCall } = get();
-    const socket = authStore.getState().socket;
+      if (socket && incomingCall?.from) {
+        socket.emit("reject-call", { to: incomingCall.from });
+      }
 
-    if (socket && incomingCall?.from) {
-      socket.emit("reject-call", { to: incomingCall.from });
-    }
+      if (peer) peer.destroy();
 
-    if (peer) peer.destroy();
+      if (localStream) localStream.getTracks().forEach((track) => track.stop());
 
-    if (localStream) localStream.getTracks().forEach((track) => track.stop());
+      set({
+        localStream: null,
+        remoteStream: null,
+        peer: null,
+        callInProgress: false,
+        targetSocketId: null,
+        callModal: null,
+        callEstablished: false,
+        incomingCall: false,
+      });
 
-    set({
-      localStream: null,
-      remoteStream: null,
-      peer: null,
-      callInProgress: false,
-      targetSocketId: null,
-      callModal: null,
-      callEstablished: false,
-      incomingCall: false,
-    });
-  },
-}));
+      if (callTimeout) clearTimeout(callTimeout);
+    },
+  };
+});

@@ -1,4 +1,3 @@
-// src/helper/callHandler.js
 export const handleCallAccepted = (data, get, set) => {
   const peer = get().peer;
   if (!peer) {
