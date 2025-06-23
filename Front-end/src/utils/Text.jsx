@@ -2,27 +2,33 @@ import React, { useState } from 'react';
 
 function Text({ msg }) {
     const [expanded, setExpanded] = useState(false);
-
     const charLimit = 50;
 
     const isLong = msg.length > charLimit;
-
-    const displayText = expanded || !isLong
-        ? msg
-        : msg.slice(0, charLimit) + '...';
+    const visibleText = msg.slice(0, charLimit);
+    const hiddenText = msg.slice(charLimit);
 
     return (
-        <>
-            {msg && <p className={`w`}>{displayText}</p>}
+        <div className="relative w-full">
+            <p className="text-sm leading-6 whitespace-pre-wrap">
+                {visibleText}
+                {!expanded && isLong && '...'}
+                {expanded && (
+                    <span className="block transition-all duration-300 ease-in-out">
+                        {hiddenText}
+                    </span>
+                )}
+            </p>
+
             {isLong && (
                 <button
                     onClick={() => setExpanded(!expanded)}
-                    className="text-sm text-blue-400 underline self-end flex  align-end cursor-pointer absolute top-6 right-2"
+                    className="text-xs text-blue-500 underline mt-1"
                 >
                     {expanded ? 'Show less' : 'Show more'}
                 </button>
             )}
-        </>
+        </div>
     );
 }
 
