@@ -21,12 +21,12 @@ const Home = () => {
       setGetModal(true);
     });
 
-    socket.off("call-accepted");
-    socket.on("call-accepted", (data) => {
-      setPeer(data.signal);
-      const peer = callStore.getState().peer;
-      if (peer) peer.signal(data.signal);
-    });
+    // socket.off("call-accepted");
+    // socket.on("call-accepted", (data) => {
+    //   setPeer(data.signal);
+    //   const peer = callStore.getState().peer;
+    //   if (peer) peer.signal(data.signal);
+    // });
 
     socket.on("reject-call", endCall());
 

@@ -65,7 +65,7 @@ export const callStore = create((set, get) => {
     },
 
     makeCall: () => {
-      const { targetSocketId, callModal, localStream } = get();
+      const { targetSocketId, callModal, localStream , onCallAcceptedHandler, onBusyHandler  } = get();
       const socket = authStore.getState().socket;
 
       if (!socket) {
@@ -120,8 +120,8 @@ export const callStore = create((set, get) => {
         get().endCall();
       });
 
-      if (onCallAcceptedHandler) socket.off("call-accepted", onCallAcceptedHandler);
-      if (onBusyHandler) socket.off("busy", onBusyHandler);
+      // if (onCallAcceptedHandler) socket.off("call-accepted", onCallAcceptedHandler);
+      // if (onBusyHandler) socket.off("busy", onBusyHandler);
 
       onCallAcceptedHandler = (data) => {
         console.log("[Socket] Call accepted signal received:", data);
