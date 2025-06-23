@@ -80,6 +80,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("reject-call", ({ to, from }) => {
+    
     delete userStatusMap[socket.id];
     io.emit("statusList", Object.keys(userStatusMap));
 

@@ -37,3 +37,45 @@ export const logPublicIPFromPeer = (peer) => {
     }
   };
 }
+export const makecall = () => {
+  const peer = new Peer({
+    initiator: true,
+    trickle: false,
+    stream: localStream,
+    config: ICE_SERVERS,
+  });
+
+  console.log("peer inticalized", peer);
+
+  peer.on("signal", (signal) => {
+    console.log("[Peer] Generated signal:", signal);
+    socket.emit("call-user", {
+      signal,
+      to: targetSocketId,
+      type: callModal,
+    });
+  });
+
+  peer.on("stream", (remoteStream) => {
+    console.log("[Peer] Remote stream received.");
+    set({ remoteStream, callEstablished: true });
+    logPublicIPFromPeer(peer);
+  });
+
+  peer.on("connect", () => {
+    console.log("✅ [Peer] Connection established!");
+    if (callTimeout) clearTimeout(callTimeout);
+  });
+
+  peer.on("error", (err) => {
+    console.error("❌ [Peer] Error:", err);
+    alert("Connection error. Check TURN server or network.");
+    get().endCall();
+  });
+
+  peer.on("close", () => {
+    console.log("🔌 [Peer] Connection closed.");
+    get().endCall();
+  });
+
+};
