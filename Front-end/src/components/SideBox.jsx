@@ -10,7 +10,7 @@ export default function SideBox() {
   const { isStar } = functionStore();
 
   return (
-    <div className="flex justify-between flex-row bg-[rgba(0,0,0,0.6)] w-2/5 h-screen ">
+    <div className="flex justify-between flex-row bg-[rgba(0,0,0,0.6)] w-2/5 h-full ">
       <div className="h-full w-[90%]">
         {!isStar ? <Lister /> : <Star />}
       </div>
