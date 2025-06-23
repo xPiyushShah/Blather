@@ -23,8 +23,11 @@ export default function ChatContainer() {
   const { onlineUser } = authStore();
   const { callModal, setModal, incomingCall } = callStore();
   const { setUsrId } = functionStore();
-
-  // Show CallProfile if audio or video call is active
+  useEffect(() => {
+    const handleClick = () => setContext(false);
+    window.addEventListener("click", handleClick);
+    return () => window.removeEventListener("click", handleClick);
+  }, []);
   if (callModal || incomingCall) {
     return <CallProfile />;
   }

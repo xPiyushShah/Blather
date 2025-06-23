@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope, faStar } from "@fortawesome/free-solid-svg-icons";
+import MessageSkeleton from "./MessageSkeleton.jsx";
 
 import { useChatStore } from "../../store/useChatStore.js";
 import { authStore } from "../../store/authStore.js";
@@ -134,11 +135,7 @@ export default function Message() {
     setMessageOption(null);
   };
 
-  const isNearBottom = (index) => {
-    const threshold = 2;
-    return messages.length - index <= threshold;
-  };
-
+c
 
   //text messages
   const msgCheck = (text) => {
@@ -158,14 +155,7 @@ export default function Message() {
 
   if (!messages || messages.length === 0) {
     return (
-      <div className="flex flex-col justify-center items-center h-[75%] text-gray-400 gap-4">
-        <FontAwesomeIcon
-          icon={faEnvelope}
-          size="4x"
-          className="animate-pulse"
-        />
-        <p className="text-x font-semibold">No messages yet...</p>
-      </div>
+      <MessageSkeleton />
     );
   }
 
@@ -181,7 +171,7 @@ export default function Message() {
               key={msgID}
               className={`chat space-y-4 ${isSender ? "chat-end" : "chat-start"
                 } rounded-lg mb-8 relative ${isSelected ? "bg-[#1b34e129]" : ""}`}
-              onContextMenu={(e) => {
+              onClick={(e) => {
                 e.preventDefault();
                 setMessageOption((prev) => (prev === msgID ? null : msgID));
               }}>
