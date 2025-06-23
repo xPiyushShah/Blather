@@ -11,7 +11,7 @@ function FriendUi() {
   return (
     <>
       {friendList && (
-        <div className="part-cont">
+        <div className="part-cont w-full h-full overflow-auto transition-all duration-500 ease-in-out">
           {friendList?.map((item) => (
             <div
               key={item._id}

@@ -39,7 +39,7 @@ export default function Lister() {
     <>
       <div
         className="border-b-[1px] border-b-[#dddddd35] flex flex-row-reverse align-center text-center items-center 
-      h-[12%]  justify-between w-full "
+      h-[12%]  justify-between w-full t"
         style={{ padding: "12px 16px" }}>
         <div>
           <div className="avatar text-center align-center">
