@@ -1,7 +1,8 @@
 import { create } from "zustand";
 // import Peer from "simple-peer";
-import Peer from 'simple-peer/simplepeer.min.js'
+import Peer from "simple-peer/simplepeer.min.js";
 import { authStore } from "./authStore.js";
+import { handleCallAccepted, handleBusy } from "../helper/callhandler.js";
 
 // const ICE_SERVERS = {
 //   iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
@@ -80,7 +81,7 @@ export const callStore = create((set, get) => ({
       initiator: true,
       trickle: false,
       stream: localStream,
-      config: ICE_SERVERS, 
+      config: ICE_SERVERS,
     });
 
     peer.on("signal", (signal) => {
@@ -91,15 +92,13 @@ export const callStore = create((set, get) => ({
       });
     });
 
-
     peer.on("stream", (remoteStream) => {
       set({ remoteStream, callEstablished: true });
     });
 
-
     peer.on("connect", () => {
       console.log("✅ Peer connection established!");
-      clearTimeout(timeout); 
+      clearTimeout(timeout);
     });
 
     peer.on("error", (err) => {
@@ -108,26 +107,16 @@ export const callStore = create((set, get) => ({
       get().endCall();
     });
 
-
     peer.on("close", () => {
       console.log("🔌 Peer connection closed.");
       get().endCall();
     });
 
+    socket.off("call-accepted", (data) => handleCallAccepted(data, get, set));
+    socket.on("call-accepted", (data) => handleCallAccepted(data, get, set));
 
-    socket.off("call-accepted");
-    socket.on("call-accepted", (data) => {
-      peer.signal(data.signal);
-      set({ callEstablished: true });
-    });
-
-
-    socket.off("busy");
-    socket.on("busy", () => {
-      alert("📞 User is busy.");
-      get().endCall();
-    });
-
+    socket.off("busy", () => handleBusy(get));
+    socket.on("busy", () => handleBusy(get));
 
     const timeout = setTimeout(() => {
       if (!get().callEstablished) {
