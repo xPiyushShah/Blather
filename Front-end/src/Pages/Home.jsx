@@ -38,8 +38,8 @@ const Home = () => {
 
   return (
     <div className="main-root ">
-      <div className="hidden sm:flex w-full max-h-svh h-full absolute text-white flex-row">
-        <div className="w-full h-full flex flex-row align-center ">
+      <div className="hidden sm:flex w-full max-h-svh h-full absolute text-white flex-row overflow-hidden" >
+        <div className="w-full h-full flex flex-row align-center overflow-hidden">
           <LeftBox />
           <SideBox />
         </div>

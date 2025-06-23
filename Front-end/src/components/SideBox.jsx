@@ -11,7 +11,7 @@ export default function SideBox() {
 
   return (
     <div className="flex justify-between flex-row bg-[rgba(0,0,0,0.6)] w-2/5 h-full ">
-      <div className="h-full w-[90%]">
+      <div className="h-full w-[90%] overflow-hidden ">
         {!isStar ? <Lister /> : <Star />}
       </div>
       <div
