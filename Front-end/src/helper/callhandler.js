@@ -4,12 +4,14 @@ export const handleCallAccepted = (data, get, set) => {
     console.error("No peer instance available on call accepted.");
     return;
   }
+  console.log("[Socket] Call accepted signal received:", data);
   peer.signal(data.signal);
   set({ callEstablished: true });
 };
 
 export const handleBusy = (get) => {
   alert("📞 User is busy.");
+  console.log("[Socket] User is busy.");
   get().endCall();
 };
 
