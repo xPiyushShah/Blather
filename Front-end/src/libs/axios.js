@@ -6,12 +6,25 @@ export const axiosInstance = axios.create({
   withCredentials: true,
 });
 
+let abortControllers = {};
+
 axiosInstance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("auth_token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+
+    if (config.method === 'get' && config.url) {
+      const urlKey = config.url.split('?')[0];
+      if (abortControllers[urlKey]) {
+        abortControllers[urlKey].abort();
+      }
+      const controller = new AbortController();
+      config.signal = controller.signal;
+      abortControllers[urlKey] = controller;
+    }
+
     return config;
   },
   (error) => {
