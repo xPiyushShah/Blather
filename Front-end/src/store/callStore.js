@@ -128,8 +128,8 @@ export const callStore = create((set, get) => ({
     //   handleBusy(get);
     // };
 
-    socket.on("call-accepted", onCallAcceptedHandler);
-    socket.on("busy", onBusyHandler);
+    socket.on("call-accepted", handleCallAccepted);
+    socket.on("busy", handleBusy);
 
     callTimeout = setTimeout(() => {
       if (!get().callEstablished) {
