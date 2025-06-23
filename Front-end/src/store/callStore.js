@@ -60,7 +60,7 @@ export const callStore = create((set, get) => ({
   },
 
   makeCall: () => {
-    const { targetSocketId, callModal, localStream , callTimeout} = get();
+    const { targetSocketId, callModal, localStream, callTimeout } = get();
     const socket = authStore.getState().socket;
 
     if (!socket) {
@@ -131,7 +131,7 @@ export const callStore = create((set, get) => ({
     socket.on("call-accepted", handleCallAccepted);
     socket.on("busy", handleBusy);
 
-    callTimeout = setTimeout(() => {
+    setTimeout(() => {
       if (!get().callEstablished) {
         alert("Call failed to connect. Please check your network or TURN server.");
         console.log("[Call] Timeout: connection not established.");
@@ -199,7 +199,7 @@ export const callStore = create((set, get) => ({
   },
 
   endCall: () => {
-    const { peer, localStream, incomingCall,callTimeout } = get();
+    const { peer, localStream, incomingCall, callTimeout } = get();
     const socket = authStore.getState().socket;
 
     console.log("[Call] Ending call...");
@@ -230,9 +230,9 @@ export const callStore = create((set, get) => ({
       incomingCall: false,
     });
 
-    if (callTimeout) {
-      clearTimeout(callTimeout);
-      console.log("[Call] Cleared call timeout.");
-    }
+    // clearTimeout(callTimeout);
+    // if (callTimeout) {
+    //   console.log("[Call] Cleared call timeout.");
+    // }
   },
 }));
