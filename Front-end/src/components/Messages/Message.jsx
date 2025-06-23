@@ -203,7 +203,7 @@ export default function Message() {
               <div
                 className={`chat-bubble bg-base-300 text-white max-w-xs w-fit flex flex-col gap-2 p-14 relative truncate`}>
 
-                {(msg.text) && <p className><Text msg={msgCheck(msg.text)} /></p>}
+                {(msg.text) && <Text msg={msgCheck(msg.text)} />}
 
                 {msg.image && (
                   <div
