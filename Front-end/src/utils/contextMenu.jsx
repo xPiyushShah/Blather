@@ -10,7 +10,6 @@ function contextMenu({ x, y }) {
   const { setSelctedUser, selectedUser } = useChatStore();
   const { setUsrId } = functionStore();
   const [menuHeight, setMenuHeight] = useState(0);
-
   useEffect(() => {
     if (menuRef.current) {
       setMenuHeight(menuRef.current.offsetHeight);
