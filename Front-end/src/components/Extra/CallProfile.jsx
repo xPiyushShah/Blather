@@ -106,8 +106,8 @@ function CallProfile() {
       if (peer) peer.signal(data.signal);
     });
 
-    socket.on("reject-call", handleEndCall);
-    return () => socket.off("reject-call", handleEndCall);
+    socket.on("reject-call", (data) => { handleEndCall });
+    return () => socket.off("reject-call");
   }, [socket]);
 
   useEffect(() => {
@@ -254,41 +254,41 @@ function CallProfile() {
       )}
 
       {/* Controls */}
-      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-4 opacity-90 z-20 hover:bg-base-100  bg-transparent  w-fit h-fit py-12 border-0 hover:border-1">
-        <div className="">
+      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-4 opacity-90 z-20 ">
+        {/* <div className=""> */}
+        <button
+          onClick={toggleMic}
+          className={`p-3 rounded-lg shadow-md w-16 border h-10 ${isMicOn ? "bg-transparent hover:bg-green-600 border-white text-white" : "bg-red-800 border-red-500 text-white"
+            }`}
+        >
+          <FontAwesomeIcon icon={faMicrophone} />
+        </button>
+
+        {callModal === "video" && (
           <button
-            onClick={toggleMic}
-            className={`p-3 rounded-lg shadow-md w-16 border h-10 ${isMicOn ? "bg-transparent hover:bg-green-600 border-white text-white" : "bg-red-800 border-red-500 text-white"
+            onClick={toggleCamera}
+            className={`p-3 rounded-lg shadow-md w-16 border h-10 ${isCameraOn ? "bg-transparent hover:bg-blue-600 border-white text-white" : "bg-red-800 border-red-500 text-white"
               }`}
           >
-            <FontAwesomeIcon icon={faMicrophone} />
+            <FontAwesomeIcon icon={faVideo} />
           </button>
+        )}
 
-          {callModal === "video" && (
-            <button
-              onClick={toggleCamera}
-              className={`p-3 rounded-lg shadow-md w-16 border h-10 ${isCameraOn ? "bg-transparent hover:bg-blue-600 border-white text-white" : "bg-red-800 border-red-500 text-white"
-                }`}
-            >
-              <FontAwesomeIcon icon={faVideo} />
-            </button>
-          )}
+        <button
+          onClick={toggleSpeaker}
+          className={`p-3 rounded-lg shadow-md w-16 border h-10 ${isSpeakerOn ? "bg-transparent hover:bg-purple-600 border-white text-white" : "bg-red-800 border-red-500 text-white"
+            }`}
+        >
+          <FontAwesomeIcon icon={isSpeakerOn ? faVolumeUp : faVolumeMute} />
+        </button>
 
-          <button
-            onClick={toggleSpeaker}
-            className={`p-3 rounded-lg shadow-md w-16 border h-10 ${isSpeakerOn ? "bg-transparent hover:bg-purple-600 border-white text-white" : "bg-red-800 border-red-500 text-white"
-              }`}
-          >
-            <FontAwesomeIcon icon={isSpeakerOn ? faVolumeUp : faVolumeMute} />
-          </button>
-
-          <button
-            onClick={handleEndCall}
-            className="bg-transparent hover:bg-red-700 text-white p-3 rounded-lg shadow-md w-16 border border-white h-10"
-          >
-            <FontAwesomeIcon icon={faPhoneSlash} />
-          </button>
-        </div>
+        <button
+          onClick={handleEndCall}
+          className="bg-transparent hover:bg-red-700 text-white p-3 rounded-lg shadow-md w-16 border border-white h-10"
+        >
+          <FontAwesomeIcon icon={faPhoneSlash} />
+        </button>
+        {/* </div> */}
       </div>
     </div>
   );

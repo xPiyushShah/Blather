@@ -79,11 +79,12 @@ io.on("connection", (socket) => {
     });
   });
 
-  socket.on("reject-call", ({ to }) => {
+  socket.on("reject-call", ({ to, from }) => {
     delete userStatusMap[socket.id];
     io.emit("statusList", Object.keys(userStatusMap));
 
     io.to(to).emit("reject-call", {
+      to: to,
       from: socket.id,
     });
   });

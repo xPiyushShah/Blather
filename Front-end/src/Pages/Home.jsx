@@ -9,7 +9,6 @@ import Loader from "../utils/Loader"
 const Home = () => {
   const { setIncomingCall, setGetModal, setModal, setPeer, endCall } = callStore();
   const { socket } = authStore();
-  const [mainPart, setMainPart] = useState("none");
 
   useEffect(() => {
     if (!socket) return;
@@ -21,14 +20,14 @@ const Home = () => {
       setGetModal(true);
     });
 
-    // socket.off("call-accepted");
-    // socket.on("call-accepted", (data) => {
-    //   setPeer(data.signal);
-    //   const peer = callStore.getState().peer;
-    //   if (peer) peer.signal(data.signal);
-    // });
+    socket.off("call-accepted");
+    socket.on("call-accepted", (data) => {
+      setPeer(data.signal);
+      const peer = callStore.getState().peer;
+      if (peer) peer.signal(data.signal);
+    });
 
-    socket.on("reject-call", endCall());
+    socket.on("reject-call", (data) => { endCall() });
 
     return () => {
       socket.off("incoming-call");

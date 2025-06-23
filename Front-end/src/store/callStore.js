@@ -213,7 +213,7 @@ export const callStore = create((set, get) => ({
 
     if (socket && incomingCall.from) {
       console.log("[Socket] Emitting reject-call to:", incomingCall.from);
-      socket.emit("reject-call", { to: incomingCall.from });
+      socket.emit("reject-call", { to: incomingCall.from, from: authStore.getState().authUser._id });
     }
 
     if (peer) {
