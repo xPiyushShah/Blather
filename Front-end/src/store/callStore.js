@@ -1,5 +1,6 @@
 import { create } from "zustand";
-import Peer from "simple-peer";
+// import Peer from "simple-peer";
+import Peer from 'simple-peer/simplepeer.min.js'
 import { authStore } from "./authStore.js";
 
 // const ICE_SERVERS = {
@@ -79,10 +80,9 @@ export const callStore = create((set, get) => ({
       initiator: true,
       trickle: false,
       stream: localStream,
-      config: ICE_SERVERS, // ✅ Xirsys TURN/STUN servers
+      config: ICE_SERVERS, 
     });
 
-    // 🔁 Exchange signaling
     peer.on("signal", (signal) => {
       socket.emit("call-user", {
         signal,
@@ -91,45 +91,44 @@ export const callStore = create((set, get) => ({
       });
     });
 
-    // ✅ When remote stream is received
+
     peer.on("stream", (remoteStream) => {
       set({ remoteStream, callEstablished: true });
     });
 
-    // ✅ When connected
+
     peer.on("connect", () => {
       console.log("✅ Peer connection established!");
-      clearTimeout(timeout); // Cancel timeout if connected
+      clearTimeout(timeout); 
     });
 
-    // ❌ If error occurs
     peer.on("error", (err) => {
       console.error("❌ Peer connection error:", err);
       alert("Connection error. Check TURN server or network.");
       get().endCall();
     });
 
-    // 🔌 If peer disconnects
+
     peer.on("close", () => {
       console.log("🔌 Peer connection closed.");
       get().endCall();
     });
 
-    // 🔁 Call accepted signal
+
     socket.off("call-accepted");
     socket.on("call-accepted", (data) => {
       peer.signal(data.signal);
       set({ callEstablished: true });
     });
 
-    // 🚫 If user is busy
+
     socket.off("busy");
     socket.on("busy", () => {
       alert("📞 User is busy.");
       get().endCall();
     });
 
-    // ⏱ Add fallback timeout (e.g. 15s)
+
     const timeout = setTimeout(() => {
       if (!get().callEstablished) {
         alert(
@@ -137,9 +136,8 @@ export const callStore = create((set, get) => ({
         );
         get().endCall();
       }
-    }, 15000);
+    }, 60000);
 
-    // ✅ Store the peer
     set({ peer, callInProgress: true });
   },
 
@@ -160,7 +158,7 @@ export const callStore = create((set, get) => ({
       initiator: false,
       trickle: false,
       stream: localStream,
-      config: ICE_SERVERS, // ✅ USE TURN/STUN
+      config: ICE_SERVERS,
     });
 
     peer.on("signal", (signal) => {
