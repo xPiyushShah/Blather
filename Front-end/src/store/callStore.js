@@ -2,9 +2,27 @@ import { create } from "zustand";
 import Peer from "simple-peer";
 import { authStore } from "./authStore.js";
 
+// const ICE_SERVERS = {
+//   iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+// };
 const ICE_SERVERS = {
-  iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+  iceServers: [
+    {
+      urls: ["stun:bn-turn2.xirsys.com"]
+    },
+    {
+      username: "KOo7L3-HXfompS_KFnBUpL2zPDmkLE18D7lfVKqr1bexPhmECxYyB5rcOM9ZYcrmAAAAAGhY84BibGF0aGVyNDAyMQ==",
+      credential: "f2f0e73e-4ffa-11f0-b8dc-0242ac140004",
+      urls: [
+        "turn:bn-turn2.xirsys.com:80?transport=udp",
+        "turn:bn-turn2.xirsys.com:3478?transport=udp",
+        "turn:bn-turn2.xirsys.com:80?transport=tcp",
+        "turn:bn-turn2.xirsys.com:3478?transport=tcp"
+      ]
+    }
+  ]
 };
+
 
 export const callStore = create((set, get) => ({
   localStream: null,
@@ -61,7 +79,7 @@ export const callStore = create((set, get) => ({
       initiator: true,
       trickle: false,
       stream: localStream,
-      // config: ICE_SERVERS,
+      config: ICE_SERVERS,
     });
 
     peer.on("signal", (signal) => {
@@ -104,7 +122,7 @@ export const callStore = create((set, get) => ({
       initiator: false,
       trickle: false,
       stream: localStream,
-      // config: ICE_SERVERS,
+      config: ICE_SERVERS,
     });
 
     peer.on("signal", (signal) => {
