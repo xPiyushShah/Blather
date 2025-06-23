@@ -135,8 +135,6 @@ export default function Message() {
     setMessageOption(null);
   };
 
-c
-
   //text messages
   const msgCheck = (text) => {
     try {
