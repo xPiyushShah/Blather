@@ -211,7 +211,7 @@ export const callStore = create((set, get) => ({
 
     console.log("[Call] Ending call...");
 
-    if (socket && incomingCall?.from) {
+    if (socket && incomingCall.from) {
       console.log("[Socket] Emitting reject-call to:", incomingCall.from);
       socket.emit("reject-call", { to: incomingCall.from });
     }
