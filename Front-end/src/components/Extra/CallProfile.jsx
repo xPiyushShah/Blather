@@ -97,17 +97,17 @@ function CallProfile() {
   useEffect(() => {
     if (!socket) return;
 
-    const onReject = () => {
-      handleEndCall();
-      setGetModal(false);
-    };
+    // const onReject = () => {
+    //   handleEndCall();
+    //   setGetModal(false);
+    // };
 
     socket.on("call-accepted", (data) => {
       if (peer) peer.signal(data.signal);
     });
 
-    socket.on("reject-call", onReject);
-    return () => socket.off("reject-call", onReject);
+    socket.on("reject-call", handleEndCall);
+    return () => socket.off("reject-call", handleEndCall);
   }, [socket]);
 
   useEffect(() => {
@@ -184,8 +184,9 @@ function CallProfile() {
   };
 
   const handleEndCall = () => {
-    stopAllMedia();
+    // stopAllMedia();
     endCall();
+    setGetModal(false);
     setModal(null);
   };
 
