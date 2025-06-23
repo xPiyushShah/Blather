@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 function Text({ msg }) {
     const [expanded, setExpanded] = useState(false);
 
-    const charLimit = 20;
+    const charLimit = 50;
 
     const isLong = msg.length > charLimit;
 
