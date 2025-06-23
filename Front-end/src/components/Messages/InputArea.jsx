@@ -149,7 +149,7 @@ export default function InputArea() {
             </button>
           </div>
         )}
-        <div>
+        <div className="w-full h-full">
           <input
             type="text"
             placeholder="Type a text..."

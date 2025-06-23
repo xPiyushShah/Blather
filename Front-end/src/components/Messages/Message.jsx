@@ -207,7 +207,7 @@ export default function Message() {
 
                 {msg.image && (
                   <div
-                    className={`chat-image bg-red-300 ${imgload ? "skeleton" : ""
+                    className={`chat-image bg-base-300 ${imgload ? "skeleton" : ""
                       } w-[full] h-[full]`}>
                     <img
                       src={msg.image}

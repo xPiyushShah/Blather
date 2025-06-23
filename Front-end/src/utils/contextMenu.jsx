@@ -10,7 +10,8 @@ function contextMenu({ x, y }) {
   return (
     // ${isNearBottom(index) ? "bottom-full mb-2" : "top-full mt-2"}
     <div
-      className={`absolute  left-${x}px  top-${y}px bg-base-100 text-white border-0 shadow-md w-22 h-22 rounded z-50 text-sm message-options`}>
+      className={`absolute bg-base-100 text-white border-0 shadow-md w-22 h-22 rounded z-50 text-sm message-options`}
+       style={{ top: y, left: x }} >
       <ul className="flex flex-col justify-evenly w-full h-full gap-1">
         <li
           className="hover:bg-base-content hover:text-black px-4 py-2 cursor-pointer"
