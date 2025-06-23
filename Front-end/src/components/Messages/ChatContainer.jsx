@@ -18,6 +18,8 @@ import ContextMenu from "../../utils/contextMenu.jsx";
 export default function ChatContainer() {
   const [context, setContext] = useState(false);
   const [contextPos, setContextPos] = useState({ x: 0, y: 0 });
+  const [isMobile, setIsMobile] = useState(false);
+  const longPressTimer = useRef(null);
 
   const { selectedUser, setSelctedUser } = useChatStore();
   const { onlineUser } = authStore();
@@ -28,12 +30,37 @@ export default function ChatContainer() {
     window.addEventListener("click", handleClick);
     return () => window.removeEventListener("click", handleClick);
   }, []);
+
+  //for phone deivices 
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768); // Tailwind md breakpoint
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  const handleTouchStart = (e) => {
+    if (!isMobile) return;
+    const touch = e.touches[0];
+    longPressTimer.current = setTimeout(() => {
+      setContext(true);
+      setContextPos({ x: touch.clientX, y: touch.clientY });
+    }, 600);
+  };
+
+  const handleTouchEnd = () => {
+    clearTimeout(longPressTimer.current);
+  };
+
+
   if (callModal || incomingCall) {
     return <CallProfile />;
   }
 
   return (
     <div className="flex flex-col h-full w-full justify-between "
+      onTouchStart={isMobile ? handleTouchStart : undefined}
+      onTouchEnd={isMobile ? handleTouchEnd : undefined}
       onContextMenu={(e) => {
         e.preventDefault();
         setContext(true);
