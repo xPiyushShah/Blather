@@ -6,6 +6,7 @@ function contextMenu({ x, y }) {
   // console.log(x)
   // console.log(y)
 
+  const menuRef = useRef(null);
   const { setSelctedUser, selectedUser } = useChatStore();
   const { setUsrId } = functionStore();
   const [menuHeight, setMenuHeight] = useState(0);
