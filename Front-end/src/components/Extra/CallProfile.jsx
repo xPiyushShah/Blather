@@ -253,42 +253,41 @@ function CallProfile() {
       )}
 
       {/* Controls */}
-      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-4 opacity-90 z-20">
-        <button
-          onClick={toggleMic}
-          className={`p-3 rounded-lg shadow-md w-16 border h-10 ${
-            isMicOn ? "bg-transparent hover:bg-green-600 border-white text-white" : "bg-red-800 border-red-500 text-white"
-          }`}
-        >
-          <FontAwesomeIcon icon={faMicrophone} />
-        </button>
-
-        {callModal === "video" && (
+      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-4 opacity-90 z-20 hover:bg-base-100  bg-transparent  w-fit h-fit py-12 border-0 hover:border-1">
+        <div className="">
           <button
-            onClick={toggleCamera}
-            className={`p-3 rounded-lg shadow-md w-16 border h-10 ${
-              isCameraOn ? "bg-transparent hover:bg-blue-600 border-white text-white" : "bg-red-800 border-red-500 text-white"
-            }`}
+            onClick={toggleMic}
+            className={`p-3 rounded-lg shadow-md w-16 border h-10 ${isMicOn ? "bg-transparent hover:bg-green-600 border-white text-white" : "bg-red-800 border-red-500 text-white"
+              }`}
           >
-            <FontAwesomeIcon icon={faVideo} />
+            <FontAwesomeIcon icon={faMicrophone} />
           </button>
-        )}
 
-        <button
-          onClick={toggleSpeaker}
-          className={`p-3 rounded-lg shadow-md w-16 border h-10 ${
-            isSpeakerOn ? "bg-transparent hover:bg-purple-600 border-white text-white" : "bg-red-800 border-red-500 text-white"
-          }`}
-        >
-          <FontAwesomeIcon icon={isSpeakerOn ? faVolumeUp : faVolumeMute} />
-        </button>
+          {callModal === "video" && (
+            <button
+              onClick={toggleCamera}
+              className={`p-3 rounded-lg shadow-md w-16 border h-10 ${isCameraOn ? "bg-transparent hover:bg-blue-600 border-white text-white" : "bg-red-800 border-red-500 text-white"
+                }`}
+            >
+              <FontAwesomeIcon icon={faVideo} />
+            </button>
+          )}
 
-        <button
-          onClick={handleEndCall}
-          className="bg-transparent hover:bg-red-700 text-white p-3 rounded-lg shadow-md w-16 border border-white h-10"
-        >
-          <FontAwesomeIcon icon={faPhoneSlash} />
-        </button>
+          <button
+            onClick={toggleSpeaker}
+            className={`p-3 rounded-lg shadow-md w-16 border h-10 ${isSpeakerOn ? "bg-transparent hover:bg-purple-600 border-white text-white" : "bg-red-800 border-red-500 text-white"
+              }`}
+          >
+            <FontAwesomeIcon icon={isSpeakerOn ? faVolumeUp : faVolumeMute} />
+          </button>
+
+          <button
+            onClick={handleEndCall}
+            className="bg-transparent hover:bg-red-700 text-white p-3 rounded-lg shadow-md w-16 border border-white h-10"
+          >
+            <FontAwesomeIcon icon={faPhoneSlash} />
+          </button>
+        </div>
       </div>
     </div>
   );
