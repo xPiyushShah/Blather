@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faVideoCamera,
@@ -12,6 +12,7 @@ import { callStore } from "../../store/callStore.js";
 import ProfileAvatar from "../ProfileAvatar";
 import InputArea from "./InputArea";
 import CallProfile from "../Extra/CallProfile.jsx";
+import { functionStore } from "../../store/functionStore.js";
 import ContextMenu from "../../utils/contextMenu.jsx";
 
 export default function ChatContainer() {
@@ -21,81 +22,68 @@ export default function ChatContainer() {
   const { selectedUser, setSelctedUser } = useChatStore();
   const { onlineUser } = authStore();
   const { callModal, setModal, incomingCall } = callStore();
+  const { setUsrId } = functionStore();
 
-
-  // Hide context menu on click elsewhere
-  useEffect(() => {
-    const handleClick = () => setContext(false);
-    window.addEventListener("click", handleClick);
-    return () => window.removeEventListener("click", handleClick);
-  }, []);
-
-  if (callModal || incomingCall) return <CallProfile />;
+  // Show CallProfile if audio or video call is active
+  if (callModal || incomingCall) {
+    return <CallProfile />;
+  }
 
   return (
-    <div
-      className="relative flex flex-col h-full w-full justify-between"
+    <div className="flex flex-col h-full w-full justify-between "
       onContextMenu={(e) => {
         e.preventDefault();
         setContext(true);
-        setContextPos({ x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY });
-      }}
-    >
-      {/* Header */}
-      <div className="flex flex-row justify-between w-full border-b border-[#dddddd35] min-h-[40px] max-h-[72px] items-center px-4">
-        {/* Avatar */}
+        setContextPos({ x: e.pageX, y: e.pageY });
+      }} >
+      <div
+        className="relative flex flex-row justify-between w-full border-b-[1px] border-b-[#dddddd35] min-h-[40px] max-h-[72px] align-center text-center header-lest">
         <div
-          className={`hidden md:flex w-10 h-10 rounded-full hover:cursor-pointer avatar items-center justify-center ${
-            onlineUser.includes(selectedUser._id)
+          className={`hidden md:flex mt-15 w-20 rounded-full hover:cursor-pointer  avatar  align-center justify-center text-center
+           ${onlineUser.includes(selectedUser._id)
               ? "avatar-online"
               : "avatar-offline"
-          }`}
-        >
+            }
+          `}>
           {selectedUser.profile_url ? (
             <img
               alt={selectedUser.first_name}
               src={selectedUser.profile_url}
-              className="object-cover rounded-full w-8 h-8"
+              className={`object-cover mask mask-squircle rounded-full w-6 h-6 ${!selectedUser ? "skeleton" : ""}`}
             />
           ) : (
             <ProfileAvatar onGen={selectedUser} />
           )}
         </div>
-
-        <div className="flex items-center opacity-85">
-          {selectedUser.first_name} {selectedUser.last_name}
+        <div className={`flex items-center  align-center text-center opacity-85 ${!selectedUser ? "skeleton" : ""}`}>
+          {`${selectedUser.first_name} ${selectedUser.last_name}`}
         </div>
-
-        <div className="flex gap-3">
-          <FontAwesomeIcon
-            icon={faXmark}
-            onClick={() => setSelctedUser(null)}
-            className="cursor-pointer"
-          />
-          <FontAwesomeIcon
-            icon={faVideoCamera}
-            onClick={() => setModal("video")}
-            className="cursor-pointer"
-          />
-          <FontAwesomeIcon
-            icon={faPhone}
-            onClick={() => setModal("audio")}
-            className="cursor-pointer"
-          />
+        <div className={`lest-3 lest-apply ${!selectedUser ? "skeleton" : ""}`}>
+          <div className="opt rounded-r-lg">
+            <FontAwesomeIcon
+              icon={faXmark}
+              onClick={() => setSelctedUser(null)}
+            />
+          </div>
+          <div className="opt">
+            <FontAwesomeIcon
+              icon={faVideoCamera}
+              onClick={() => setModal("video")}
+            />
+          </div>
+          <div className="opt rounded-l-lg">
+            <FontAwesomeIcon icon={faPhone} onClick={() => setModal("audio")} />
+          </div>
         </div>
       </div>
-
       <Message />
-
       <InputArea
         onContextMenu={(e) => {
           e.preventDefault();
           setContext(true);
-          setContextPos({ x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY });
         }}
       />
-
-      {context && <ContextMenu x={contextPos.x} y={contextPos.y} />}
+      {context && <div><ContextMenu x={contextPos.x} y={contextPos.y} /></div>}
     </div>
   );
 }
