@@ -3,26 +3,16 @@ import { useChatStore } from "../store/useChatStore";
 import { functionStore } from "../store/functionStore";
 
 function contextMenu({ x, y }) {
-  // console.log(x)
-  // console.log(y)
 
-  const menuRef = useRef(null);
   const { setSelctedUser, selectedUser } = useChatStore();
   const { setUsrId } = functionStore();
   const [menuHeight, setMenuHeight] = useState(0);
-  useEffect(() => {
-    if (menuRef.current) {
-      setMenuHeight(menuRef.current.offsetHeight);
-    }
-  }, []);
 
-  const viewportHeight = window.innerHeight;
-  const isNearBottom = y + menuHeight > viewportHeight;
   return (
     <div
-      className={`absolute bg-base-100 text-white border-0 shadow-md w-22 h-22 rounded z-50 text-sm message-options }`}
+      className={`absolute bg-base-100 text-white border-0 shadow-md w-22 h-22 rounded z-50 text-sm message-options `}
       style={{
-        top: isNearBottom ? y - menuHeight : y,
+        top: y,
         left: x,
       }}>
       <ul className="flex flex-col justify-evenly w-full h-full gap-1">

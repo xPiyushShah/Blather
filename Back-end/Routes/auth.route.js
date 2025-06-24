@@ -11,9 +11,9 @@ import {
   updateImage,
   cookie
 } from "../Controllers/auth.controller.js";
-import upload  from "../middleware/multer.middleware.js";
-import { protectAuth } from "../middleware/auth.middleware.js"; 
-import { sessionMiddleware } from "../middleware/session.middleware.js"; 
+import upload from "../middleware/multer.middleware.js";
+import { protectAuth } from "../middleware/auth.middleware.js";
+import { sessionMiddleware } from "../middleware/session.middleware.js";
 
 const router = express.Router();
 
@@ -22,6 +22,13 @@ router.post("/login", login);
 router.post("/register", signup);
 
 router.get("/logout", protectAuth, logout);
+
+// router.get("/v1/health-check", (req, res) => {
+//   res.status(200).json({
+//     status: "ok",
+//     message: "Server is healthy",
+//   });
+// });
 
 router.get("/cookie", cookie);
 

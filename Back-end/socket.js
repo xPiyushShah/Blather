@@ -22,6 +22,8 @@ export function getReceiverSocketId(userId) {
 const io = new Server(server, {
   cors: {
     origin: ["https://blathers.onrender.com"],
+    methods: ["GET", "POST"],
+    // credentials: true,
   },
 });
 
@@ -80,7 +82,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("reject-call", ({ to, from }) => {
-    
+
     delete userStatusMap[socket.id];
     io.emit("statusList", Object.keys(userStatusMap));
 

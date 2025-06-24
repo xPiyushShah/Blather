@@ -67,13 +67,20 @@ const Loader = () => {
             <span
               key={index}
               className={`text-4xl font-bold transition-all duration-300 ease-out transform ${index < visibleLetters
-                ? "translate-y-0 opacity-100 scale-100"
-                : "-translate-y-10 opacity-0 scale-50"
-                } ${getLetterColor(index, currentText)}`}
-              style={{ transitionDelay: `${index * 100}ms` }}
+                  ? "translate-y-0 opacity-100 scale-100"
+                  : "-translate-y-10 opacity-0 scale-50"
+                } ${getLetterColor(index, currentText)} ${!["W", "B"].includes(letter) ? "tracking-wider animate-pulse" : ""
+                }`}
+              style={{
+                transitionDelay: `${index * 100}ms`,
+                ...(!["W", "B"].includes(letter) && {
+                  textShadow: "0 0 5px #ffffff",
+                }),
+              }}
             >
               {letter}
             </span>
+
           ))}
         </div>
 

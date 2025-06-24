@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import { io } from "socket.io-client";
 
 // const BASE_URL = "https://localhost:5001";
-const BASE_URL = "https://blather.onrender.com/";
+const BASE_URL = "https://blather.onrender.com";
 
 export const authStore = create((set, get) => ({
   authUser: null,
@@ -14,7 +14,7 @@ export const authStore = create((set, get) => ({
   isUpdatingProfile: false,
   isCheckingAuth: true,
   socket: null,
-  err:null,
+  err: null,
 
   checkAuth: async () => {
     set({ isCheckingAuth: true });
@@ -24,7 +24,7 @@ export const authStore = create((set, get) => ({
       get().connectSocket();
     } catch (error) {
       // toast.error("Auth check failed: " + error.message);
-      set({ authUser: null , err : error.response?.data?.status });
+      set({ authUser: null, err: error.response?.data?.status });
       console.error("Error checking authentication:", error.message);
     } finally {
       set({ isCheckingAuth: false });
@@ -137,6 +137,11 @@ export const authStore = create((set, get) => ({
 
     const newSocket = io(BASE_URL, {
       query: { userId: authUser._id },
+      transports: ["websocket"],
+      withCredentials: true,
+      reconnectionAttempts: 5,   
+      reconnectionDelay: 1000, 
+      reconnectionDelayMax: 5000, 
     });
 
     newSocket.connect();
