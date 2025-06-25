@@ -47,9 +47,9 @@ function App() {
     }
   }, [authUser?.status]);
 
-  if (shouldShowLoader) {
-    return <Loader />;
-  }
+  // if (shouldShowLoader) {
+  //   return <Loader />;
+  // }
 
 
 

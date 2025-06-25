@@ -1,11 +1,15 @@
 import React, { useEffect, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope, faStar } from "@fortawesome/free-solid-svg-icons";
+import MessageSkeleton from "./MessageSkeleton.jsx";
 
 import { useChatStore } from "../../store/useChatStore.js";
 import { authStore } from "../../store/authStore.js";
 import { functionStore } from "../../store/functionStore.js";
 import ImagePreview from "./extra/ImagePreview.jsx";
+import CryptoJS from "crypto-js";
+import Text from "../../utils/Text.jsx";
+
 
 const formatTimeAgo = (timestamp) => {
   const now = new Date();
@@ -31,10 +35,12 @@ export default function Message() {
     unSubscribeMessages,
     subScribeMessages,
     deleteMessage,
+    updateMessage,
+    key
   } = useChatStore();
   const { starMessage, starredMessages, saveStarMessae } = functionStore();
 
-  const { authUser } = authStore();
+  const { authUser, socket } = authStore();
 
   const bottomRef = useRef(null);
 
@@ -44,9 +50,32 @@ export default function Message() {
 
   useEffect(() => {
     getMessages(selectedUser._id);
-    subScribeMessages();
-    return () => unSubscribeMessages();
-  }, [getMessages, selectedUser._id, subScribeMessages, unSubscribeMessages]);
+    // subScribeMessages();
+    // return () => unSubscribeMessages();
+  }, [getMessages, selectedUser._id]);
+
+  // useEffect(() => {
+  //   getMessages(selectedUser._id);
+  //   subScribeMessages();
+  //   return () => unSubscribeMessages();
+  // }, [getMessages, selectedUser._id, subScribeMessages, unSubscribeMessages]);
+
+  useEffect(() => {
+
+    if (!socket) return;
+
+    const handleReceiveMessage = (message) => {
+      // console.log("get", message);
+      updateMessage(message);
+    };
+
+    socket.on("receive-message", handleReceiveMessage);
+
+    return () => {
+      socket.off("receive-message", handleReceiveMessage); // clean up
+    };
+
+  }, [socket]);
 
   const [, setNow] = useState(Date.now());
   useEffect(() => {
@@ -54,9 +83,19 @@ export default function Message() {
     return () => clearInterval(interval);
   }, []);
 
+
+
+  const [imgSrc, setImgSrc] = useState(true);
   const [imgload, setImgload] = useState(true);
   const [openImg, setOpenImg] = useState(false);
   const [messageOption, setMessageOption] = useState(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setImgload(false);
+    }, 4000);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -70,7 +109,7 @@ export default function Message() {
   }, []);
 
   const handleStarMessage = (messageId) => {
-    const message = messages.find((msg) => msg._id === messageId);
+    const message = messages.find((msg) => msgID === messageId);
     if (!message) return;
 
     const isStarred = starredMessageIds.has(messageId);
@@ -96,23 +135,30 @@ export default function Message() {
     setMessageOption(null);
   };
 
+  //text messages
+  const msgCheck = (text) => {
+    try {
+      const bytes = CryptoJS.AES.decrypt(text, key);
+      const decrypted = bytes.toString(CryptoJS.enc.Utf8);
+      if (!decrypted) {
+        return text;
+      }
+      return decrypted;
+    } catch (error) {
+      return text;
+    }
+  };
   const isNearBottom = (index) => {
     const threshold = 2;
     return messages.length - index <= threshold;
   };
 
-  const starredMessageIds = new Set(starredMessages.map((msg) => msg._id));
+
+  const starredMessageIds = new Set(starredMessages.map((msg) => msgID));
 
   if (!messages || messages.length === 0) {
     return (
-      <div className="flex flex-col justify-center items-center h-[75%] text-gray-400 gap-4">
-        <FontAwesomeIcon
-          icon={faEnvelope}
-          size="4x"
-          className="animate-pulse"
-        />
-        <p className="text-x font-semibold">No messages yet...</p>
-      </div>
+      <MessageSkeleton />
     );
   }
 
@@ -121,16 +167,16 @@ export default function Message() {
       <div className="flex-1 overflow-y-hidden p-4 space-y-4 flex flex-col gap-4">
         {messages.map((msg, index) => {
           const isSender = authUser._id == msg.senderId;
-          const isSelected = messageOption == msg._id;
+          const msgID = index;
+          const isSelected = messageOption == msgID;
           return (
             <div
-              key={msg._id}
-              className={`chat space-y-4 ${
-                isSender ? "chat-end" : "chat-start"
-              } rounded-lg mb-8 relative ${isSelected ? "bg-[#1b34e129]" : ""}`}
-              onContextMenu={(e) => {
+              key={msgID}
+              className={`chat space-y-4 ${isSender ? "chat-end" : "chat-start"
+                } rounded-lg mb-8 relative ${isSelected ? "bg-[#1b34e129]" : ""}`}
+              onClick={(e) => {
                 e.preventDefault();
-                setMessageOption((prev) => (prev === msg._id ? null : msg._id));
+                setMessageOption((prev) => (prev === msgID ? null : msgID));
               }}>
               <div className="chat-footer mb-18 flex items-center gap-1">
                 <time dateTime="" className="text-xs opacity-50 ml-1">
@@ -139,7 +185,7 @@ export default function Message() {
                     : `Received ${formatTimeAgo(msg.createdAt)}`}
                 </time>
 
-                {starredMessageIds.has(msg._id) && (
+                {starredMessageIds.has(msgID) && (
                   <FontAwesomeIcon
                     icon={faStar}
                     className="text-yellow-400 text-xs ml-1"
@@ -148,46 +194,68 @@ export default function Message() {
                 )}
               </div>
               <div
-                className={`chat-bubble bg-base-300 text-white max-w-xs flex flex-col gap-2 p-14 relative`}>
-                {msg.text && <p>{msg.senderId}</p>}
-                {msg.text && <p>{msg.receiverId}</p>}
+                className={`chat-bubble bg-base-300 text-white max-w-xs w-fit flex flex-col gap-2 p-14 relative truncate`}>
+
+                {(msg.text) && <Text msg={msgCheck(msg.text)} />}
+
                 {msg.image && (
                   <div
-                    className={`chat-image ${
-                      imgload ? "skeleton" : ""
-                    }  w-[200px] h-[200px]`}>
+                    className={`chat-image bg-base-300 ${imgload ? "skeleton" : ""
+                      } w-[full] h-[full]`}>
                     <img
                       src={msg.image}
                       alt="sent file"
-                      className=" mb-2 rounded-md sm:max-w-[200px] sm:max-h-[200px] object-cover w-full cursor-pointer"
+                      className="mb-2 rounded-md sm:max-w-[full] sm:max-h-[full] object-cover w-full cursor-pointer"
                       loading="lazy"
-                      onClick={() => setOpenImg(true)}
+                      onClick={() => {
+                        setOpenImg(true);
+                        setImgSrc(msg.image);
+                      }}
                     />
                   </div>
                 )}
-                {openImg && (
+                {msg.audio && (
+                  <audio
+                    controls
+                    controlsList="nodownload"
+                    className="w-full  bg-base-200 rounded-md p-2">
+                    <source src={msg.audio} type="audio/mpeg" />
+                    Your browser does not support the audio element.
+                  </audio>
+                )}
+                {msg.video && (
+                  <div className="flex justify-center items-center">
+                    <video
+                      controls
+                      className="w-65 bg-base-200 rounded-md p-2"
+                      controlsList="nodownload">
+                      <source src={msg.video} type="video/mp4" />
+                      Your browser does not support the video tag.
+                    </video>
+                  </div>
+                )}
+
+                {openImg && msg.image && (
                   <ImagePreview
-                    src={msg.image}
+                    src={imgSrc}
                     close={() => setOpenImg(false)}
                   />
                 )}
 
-                {messageOption === msg._id && (
+                {messageOption === msgID && (
                   <div
-                    className={`absolute ${
-                      isNearBottom(index) ? "bottom-full mb-2" : "top-full mt-2"
-                    } ${
-                      !isSender ? "left-12" : "right-12"
-                    } bg-base-100 text-white border-0 shadow-md w-22 h-22 rounded z-50 text-sm message-options`}>
+                    className={`absolute ${isNearBottom(index) ? "bottom-full mb-2" : "top-full mt-2"
+                      } ${!isSender ? "left-12" : "right-12"
+                      } bg-base-100 text-white border-0 shadow-md w-22 h-22 rounded z-50 text-sm message-options`}>
                     <ul className="flex flex-col justify-evenly w-full h-full gap-1">
                       <li
                         className="hover:bg-base-content hover:text-black px-4 py-2 cursor-pointer"
-                        onClick={() => handleStarMessage(msg._id)}>
-                        {starredMessageIds.has(msg._id) ? "Unstar" : "Star"}
+                        onClick={() => handleStarMessage(msgID)}>
+                        {starredMessageIds.has(msgID) ? "Unstar" : "Star"}
                       </li>
                       <li
                         className="hover:bg-red-100 px-4 py-2 cursor-pointer text-red-500"
-                        onClick={() => handleDeleteMessage(msg._id)}>
+                        onClick={() => handleDeleteMessage(msgID)}>
                         Delete
                       </li>
                     </ul>
@@ -202,111 +270,3 @@ export default function Message() {
     </div>
   );
 }
-import { create } from "zustand";
-import toast from "react-hot-toast";
-import { axiosInstance } from "../libs/axios.js";
-import { authStore } from "./authStore.js";
-
-export const useChatStore = create((set, get) => ({
-  messages: [],
-  users: [],
-  pend_users: [],
-  selectedUser: null,
-  isUserLoading: false,
-  isMessageLoading: false,
-  friendList: [],
-  isFriendLoading: false,
-  count: 0,
-
-  getUsers: async () => {
-    // this is for load frnd rqst and send rqst - gloabl user
-    set({ isUserLoading: true });
-    try {
-      const res = await axiosInstance.post("/messages/users");
-      set({ users: res.data.main_user });
-      set({ pend_users: res.data.wait_user });
-    } catch (error) {
-      toast.error("Failed to fetch user");
-    } finally {
-      set({ isUserLoading: false });
-    }
-  },
-
-  getfriend: async () => {
-    set({ isFriendLoading: true });
-    try {
-      const response = await axiosInstance.get("/auth/friendlist");
-      set({ friendList: response.data });
-    } catch (error) {
-      toast.error("Failed to fetch user");
-    } finally {
-      set({ isFriendLoading: false });
-    }
-  },
-
-  getMessages: async (userId) => {
-    set({ isMessageLoading: true });
-    try {
-      const response = await axiosInstance.get(`/messages/${userId}`);
-      set({ messages: response.data });
-    } catch (error) {
-      toast.error("Failed to fetch messages");
-    } finally {
-      set({ isMessageLoading: false });
-    }
-  },
-
-  sendMessage: async (messageData) => {
-    const { selectedUser, messages } = get();
-    try {
-      // console.log("Sending message to:", selectedUser);
-      const res = await axiosInstance.post(
-        `/messages/send-msg/${selectedUser._id}`,
-        messageData
-      );
-      set({ messages: [...messages, res.data] });
-      toast.success("Message sent successfully");
-    } catch (error) {
-      toast.error("Failed to send message");
-    }
-  },
-
-  deleteMessage: async (messageId) => {
-    const { selectedUser, messages } = get();
-    try {
-      await fetch(`/messages/${messageId}`, {
-        method: "DELETE",
-      });
-      set((state) => ({
-        messages: state.messages.filter((msg) => msg._id !== messageId),
-      }));
-    } catch (error) {
-      console.error("Failed to delete message:", error);
-    }
-  },
-
-  setSelctedUser: (selectedUser) => {
-    set({ selectedUser });
-    // getMessages(selectedUser._id);
-  },
-
-  subScribeMessages: (userId) => {
-    const { selectedUser, count } = get();
-    if (!selectedUser) return;
-    const socket = authStore.getState().socket;
-    socket.on("message", (msg) => {
-      set({ messages: [...get().messages, msg], count: count + 1 });
-    });
-  },
-
-  unSubscribeMessages: () => {
-    const socket = authStore.getState().socket;
-    socket.off("message");
-  },
-
-  subScribeToUser: (userId) => {
-    set({ selectedUser: userId });
-  },
-
-  setUserLoading: (value) => set({ isUserLoading: value }),
-}));
