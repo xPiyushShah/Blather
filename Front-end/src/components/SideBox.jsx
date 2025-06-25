@@ -14,11 +14,7 @@ export default function SideBox() {
       <div className="h-full w-[90%] overflow-hidden ">
         {!isStar ? <Lister /> : <Star />}
       </div>
-      <div
-        className="flex flex-column relative h-full w-[10%] border-l-[1px] border-l-[#dddddd35]"
-        style={{ padding: "13px" }}>
-        <ToolSide />
-      </div>
+      <ToolSide />
     </div>
   );
 }

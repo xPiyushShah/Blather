@@ -40,7 +40,7 @@ export default function ToolSide() {
   };
 
   return (
-    <>
+    <div className="flex flex-column relative h-full w-[10%] border-l-[1px] border-l-[#dddddd35]" style={{ padding: "13px" }}>
       <div className="flex flex-col gap-6 align-end text-center items-center absolute b-0 self-end-safe mb-6 *:sm:mb-0  sm:left-0 sm:right-0 sm:flex-col sm:justify-between  sm:absolute sm:b-0">
         {/* <div className=" pk rounded-xl">
           <FontAwesomeIcon icon={faThumbsUp} onClick={() => onClicked("theme")} />
@@ -91,6 +91,6 @@ export default function ToolSide() {
           <FontAwesomeIcon icon={faRightFromBracket} onClick={handleLogout} />
         </div>
       </div>
-    </>
+    </div>
   );
 }
