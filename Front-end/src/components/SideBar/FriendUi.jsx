@@ -29,18 +29,18 @@ function FriendUi() {
                     : "avatar-offline"
                     }`}>
                   <div className="w-8 mask mask-squircle">
-                    {item.profile_url ? (
-                      <img
-                        alt={`${item.first_name} ${item.last_name}`}
-                        src={item.profile_url}
-                      />
-                    ) : (
+                    {item.profile_url && (
+                    //   <img
+                    //     alt={`${item.first_name} ${item.last_name}`}
+                    //     src={item.profile_url}
+                    //   />
+                    // ) : (
                       <ProfileAvatar onGen={item} />
                     )}
-                    <img
+                    {/* <img
                       alt={`${item.first_name} ${item.last_name}`}
                       src={item.profile_url}
-                    />
+                    /> */}
                   </div>
                 </div>
               </div>

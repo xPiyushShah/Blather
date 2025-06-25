@@ -38,18 +38,19 @@ export default function Lister() {
   return (
     <>
       <div
-        className="border-b-[1px] border-b-[#dddddd35] flex flex-row-reverse align-center text-center items-center 
+        className="border-b-[1px] border-b-[#dddddd35]  flex-row-reverse align-center text-center items-center 
       h-[12%]  justify-between w-full  hidden md:flex"
         style={{ padding: "12px 16px" }}>
         <div>
-          <div className="avatar text-center align-center">
+          <ProfileAvatar onGen={authUser} />
+          {/* <div className="avatar text-center align-center">
             <div className="w-8 rounded-full">
               <img
                 alt="me"
-                src={authUser.profile_url || "https://img.daisyui.com/images/profile/demo/anakeen@192.webp"}
+                src={authUser.profile_url || "https://res.cloudinary.com/dufcac38i/image/upload/v1750871808/user-3d-icon_642950-57_y7w2bq.jpg"}
               />
             </div>
-          </div>
+          </div> */}
         </div>
         <div className="icom">
           {authUser.first_name} {authUser.last_name}

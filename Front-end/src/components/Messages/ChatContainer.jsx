@@ -75,13 +75,13 @@ export default function ChatContainer() {
               : "avatar-offline"
             }
           `}>
-          {selectedUser.profile_url ? (
-            <img
-              alt={selectedUser.first_name}
-              src={selectedUser.profile_url}
-              className={`object-cover mask mask-squircle rounded-full w-6 h-6 ${!selectedUser ? "skeleton" : ""}`}
-            />
-          ) : (
+          {selectedUser.profile_url && (
+            //   <img
+            //     alt={selectedUser.first_name}
+            //     src={selectedUser.profile_url}
+            //     className={`object-cover mask mask-squircle rounded-full w-6 h-6 ${!selectedUser ? "skeleton" : ""}`}
+            //   />
+            // ) : (
             <ProfileAvatar onGen={selectedUser} />
           )}
         </div>
