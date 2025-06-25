@@ -21,11 +21,13 @@ export function getReceiverSocketId(userId) {
 
 const io = new Server(server, {
   cors: {
-    origin: ["https://blathers.onrender.com"],
+    origin: ["https://blather.onrender.com"],
     methods: ["GET", "POST"],
-    // credentials: true,
+    credentials: true,
   },
+  transports: ["websocket"], 
 });
+
 
 io.on("connection", (socket) => {
   console.log("User connected", socket.id);
