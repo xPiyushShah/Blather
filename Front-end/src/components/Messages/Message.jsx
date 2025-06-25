@@ -148,6 +148,11 @@ export default function Message() {
       return text;
     }
   };
+  const isNearBottom = (index) => {
+    const threshold = 2;
+    return messages.length - index <= threshold;
+  };
+
 
   const starredMessageIds = new Set(starredMessages.map((msg) => msgID));
 
