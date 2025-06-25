@@ -32,7 +32,7 @@ export default function InputArea() {
 
   const fileInputRef = useRef(null);
 
-  const { sendMessage , key } = useChatStore();
+  const { sendMessage, key } = useChatStore();
 
   const handleEmojiClick = (emojiData) => {
     settext((prev) => prev + emojiData.emoji + " ");
@@ -78,6 +78,18 @@ export default function InputArea() {
     setShowEmojiPicker(false);
     setPreview(null);
   };
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (!e.target.closest(".allbox")) {
+        setShowAllBox(null);
+      }
+    };
+
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, []);
+
   if (mic) {
     return (<Mic close={() => setMic(false)} />);
   }
@@ -116,7 +128,7 @@ export default function InputArea() {
         )
       }
       {allBox && (
-        <div className="absolute bottom-16 left-4 bg-base-100 shadow-lg rounded-lg mt-2 z-40 w-35 h-30 min-w-fit min-h-fit flex align-center justify-center">
+        <div className="absolute bottom-16 left-4 bg-base-100 shadow-lg rounded-lg mt-2 z-40 w-35 h-30 min-w-fit min-h-fit flex align-center justify-center allbox">
           <div className="p-6 text-white grid grid-cols-3 gap-6 place-items-center m-12 *:hover:cursor-pointer  *:hover:scale-110 transition-all duration-300 ease-in-out" onClick={() => setShowAllBox(false)}>
             <div className="flex flex-col items-center gap-2" onClick={() => setMic((prev) => !prev)}>
               <FontAwesomeIcon icon={faMicrophone} size="lg" />
