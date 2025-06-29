@@ -337,10 +337,10 @@ export const sendMedia = async (req, res) => {
 
     await message.save();
 
-    const receiverSocketId = getReceiverSocketId(receiverId);
-    if (receiverSocketId) {
-      io.to(receiverSocketId).emit("receive-message", message);
-    }
+    // const receiverSocketId = getReceiverSocketId(receiverId);
+    // if (receiverSocketId) {
+    //   io.to(receiverSocketId).emit("receive-message", message);
+    // }
 
     res.status(201).json(message);
   } catch (error) {

@@ -14,7 +14,6 @@ const Home = () => {
     if (!socket) return;
 
     socket.on("incoming-call", (data) => {
-      // console.log("📞 Incoming call:", data);
       setIncomingCall(data);
       setModal(data.type);
       setGetModal(true);

@@ -10,10 +10,11 @@ function contextMenu({ x, y }) {
 
   return (
     <div
-      className={`absolute bg-base-100 text-white border-0 shadow-md w-22 h-22 rounded z-50 text-sm message-options `}
+      className={`absolute bg-base-100 text-white border-0 shadow-md w-32 h-22 max-h-fit rounded z-50 text-sm message-options `}
       style={{
         top: y,
         left: x,
+        padding:"4px"
       }}>
       <ul className="flex flex-col justify-evenly w-full h-full gap-1">
         <li

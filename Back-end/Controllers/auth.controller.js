@@ -17,7 +17,7 @@ export const signup = async (req, res) => {
   try {
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ message: "User already exists" , status: false });
+      return res.status(400).json({ message: "User already exists", status: false });
     }
 
     // Hash password
@@ -36,18 +36,19 @@ export const signup = async (req, res) => {
 
     const session = await generateSession(user._id, res);
 
-    console.log(session);
+    // console.log(session);
 
     // Generate token
+    // gToken(newUser._id, res);
     const token = gToken(newUser._id, res);
 
     await User.findByIdAndUpdate(newUser._id, { token: token }, { new: true });
 
-    // res.status(201).json({ message: "User created successfully"});
+    // res.status(201).json({ message: "User created successfully" });
     res.status(201).json({ message: "User created successfully", token  , status: true  });
   } catch (err) {
     console.error("Error to Integrate with data:", err.message);
-    res.status(500).json({ message: "Internal Server Error"  , status: false  });
+    res.status(500).json({ message: "Internal Server Error", status: false });
   }
 };
 export const login = async (req, res) => {
@@ -55,21 +56,22 @@ export const login = async (req, res) => {
 
   try {
     const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ message: "User not found"  , status: false  });
+    if (!user) return res.status(400).json({ message: "User not found", status: false });
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch)
-      return res.status(400).json({ message: "Invalid email or password"  , status: false  });
+      return res.status(400).json({ message: "Invalid email or password", status: false });
 
     const session = await generateSession(user._id, res);
 
-    console.log(session);
+    // console.log(session);
+
+    // gToken(user._id, res);
 
     const token = gToken(user._id, res);
-
     await User.findByIdAndUpdate(user._id, { token: token }, { new: true });
 
-    // res.status(200).json({ message: "You are logged in..!"});
+    // res.status(200).json({ message: "You are logged in..!" });
     res.status(200).json({ message: "You are logged in..!", token   , status: false  });
 
     // res.status(200).json({
@@ -80,22 +82,22 @@ export const login = async (req, res) => {
     // });
   } catch (err) {
     // console.error("Login Error:", err.message);
-    res.status(500).json({ message: "Server error" , status: false  });
+    res.status(500).json({ message: "Server error", status: false });
   }
 };
 export const logout = async (req, res) => {
-  const sessionId = req.cookies.sessionId;
+  // const sessionId = req.cookies.sessionId;
 
-  if (sessionId) {
-    await redisClient.del(sessionId); // delete session from Redis
-  }
+  // if (sessionId) {
+  //   await redisClient.del(sessionId); // delete session from Redis
+  // }
   const userID = req.user._id;
-  await User.findByIdAndUpdate(userID, { token: "" }, { new: true });
+  // await User.findByIdAndUpdate(userID, { token: "" }, { new: true });
 
-  // res.cookie("auth_token", "", {
-  //   httpOnly: true,
-  //   expires: new Date(0),
-  // });
+  res.cookie("auth_token", "", {
+    httpOnly: true,
+    expires: new Date(0),
+  });
   res.status(200).json({ message: "Logged out successfully" });
 };
 export const updateImage = async (req, res) => {
@@ -261,5 +263,21 @@ export const acceptRequest = async (req, res) => {
   } catch (error) {
     console.error("Error accepting friend request:", error.message);
     res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const userData = async (req, res) => {
+  try {
+    const rqstID = req.params.id;
+    if (rqstID) {
+      const user = await User.findById(rqstID).select("-password");
+      if (user) {
+        res.status(200).json({ user, status: true });
+      } else {
+        res.status(404).json({ message: "User not found", status: false });
+      }
+    }
+  } catch (err) {
+    console.error("Error to get  data:", err.message);
   }
 };

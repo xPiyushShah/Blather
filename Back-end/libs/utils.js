@@ -8,22 +8,22 @@ export const gToken = (userId, res) => {
     expiresIn: "7d",
   });
 
-  res.cookie("auth_token", token, {
-    httpOnly: true,
-    secure: true,
-    sameSite: "none",
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-    domain: ".onrender.com",
-    path: "/",
-  });
-  return token;
   // res.cookie("auth_token", token, {
   //   httpOnly: true,
-  //   secure: process.env.NODE_ENV === "production",
-  //   sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-  //   maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+  //   secure: true,
+  //   sameSite: "none",
+  //   maxAge: 7 * 24 * 60 * 60 * 1000,
+  //   domain: ".onrender.com",
+  //   path: "/",
   // });
-
+  res.cookie("auth_token", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+  });
+  
+  return token;
   console.log("token for user:", userId, "is generated successfully", token);
 };
 

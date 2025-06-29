@@ -1,4 +1,4 @@
-import React, { useState, useRef,useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faSmile,
@@ -7,7 +7,8 @@ import {
   faXmark,
   faImage,
   faSquareCaretDown,
-  faMicrophone, faVideo, faFile, faChalkboard
+  faMicrophone, faVideo, faFile, faChalkboard,
+  faCamera
 } from "@fortawesome/free-solid-svg-icons";
 
 import EmojiPicker from "emoji-picker-react";
@@ -15,14 +16,17 @@ import { Picker } from "emoji-mart";
 import CryptoJS from "crypto-js";
 // import "emoji-mart/css/emoji-mart.css";
 import toast from "react-hot-toast";
+import { authStore } from "../../store/authStore";
 import { useChatStore } from "../../store/useChatStore";
 import Mic from "./extra/Mic";
 import Board from "./extra/Board";
+import Camera from "./extra/Camera";
 
 export default function InputArea() {
   // Extra features
   const [mic, setMic] = useState(false);
   const [board, setBoard] = useState(false);
+  const [camera, setCamera] = useState(false);
 
   // OWN features
   const [text, settext] = useState("");
@@ -32,7 +36,8 @@ export default function InputArea() {
 
   const fileInputRef = useRef(null);
 
-  const { sendMessage, key } = useChatStore();
+  const { sendMessage, key, selectedUser } = useChatStore();
+  const { socket, authUser } = authStore();
 
   const handleEmojiClick = (emojiData) => {
     settext((prev) => prev + emojiData.emoji + " ");
@@ -78,18 +83,56 @@ export default function InputArea() {
     setShowEmojiPicker(false);
     setPreview(null);
   };
+  //typing effect
+  const handleTyping = (data) => {
+    let now = true;
+    if (!data) now = false;
+    socket.emit("typing", { sender: authUser._id, recevier: selectedUser._id, text: text, now: data });
+  };
+  const typingTimeoutRef = useRef(null);
+
+  const handleChange = (e) => {
+    settext(e.target.value);
+    handleTyping(true);
+
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+    typingTimeoutRef.current = setTimeout(() => {
+      handleTyping(false);
+    }, 1000);
+  };
+  const modalRef = useRef(null);
 
   useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (!e.target.closest(".allbox")) {
-        setShowAllBox(null);
+    const handleClickOutside = (event) => {
+      if (modalRef.current && !modalRef.current.contains(event.target)) {
+        close(); // Call the close function
       }
     };
 
-    document.addEventListener("click", handleClickOutside);
-    return () => document.removeEventListener("click", handleClickOutside);
-  }, []);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [close]);
 
+
+
+  // useEffect(() => {
+  //   const handleClickOutside = (e) => {
+  //     if (!e.target.closest(".allbox")) {
+  //       setShowAllBox(null);
+  //     }
+  //   };
+
+  //   document.addEventListener("click", handleClickOutside);
+  //   return () => document.removeEventListener("click", handleClickOutside);
+  // }, []);
+  const handleBoxClicker = () => {
+    console.log(allBox)
+    setShowAllBox((prev) => !prev)
+  }
   if (mic) {
     return (<Mic close={() => setMic(false)} />);
   }
@@ -116,32 +159,49 @@ export default function InputArea() {
         <FontAwesomeIcon
           icon={faSquareCaretDown}
           size="lg"
-          onClick={() => setShowAllBox((prev) => !prev)}
-          className={`hover:scale-3d transition-all duration-300 ease-in-out ${allBox ? "rotate-180" : "rotate-270"
-            }`}
+          onClick={handleBoxClicker}
+          className={`hover:scale-3d transition-all duration-300 ease-in-out ${allBox ? "rotate-180" : "rotate-270"}`}
         />
       </div>
       {
         board && (
           <Board close={() => setBoard(false)} />
-
+        )
+      }
+      {
+        camera && (
+          <Camera close={() => setCamera(false)} />
         )
       }
       {allBox && (
-        <div className="absolute bottom-16 left-4 bg-base-100 shadow-lg rounded-lg mt-2 z-40 w-35 h-30 min-w-fit min-h-fit flex align-center justify-center allbox">
+        <div className="absolute bottom-16 left-4 bg-base-100 shadow-lg rounded-lg mt-2 z-40 w-35 h-30 min-w-fit min-h-fit flex align-center justify-center allbox" ref={modalRef}>
           <div className="p-6 text-white grid grid-cols-3 gap-6 place-items-center m-12 *:hover:cursor-pointer  *:hover:scale-110 transition-all duration-300 ease-in-out" onClick={() => setShowAllBox(false)}>
             <div className="flex flex-col items-center gap-2" onClick={() => setMic((prev) => !prev)}>
-              <FontAwesomeIcon icon={faMicrophone} size="lg" />
+              <FontAwesomeIcon icon={faMicrophone}  />
             </div>
             <div className="flex flex-col items-center gap-2">
-              <FontAwesomeIcon icon={faVideo} size="lg" />
+              <FontAwesomeIcon icon={faCamera}   onClick={() => setCamera((prev) => !prev)} />
             </div>
             <div className="flex flex-col items-center gap-2">
-              <FontAwesomeIcon icon={faFile} size="lg" />
+              <FontAwesomeIcon icon={faFile}  />
             </div>
             <div className="flex flex-col items-center gap-2">
-              <FontAwesomeIcon icon={faChalkboard} size="lg" onClick={() => setBoard((prev) => !prev)} />
+              <FontAwesomeIcon icon={faChalkboard}  onClick={() => setBoard((prev) => !prev)} />
             </div>
+            <div className="flex flex-col items-center gap-2 ">
+              <FontAwesomeIcon
+                icon={faImage}
+                style={{ cursor: "pointer" }}
+                onClick={() => fileInputRef.current.click()}
+              />
+            </div>
+            <input
+              type="file"
+              ref={fileInputRef}
+              style={{ display: "none" }}
+              accept="image/*"
+              onChange={handleFileChange}
+            />
           </div>
         </div>
       )}
@@ -166,7 +226,7 @@ export default function InputArea() {
             type="text"
             placeholder="Type a text..."
             value={text}
-            onChange={(e) => settext(e.target.value)}
+            onChange={handleChange}
             onFocus={handleInputFocus}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
@@ -179,21 +239,7 @@ export default function InputArea() {
       </div>
 
       <div className="file-box rounded-lg ">
-        <div className="icon-wrapper rounded-l-lg">
-          <FontAwesomeIcon
-            icon={faImage}
-            style={{ cursor: "pointer" }}
-            onClick={() => fileInputRef.current.click()}
-          />
-        </div>
-        <input
-          type="file"
-          ref={fileInputRef}
-          style={{ display: "none" }}
-          accept="image/*"
-          onChange={handleFileChange}
-        />
-        <div className="icon-wrapper  rounded-r-lg">
+        <div className="icon-wrapper  rounded-lg">
           <FontAwesomeIcon
             icon={faPaperPlane}
             onClick={sendMsg}

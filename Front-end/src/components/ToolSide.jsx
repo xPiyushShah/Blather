@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faGear,
@@ -10,10 +10,12 @@ import {
   faRadio,
   faUserNinja,
   faPalette,
+  faWifi
 } from "@fortawesome/free-solid-svg-icons";
 import { Link, useNavigate } from "react-router-dom";
 import { authStore } from "../store/authStore";
 import { functionStore } from "../store/functionStore";
+import NetwrokModal from "../utils/NetwrokModal"
 
 export default function ToolSide() {
   const {
@@ -31,6 +33,7 @@ export default function ToolSide() {
     setFriend,
   } = functionStore();
   const [logout, setLogout] = useState(false);
+  const [network, setNetWork] = useState(false)
   const navigate = useNavigate();
   const { logOut } = authStore();
   const handleLogout = () => {
@@ -38,6 +41,16 @@ export default function ToolSide() {
     logOut("ok");
     navigate("/");
   };
+  // useEffect(() => {
+  //   const handleClickOutside = (e) => {
+  //     if (!e.target.closest(".ntwrk-bx")) {
+  //       setNetWork(null);
+  //     }
+  //   };
+
+  //   document.addEventListener("click", handleClickOutside);
+  //   return () => document.removeEventListener("click", handleClickOutside);
+  // }, []);
 
   return (
     <div className="flex flex-column relative h-full w-[10%] border-l-[1px] border-l-[#dddddd35]" style={{ padding: "13px" }}>
@@ -87,6 +100,10 @@ export default function ToolSide() {
         {/* <div className="rounded-xl pk">
           <FontAwesomeIcon icon={faPalette}  />
         </div> */}
+        <div className={`rounded-xl pk  transition-all ease-in-out  delay-200 duration-300`}>
+          <FontAwesomeIcon icon={faWifi} onClick={(prev) => setNetWork(prev => !prev)} style={{ color: network ? "lightblue" : "" }} />
+        </div>
+        {network && <NetwrokModal close={setNetWork} />}
         <div className="rounded-xl pk">
           <FontAwesomeIcon icon={faRightFromBracket} onClick={handleLogout} />
         </div>

@@ -21,18 +21,17 @@ export const functionStore = create((set, get) => ({
       isStar: false,
       isSetting: false,
       isRoom: false,
-      isNotify: false,
       isFriend: false,
     })),
 
   setUsrId: (usrID) => {
-    set({ usrID: usrID });
+    set({ usrID });
     get().setProfile();
   },
 
   setProfile: () =>
-    set((state) => ({
-      isProfile: !state.isProfile,
+    set(() => ({
+      isProfile: !get().isProfile,
       isUsrProfile: false,
       isStar: false,
       isSetting: false,
@@ -40,9 +39,10 @@ export const functionStore = create((set, get) => ({
       isNotify: false,
       isFriend: false,
     })),
+
   setStar: () =>
-    set((state) => ({
-      isStar: !state.isStar,
+    set(() => ({
+      isStar: !get().isStar,
       isProfile: false,
       isSetting: false,
       isRoom: false,
@@ -50,9 +50,10 @@ export const functionStore = create((set, get) => ({
       isFriend: false,
       usrID: null,
     })),
+
   setSetting: () =>
-    set((state) => ({
-      isSetting: !state.isSetting,
+    set(() => ({
+      isSetting: !get().isSetting,
       isProfile: false,
       isStar: false,
       isRoom: false,
@@ -60,9 +61,10 @@ export const functionStore = create((set, get) => ({
       isFriend: false,
       usrID: null,
     })),
+
   setRoom: () =>
-    set((state) => ({
-      isRoom: !state.isRoom,
+    set(() => ({
+      isRoom: !get().isRoom,
       isProfile: false,
       isStar: false,
       isSetting: false,
@@ -70,11 +72,12 @@ export const functionStore = create((set, get) => ({
       isNotify: false,
       usrID: null,
     })),
+
   setFriend: () => {
     const { setUserLoading } = useChatStore.getState();
     setUserLoading(false);
-    set((state) => ({
-      isFriend: !state.isFriend,
+    set(() => ({
+      isFriend: !get().isFriend,
       isProfile: false,
       isStar: false,
       isSetting: false,
@@ -84,20 +87,55 @@ export const functionStore = create((set, get) => ({
   },
 
   saveStarMessae: async (messageData) => {
-    // try {
-    //   const res = await axiosInstance.post(
-    //     `/messages/star_message`,
-    //     messageData
-    //   );
-    // } catch (error) {
-    //   toast.error("Failed to save message");
-    // }
+    // Optional async save logic here
   },
 
   starMessage: (message) => {
     set((state) => ({
       starredMessages: [...state.starredMessages, message],
     }));
+    // Side effects outside set
+    const starred = get().starredMessages;
+    localStorage.setItem("st_message", JSON.stringify(starred));
+    toast.success("Message starred and saved locally!");
     get().saveStarMessae(message);
   },
+
+  removeStarMessage: (message) => {
+    set((state) => ({
+      starredMessages: state.starredMessages.filter((msg) => {
+        if (message._id && msg._id) return msg._id !== message._id;
+        if (message.uid && msg.uid) return msg.uid !== message.uid;
+        return msg._id !== message._id && msg.uid !== message.uid;
+      }),
+    }));
+    // Side effects outside set
+    const starred = get().starredMessages;
+    localStorage.setItem("st_message", JSON.stringify(starred));
+    toast.success("Message removed from starred and updated locally!");
+  },
+
+  loadStarMessages: () => {
+    try {
+      const stored = JSON.parse(localStorage.getItem("st_message"));
+      if (Array.isArray(stored)) {
+        set({ starredMessages: stored });
+      } else if (stored !== null && stored !== undefined) {
+        set({ starredMessages: [stored] });
+      } else {
+        set({ starredMessages: [] });
+      }
+    } catch (error) {
+      console.error("Failed to parse starred messages:", error);
+      set({ starredMessages: [] });
+    }
+  },
+  //  useEffect(() => {
+  //   // Sync to localStorage every second
+  //   const interval = setInterval(() => {
+  //     updateLocalStarMessages();
+  //   }, 1000);
+
+  //   return () => clearInterval(interval); // cleanup on unmount
+  // }, [updateLocalStarMessages]);
 }));

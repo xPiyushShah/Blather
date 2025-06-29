@@ -15,8 +15,8 @@ function FriendUi() {
           {friendList?.map((item) => (
             <div
               key={item._id}
-              className={`h-[4rem] border-b-[1px] border-b-[#dddddd35] w-full flex flex-row justify-between items-center text-center ${selectedUser?._id === item._id
-                ? "bg-[#8ed4d2] opacity-80 border-0 outline-0"
+              className={` h-[4rem] border-b-[1px] border-b-[#dddddd35] w-full flex flex-row justify-between items-center text-center ${selectedUser?._id === item._id
+                ? "bg-[#916767] opacity-80 border-0 outline-0"
                 : ""
                 } mb-4`}
               style={{ cursor: "pointer", padding: "2px 16px" }}
@@ -29,14 +29,15 @@ function FriendUi() {
                     : "avatar-offline"
                     }`}>
                   <div className="w-8 mask mask-squircle">
-                    {item.profile_url && (
+                    <ProfileAvatar onGen={item} />
+                    {/* {item.profile_url && (
                     //   <img
                     //     alt={`${item.first_name} ${item.last_name}`}
                     //     src={item.profile_url}
                     //   />
                     // ) : (
-                      <ProfileAvatar onGen={item} />
-                    )}
+                    
+                    )} */}
                     {/* <img
                       alt={`${item.first_name} ${item.last_name}`}
                       src={item.profile_url}

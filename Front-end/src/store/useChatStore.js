@@ -3,11 +3,13 @@ import toast from "react-hot-toast";
 import { axiosInstance } from "../libs/axios.js";
 import { authStore } from "./authStore.js";
 import CryptoJS from "crypto-js";
+import { v4 as uuidv4 } from 'uuid';
 
 export const useChatStore = create((set, get) => ({
   messages: [],
   users: [],
   pend_users: [],
+  isTyping: null,
   selectedUser: null,
   isUserLoading: false,
   isMessageLoading: false,
@@ -50,7 +52,7 @@ export const useChatStore = create((set, get) => ({
       const response = await axiosInstance.post(`/messages/${userId}`);
       set({ messages: response.data });
     } catch (error) {
-      toast.error("Failed to fetch messages");
+      // toast.error("Failed to fetch messages");
     } finally {
       set({ isMessageLoading: false });
     }
@@ -67,6 +69,7 @@ export const useChatStore = create((set, get) => ({
       //   encryptMsg
       // );
       const msg = {
+        uid: uuidv4(),
         senderId: myId._id,
         receiverId: selectedUser._id,
         image: messageData.image,
@@ -93,7 +96,7 @@ export const useChatStore = create((set, get) => ({
     const socket = authStore.getState().socket;
     const formData = new FormData();
     if (messageData.audio) formData.append("audio", messageData.audio);
-    if (messageData.video) formData.append("video", messageData.video);
+    if (messageData.video) formData.append("video", messageData.video, "video.webm");
     try {
       console.log("Sending message media:", messageData);
       const res = await axiosInstance.post(
@@ -115,7 +118,7 @@ export const useChatStore = create((set, get) => ({
       });
       set({ messages: [...messages, res.data] });
       toast.success("Media sent successfully");
-    } catch (error) {
+    } catch (err) {
       toast.error("Not Sent");
       console.log(err.message);
     }
@@ -144,14 +147,28 @@ export const useChatStore = create((set, get) => ({
     const { selectedUser, count } = get();
     if (!selectedUser) return;
     const socket = authStore.getState().socket;
+
+    socket.on("receive-message", (msg) => {
+      set({ messages: [...get().messages, msg] });
+    });
+
+    const handleTyping = (data) => {
+      set({ isTyping: data });
+    };
+
+    socket.on("typing", handleTyping);
     // socket.on("message", (msg) => {
     //   set({ messages: [...get().messages, msg], count: count + 1 });
     // });
   },
 
   unSubscribeMessages: () => {
+    const { selectedUser, count } = get();
+    const authUser = authStore.getState().authUser;
+    if (!selectedUser && !authUser) return;
     const socket = authStore.getState().socket;
-    socket.off("message");
+    socket.off("receive-message"); // clean up
+    socket.off("typing"); // clean up
   },
 
   subScribeToUser: (userId) => {

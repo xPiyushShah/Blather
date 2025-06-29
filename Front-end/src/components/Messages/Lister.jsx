@@ -37,13 +37,11 @@ export default function Lister() {
   useEffect(() => { }, [socket]);
   return (
     <>
-      <div
-        className="border-b-[1px] border-b-[#dddddd35]  flex-row-reverse align-center text-center items-center 
-      h-[12%]  justify-between w-full  hidden md:flex"
-        style={{ padding: "12px 16px" }}>
-        <div>
+      <div className="border-b-[1px] border-b-[#dddddd35]  flex-row-reverse align-center text-center items-center  h-[12%]  justify-between w-full  hidden md:flex" style={{ padding: "12px 16px" }}>
+        <div className="w-10 h-10">
           <ProfileAvatar onGen={authUser} />
-          {/* <div className="avatar text-center align-center">
+        </div>
+        {/* <div className="avatar text-center align-center">
             <div className="w-8 rounded-full">
               <img
                 alt="me"
@@ -51,7 +49,6 @@ export default function Lister() {
               />
             </div>
           </div> */}
-        </div>
         <div className="icom">
           {authUser.first_name} {authUser.last_name}
         </div>

@@ -1,31 +1,22 @@
 import React, { useEffect, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEnvelope, faStar } from "@fortawesome/free-solid-svg-icons";
-import MessageSkeleton from "./MessageSkeleton.jsx";
+import { faStar } from "@fortawesome/free-solid-svg-icons";
 
+//store for management
 import { useChatStore } from "../../store/useChatStore.js";
 import { authStore } from "../../store/authStore.js";
 import { functionStore } from "../../store/functionStore.js";
+
+//helper function 
+import { formatTimeAgo, msgCheck, isNearBottom, getMessageId } from "../../helper/messages.js"
+
+//components
 import ImagePreview from "./extra/ImagePreview.jsx";
-import CryptoJS from "crypto-js";
 import Text from "../../utils/Text.jsx";
+import ContextMenu from "../../utils/contextMenu.jsx";
+import MessageSkeleton from "./MessageSkeleton.jsx";
 
 
-const formatTimeAgo = (timestamp) => {
-  const now = new Date();
-  const sent = new Date(timestamp);
-  const diffMs = now - sent;
-
-  const seconds = Math.floor(diffMs / 1000);
-  const minutes = Math.floor(seconds / 60);
-  const hours = Math.floor(minutes / 60);
-  const days = Math.floor(hours / 24);
-
-  if (seconds < 60) return `${seconds}s ago`;
-  if (minutes < 60) return `${minutes}m ago`;
-  if (hours < 24) return `${hours}h ago`;
-  return `${days}d ago`;
-};
 
 export default function Message() {
   const {
@@ -35,66 +26,26 @@ export default function Message() {
     unSubscribeMessages,
     subScribeMessages,
     deleteMessage,
-    updateMessage,
-    key
+    isMessageLoading,
+    isTyping,
   } = useChatStore();
-  const { starMessage, starredMessages, saveStarMessae } = functionStore();
-
-  const { authUser, socket } = authStore();
+  const { starredMessages, saveStarMessae,loadStarMessages } = functionStore();
+  const { authUser } = authStore();
 
   const bottomRef = useRef(null);
-
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
-
-  useEffect(() => {
-    getMessages(selectedUser._id);
-    // subScribeMessages();
-    // return () => unSubscribeMessages();
-  }, [getMessages, selectedUser._id]);
-
-  // useEffect(() => {
-  //   getMessages(selectedUser._id);
-  //   subScribeMessages();
-  //   return () => unSubscribeMessages();
-  // }, [getMessages, selectedUser._id, subScribeMessages, unSubscribeMessages]);
-
-  useEffect(() => {
-
-    if (!socket) return;
-
-    const handleReceiveMessage = (message) => {
-      // console.log("get", message);
-      updateMessage(message);
-    };
-
-    socket.on("receive-message", handleReceiveMessage);
-
-    return () => {
-      socket.off("receive-message", handleReceiveMessage); // clean up
-    };
-
-  }, [socket]);
-
-  const [, setNow] = useState(Date.now());
-  useEffect(() => {
-    const interval = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-
-
+  const [context, setContext] = useState(false);
+  const [contextPos, setContextPos] = useState({ x: 0, y: 0 });
+  const [messageOption, setMessageOption] = useState(null);
   const [imgSrc, setImgSrc] = useState(true);
   const [imgload, setImgload] = useState(true);
   const [openImg, setOpenImg] = useState(false);
-  const [messageOption, setMessageOption] = useState(null);
+
+
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setImgload(false);
-    }, 4000);
-    return () => clearTimeout(timer);
+    const handleClick = () => setContext(false);
+    window.addEventListener("click", handleClick);
+    return () => window.removeEventListener("click", handleClick);
   }, []);
 
   useEffect(() => {
@@ -108,166 +59,188 @@ export default function Message() {
     return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  useEffect(() => {
+    getMessages(selectedUser._id);
+    subScribeMessages();
+    return () => unSubscribeMessages();
+  }, [getMessages, selectedUser._id, subScribeMessages, unSubscribeMessages]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setImgload(false);
+    }, 4000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const starredMessageIds = new Set(
+    starredMessages.map((msg, idx) => getMessageId(msg, idx))
+  );
+
   const handleStarMessage = (messageId) => {
-    const message = messages.find((msg) => msgID === messageId);
+    const message = messages.find((msg, index) => getMessageId(msg, index) === messageId);
     if (!message) return;
 
     const isStarred = starredMessageIds.has(messageId);
 
-    if (isStarred) {
-      functionStore.setState((state) => ({
-        starredMessages: state.starredMessages.filter(
-          (m) => m._id !== messageId
-        ),
-      }));
-    } else {
-      functionStore.setState((state) => ({
-        starredMessages: [...state.starredMessages, message],
-      }));
-    }
+    loadStarMessages();
+    functionStore.setState((state) => ({
+      starredMessages: isStarred
+        ? state.starredMessages.filter((m, i) => getMessageId(m, i) !== messageId)
+        : [...state.starredMessages, message],
+    }));
+    localStorage.setItem("st_message", JSON.stringify(message));
 
-    setMessageOption(null);
     saveStarMessae(message);
+    setMessageOption(null);
   };
+  useEffect(() => {
+    loadStarMessages();
+  }, []);
 
   const handleDeleteMessage = (messageId) => {
-    deleteMessage(messageId);
+    const message = messages.find((msg, index) => getMessageId(msg, index) === messageId);
+    if (message && message._id) {
+      deleteMessage(message._id);
+    }
     setMessageOption(null);
   };
 
-  //text messages
-  const msgCheck = (text) => {
-    try {
-      const bytes = CryptoJS.AES.decrypt(text, key);
-      const decrypted = bytes.toString(CryptoJS.enc.Utf8);
-      if (!decrypted) {
-        return text;
-      }
-      return decrypted;
-    } catch (error) {
-      return text;
-    }
-  };
-  const isNearBottom = (index) => {
-    const threshold = 2;
-    return messages.length - index <= threshold;
-  };
-  
-
-
-  const starredMessageIds = new Set(starredMessages.map((msg) => msgID));
-
-  if (!messages || messages.length === 0) {
+  if (isMessageLoading) {
     return (
-      <MessageSkeleton />
+      <div className="flex flex-row items-end justify-center h-full mb-12">
+        <span className="loading loading-spinner loading-xl"></span>
+      </div>
     );
   }
 
+  if (!messages || messages.length === 0) {
+    return <MessageSkeleton />;
+  }
+
   return (
-    <div className="chat-show content-end scroll-smooth snap-proximity snap-y overflow-y-auto h-screen">
-      <div className="flex-1 overflow-y-hidden p-4 space-y-4 flex flex-col gap-4">
-        {messages.map((msg, index) => {
-          const isSender = authUser._id == msg.senderId;
-          const msgID = index;
-          const isSelected = messageOption == msgID;
-          return (
-            <div
-              key={msgID}
-              className={`chat space-y-4 ${isSender ? "chat-end" : "chat-start"
-                } rounded-lg mb-8 relative ${isSelected ? "bg-[#1b34e129]" : ""}`}
-              onClick={(e) => {
-                e.preventDefault();
-                setMessageOption((prev) => (prev === msgID ? null : msgID));
-              }}>
-              <div className="chat-footer mb-18 flex items-center gap-1">
-                <time dateTime="" className="text-xs opacity-50 ml-1">
-                  {isSender
-                    ? `Sent ${formatTimeAgo(msg.createdAt)}`
-                    : `Received ${formatTimeAgo(msg.createdAt)}`}
-                </time>
+    <>
+      <div
+        className="chat-show content-end scroll-smooth snap-y overflow-y-auto h-screen relative"
+        onContextMenu={(e) => {
+          e.preventDefault();
+          setContext(true);
+          setContextPos({ x: e.pageX, y: e.pageY });
+        }}
+      >
+        <div className="flex-1 overflow-y-hidden p-4 space-y-4 flex flex-col gap-4">
+          {messages.map((msg, index) => {
+            const isSender = authUser._id === msg.senderId;
+            const messageId = getMessageId(msg, index);
+            const isSelected = messageOption === messageId;
 
-                {starredMessageIds.has(msgID) && (
-                  <FontAwesomeIcon
-                    icon={faStar}
-                    className="text-yellow-400 text-xs ml-1"
-                    title="Starred message"
-                  />
-                )}
-              </div>
+            return (
               <div
-                className={`chat-bubble bg-base-300 text-white max-w-xs w-fit flex flex-col gap-2 p-14 relative truncate`}>
+                key={messageId}
+                className={`chat space-y-4 ${isSender ? "chat-end" : "chat-start"} rounded-lg mb-8 relative ${isSelected ? "bg-[#1b34e129]" : ""}`}
+                onDoubleClick={() =>
+                  setMessageOption((prev) => (prev === messageId ? null : messageId))
+                }
+              >
+                <div className="chat-footer mb-18 flex items-center gap-1">
+                  <time className="text-xs opacity-50 ml-1">
+                    {isSender
+                      ? `Sent ${formatTimeAgo(msg.createdAt)}`
+                      : `Received ${formatTimeAgo(msg.createdAt)}`}
+                  </time>
 
-                {(msg.text) && <Text msg={msgCheck(msg.text)} />}
-
-                {msg.image && (
-                  <div
-                    className={`chat-image bg-base-300 ${imgload ? "skeleton" : ""
-                      } w-[full] h-[full]`}>
-                    <img
-                      src={msg.image}
-                      alt="sent file"
-                      className="mb-2 rounded-md sm:max-w-[full] sm:max-h-[full] object-cover w-full cursor-pointer"
-                      loading="lazy"
-                      onClick={() => {
-                        setOpenImg(true);
-                        setImgSrc(msg.image);
-                      }}
+                  {starredMessageIds.has(messageId) && (
+                    <FontAwesomeIcon
+                      icon={faStar}
+                      style={{ fontSize: "8px" }}
+                      className="text-yellow-400 text-sm ml-1 items-baseline align-bottom"
+                      title="Starred message"
                     />
-                  </div>
-                )}
-                {msg.audio && (
-                  <audio
-                    controls
-                    controlsList="nodownload"
-                    className="w-full  bg-base-200 rounded-md p-2">
-                    <source src={msg.audio} type="audio/mpeg" />
-                    Your browser does not support the audio element.
-                  </audio>
-                )}
-                {msg.video && (
-                  <div className="flex justify-center items-center">
-                    <video
+                  )}
+                </div>
+
+                <div className="chat-bubble bg-base-300 text-white max-w-xs w-fit flex flex-col gap-2 p-14 relative truncate">
+                  {msg.text && <Text msg={msgCheck(msg.text)} />}
+
+                  {msg.image && (
+                    <div className={`chat-image bg-base-300 ${imgload ? "skeleton" : ""}`}>
+                      <img
+                        src={msg.image}
+                        alt="sent file"
+                        className="mb-2 rounded-md sm:max-w-full sm:max-h-full object-cover w-full cursor-pointer"
+                        loading="lazy"
+                        onClick={() => {
+                          setOpenImg(true);
+                          setImgSrc(msg.image);
+                        }}
+                      />
+                    </div>
+                  )}
+
+                  {msg.audio && (
+                    <audio
                       controls
-                      className="w-65 bg-base-200 rounded-md p-2"
-                      controlsList="nodownload">
-                      <source src={msg.video} type="video/mp4" />
-                      Your browser does not support the video tag.
-                    </video>
-                  </div>
-                )}
+                      controlsList="nodownload"
+                      className="w-62 bg-base-200 rounded-lg p-2 border-0"
+                    >
+                      <source src={msg.audio} type="audio/mpeg" />
+                      Your browser does not support the audio element.
+                    </audio>
+                  )}
 
-                {openImg && msg.image && (
-                  <ImagePreview
-                    src={imgSrc}
-                    close={() => setOpenImg(false)}
-                  />
-                )}
+                  {msg.video && (
+                    <div className="flex justify-center items-center w-65">
+                      <video
+                        controls
+                        className="w-65 bg-base-200 rounded-md p-2"
+                        controlsList="nodownload"
+                      >
+                        <source src={msg.video} type="video/mp4" />
+                        Your browser does not support the video tag.
+                      </video>
+                    </div>
+                  )}
 
-                {messageOption === msgID && (
-                  <div
-                    className={`absolute ${isNearBottom(index) ? "bottom-full mb-2" : "top-full mt-2"
-                      } ${!isSender ? "left-12" : "right-12"
-                      } bg-base-100 text-white border-0 shadow-md w-22 h-22 rounded z-50 text-sm message-options`}>
+                  {openImg && msg.image && (
+                    <ImagePreview src={imgSrc} close={() => setOpenImg(false)} />
+                  )}
+                </div>
+                {isSelected && (
+                  <div className={`absolute ${isNearBottom(index, messageOption) ? "bottom-full mb-2" : "top-full mt-2"} ${!isSender ? "left-12" : "right-12"} absolute bg-base-100 text-white border-0 shadow-md w-32 h-22 max-h-fit rounded z-50 text-sm message-options`}
+                    style={{ padding: "4px" }}>
                     <ul className="flex flex-col justify-evenly w-full h-full gap-1">
                       <li
                         className="hover:bg-base-content hover:text-black px-4 py-2 cursor-pointer"
-                        onClick={() => handleStarMessage(msgID)}>
-                        {starredMessageIds.has(msgID) ? "Unstar" : "Star"}
+                        onClick={() => handleStarMessage(messageId)}
+                      >
+                        {starredMessageIds.has(messageId) ? "Unstar" : "Star"}
                       </li>
                       <li
                         className="hover:bg-red-100 px-4 py-2 cursor-pointer text-red-500"
-                        onClick={() => handleDeleteMessage(msgID)}>
+                        onClick={() => handleDeleteMessage(messageId)}
+                      >
                         Delete
                       </li>
                     </ul>
                   </div>
                 )}
               </div>
+            );
+          })}
+
+          {isTyping && isTyping.now && (
+            <div className={`${isTyping.sender === authUser._id ? "chat-end" : "chat-start"} flex flex-row justify-start align-bottom p-12`} style={{ padding: "6px" }}>
+              <span className="loading loading-dots loading-md"></span>
             </div>
-          );
-        })}
-        <div ref={bottomRef} />
+          )}
+          <div ref={bottomRef} />
+        </div>
       </div>
-    </div>
+
+      {context && <ContextMenu x={contextPos.x} y={contextPos.y} />}
+    </>
   );
 }

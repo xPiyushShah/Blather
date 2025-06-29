@@ -1,4 +1,5 @@
 import Message from "../Models/message.model.js";
+import User from "../Models/user.model.js";
 
 export const SendMessage = async ({
   senderId,
@@ -20,8 +21,18 @@ export const SendMessage = async ({
       updatedAt: time,
     });
     await message.save();
-    console.log("from helper ", message);
+    // console.log("from helper ", message);
   } catch (error) {
     console.error("Error saving message:", error);
   }
+};
+
+export const onceUser = async ( id ) => {
+  try {
+    const user = await User.findById(id).select("-password");
+    return user;
+  } catch (error) {
+    console.error("Error saving message:", error);
+  }
+  return ;
 };

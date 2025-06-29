@@ -8,8 +8,8 @@ export default function ProfileAvatar({ onGen }) {
   const initials = `${onGen.first_name?.[0] ?? ""}${onGen.last_name?.[0] ?? ""
     }`.toUpperCase();
   const bgColor = getRandomColor();
-  
-  const imageUrl = onGen.profile_url || "https://res.cloudinary.com/dufcac38i/image/upload/v1750871808/user-3d-icon_642950-57_y7w2bq.jpg";
+
+  const imageUrl = onGen.profile_url ? onGen.profile_url : "https://res.cloudinary.com/dufcac38i/image/upload/v1750871808/user-3d-icon_642950-57_y7w2bq.jpg";
 
 
   return (
@@ -21,12 +21,12 @@ export default function ProfileAvatar({ onGen }) {
     //   }}
     //   title={`${onGen.first_name} ${onGen.last_name}`}>
     //   {initials}
-    <div className="avatar text-center align-center">
-      <div className="w-8 rounded-full">
+    <div className="avatar text-center align-center ">
+      <div className="w-full rounded-lg">
         <img
           alt={`${onGen.first_name} ${onGen.last_name}`}
           src={imageUrl}
-          className="w-10 h-10 rounded-full object-cover ring-2 ring-blue-500"
+          className="w-10 h-10 rounded-lg object-cover  "
           title={`${onGen.first_name} ${onGen.last_name}`}
         />
       </div>
