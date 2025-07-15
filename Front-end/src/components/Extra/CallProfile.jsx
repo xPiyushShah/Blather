@@ -28,6 +28,7 @@ function CallProfile() {
     getModal,
     peer,
     setGetModal,
+    handleMediaToggle
   } = callStore();
 
   const { selectedUser } = useChatStore();
@@ -114,6 +115,24 @@ function CallProfile() {
       if (peer) peer.signal(data.signal);
     });
 
+    // socket.on("busy", (data) => { handleBusy }); // busy
+    socket.on("video-bot", ({ userId, receiverId, camera }) => {
+      setRemoteVideoStatus(camera);
+
+      if (remoteVideoRef.current) {
+        remoteVideoRef.current.style.display = camera ? "block" : "none";
+      }
+    });
+
+    socket.on("audio-bot", ({ userId, receiverId, mic }) => {
+      setRemoteAudioStatus(mic);
+
+      if (remoteVideoRef.current) {
+        remoteVideoRef.current.muted = !mic;
+        remoteVideoRef.current.volume = mic ? 1 : 0;
+      }
+    });
+
     socket.on("reject-call", (data) => { handleEndCall });
     return () => socket.off("reject-call");
   }, [socket]);
@@ -156,6 +175,7 @@ function CallProfile() {
   const toggleCamera = async () => {
     if (!mediaStreamRef.current) return;
     const videoTrack = mediaStreamRef.current.getVideoTracks()[0];
+    handleMediaToggle(true, videoTrack?.enabled);
 
     if (isCameraOn && videoTrack) {
       videoTrack.stop();
@@ -180,6 +200,7 @@ function CallProfile() {
       audioTrack.enabled = !audioTrack.enabled;
       setIsMicOn(audioTrack.enabled);
     }
+    handleMediaToggle(false, audioTrack.enabled);
   };
 
   const toggleSpeaker = () => {
@@ -197,6 +218,7 @@ function CallProfile() {
     setGetModal(false);
     setModal(null);
   };
+
 
   if (getModal) {
     return <CallModal />

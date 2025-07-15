@@ -26,7 +26,7 @@ const io = new Server(server, {
     methods: ["GET", "POST"],
     credentials: true,
   },
-  transports: ["websocket"], 
+  transports: ["websocket"],
 });
 
 
@@ -97,6 +97,29 @@ io.on("connection", (socket) => {
   socket.onAny((event, data) => {
     // console.log("🔍 Event received:", event, data);
   });
+
+  // features start for call--
+  socket.on("toggle-media", (data) => {
+    const { userId, receiverId, camera, mic } = data;
+
+    // userMediaStatus[userId] = { camera, mic };
+    const receiverSocketId = getReceiverSocketId(receiverId);
+    if (receiverSocketId) {
+
+      io.to(receiverSocketId).emit("video-bot", {
+        userId,
+        receiverId,
+        camera,
+      });
+
+      io.to(receiverSocketId).emit("audio-bot", {
+        userId,
+        receiverId,
+        mic,
+      });
+    }
+  });
+  // feature end for call--
 
   socket.on("disconnect", () => {
     console.log("User disconnected", socket.id);

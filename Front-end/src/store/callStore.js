@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import Peer from "simple-peer/simplepeer.min.js";
 import { authStore } from "./authStore.js";
+import { useChatStore } from "./useChatStore.js";
 import { handleCallAccepted, handleBusy, logPublicIPFromPeer } from "../helper/callhandler.js";
 
 const ICE_SERVERS = {
@@ -241,5 +242,14 @@ export const callStore = create((set, get) => ({
     // if (callTimeout) {
     //   console.log("[Call] Cleared call timeout.");
     // }
+  },
+  handleMediaToggle: (video, audio) => {
+    const payload = {
+      userId: authStore.getState().authUser._id,
+      receiverId: useChatStore.getState().selectedUser._id,
+      camera: video,
+      mic: audio,
+    };
+    socket.emit("toggle-media", payload);
   },
 }));

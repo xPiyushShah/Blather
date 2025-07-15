@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import {Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Home from "./Pages/Home";
 import Login from "./Pages/Login";
 import Register from "./Pages/SignUp";
@@ -18,31 +18,35 @@ function App() {
   const [shouldShowLoader, setShouldShowLoader] = useState(true);
 
   useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+  }, [theme,]);
+
+  useEffect(() => {
     checkAuth();
   }, [checkAuth]);
 
-  useEffect(() => {
-    const delayTimer = setTimeout(() => {
-      setMinDelayPassed(true);
-    }, 8000);
-    return () => clearTimeout(delayTimer);
-  }, []);
+  // useEffect(() => {
+  //   const delayTimer = setTimeout(() => {
+  //     setMinDelayPassed(true);
+  //   }, 8000);
+  //   return () => clearTimeout(delayTimer);
+  // }, []);
 
-  useEffect(() => {
-    if (!isCheckingAuth && authUser && minDelayPassed) {
-      setShouldShowLoader(false);
-    }
-    if (err == false && minDelayPassed) {
-      setShouldShowLoader(false);
-    }
-    // console.log(err);
-  }, [isCheckingAuth, authUser, minDelayPassed, err]);
+  // useEffect(() => {
+  //   if (!isCheckingAuth && authUser && minDelayPassed) {
+  //     setShouldShowLoader(false);
+  //   }
+  //   if (err == false && minDelayPassed) {
+  //     setShouldShowLoader(false);
+  //   }
+  //   // console.log(err);
+  // }, [isCheckingAuth, authUser, minDelayPassed, err]);
 
-  useEffect(() => {
-    if (authUser?.status === false) {
-      setShouldShowLoader(false);
-    }
-  }, [authUser?.status]);
+  // useEffect(() => {
+  //   if (authUser?.status === false) {
+  //     setShouldShowLoader(false);
+  //   }
+  // }, [authUser?.status]);
 
   // if (shouldShowLoader) {
   //   return <Loader />;

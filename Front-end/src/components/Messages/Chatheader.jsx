@@ -9,17 +9,16 @@ import { callStore } from "../../store/callStore.js";
 import ProfileAvatar from "../ProfileAvatar";
 
 function Chatheader() {
-    const { selectedUser} = useChatStore();
+    const { selectedUser } = useChatStore();
     const { onlineUser } = authStore();
     const { setModal } = callStore();
     return (
         <>
-            <div className=" flex flex-row justify-between w-full border-b-[1px] border-b-[#dddddd35] min-h-[72px] max-h-[78px] align-center text-center items-center">
-                <div className={`hidden md:flex mt-15 w-20 rounded-full hover:cursor-pointer  avatar  align-center justify-center text-center relative`}>
-                    <ProfileAvatar onGen={selectedUser} />
-                    <div className={`${onlineUser.includes(selectedUser._id) ? "avatar-online" : "avatar-offline"} absolute top-11 left-13 w-6 h-6`}></div>
-                </div>
-                <div className={`flex items-center  align-center text-center opacity-85 ${!selectedUser ? "skeleton" : ""}`}>
+            <div className="bg-[var(--all-header-bg)] flex shadow-lg flex-row justify-between w-full border-b-[1px] border-b-[#dddddd35] min-h-[73px] header-lest align-center text-center items-center overflow-hidden">
+                <div className={`hidden md:flex mt-15 w-12 h-12 rounded-full hover:cursor-pointer`}>
+                    <ProfileAvatar onGen={selectedUser} /> </div>
+                <div className={`flex items-center  align-center text-center opacity-85 ${!selectedUser ? "skeleton" : ""} relative`}>
+                    <span className={`${onlineUser.includes(selectedUser._id) ? "avatar-online" : "avatar-offline"} absolute top-0 left-0 right-14 w-6 h-6`}></span>
                     {`${selectedUser.first_name} ${selectedUser.last_name}`}
                 </div>
                 <div className={`lest-3 lest-apply ${!selectedUser ? "skeleton" : ""}`}>

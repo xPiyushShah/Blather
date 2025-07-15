@@ -82,17 +82,17 @@ export const login = async (req, res) => {
     // });
   } catch (err) {
     // console.error("Login Error:", err.message);
-    res.status(500).json({ message: "Server error", status: false });
+    res.status(500).json({ message: "Server error", status: false,d:err.message });
   }
 };
 export const logout = async (req, res) => {
-  // const sessionId = req.cookies.sessionId;
+  const sessionId = req.cookies.sessionId;
 
-  // if (sessionId) {
-  //   await redisClient.del(sessionId); // delete session from Redis
-  // }
+  if (sessionId) {
+    await redisClient.del(sessionId); // delete session from Redis
+  }
   const userID = req.user._id;
-  // await User.findByIdAndUpdate(userID, { token: "" }, { new: true });
+  await User.findByIdAndUpdate(userID, { token: "" }, { new: true });
 
   res.cookie("auth_token", "", {
     httpOnly: true,

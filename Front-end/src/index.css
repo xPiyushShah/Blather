@@ -1,16 +1,64 @@
 @import "tailwindcss";
 @plugin "daisyui";
+
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color: white;
+  background-color: black;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* --all-header-bg: #bd76e4ce; */
+}
+::selection {
+  background-color: #91eb13; /* Indigo background */
+  color: #ffffff;            /* White text */
+
+}
+/* [data-theme] */
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --chat-box-bg: #dedc67ce;
+    --input-bg: #dedc67ce;
+    --input-border: #dedc67ce;
+    --input-text: #000000;
+    --input-placeholder: #000000;
+    --input-focus-border: #000000;
+    --input-focus-bg: #dedc67ce;
+    --input-focus-text: #000000;
+    --input-focus-placeholder: #000000;
+    --input-focus-shadow: rgba(0, 0, 0, 0 1);
+    --input-focus-shadow-color: rgba(0, 0, 0, 0.1);
+    --input-focus-shadow-width: 0px;
+    --input-focus-shadow-style: solid;
+    --input-focus-shadow-offset: 0px 0px;
+    --input-focus-shadow-blur: 0px;
+    --input-focus-shadow-spread: 0px;
+    --input-focus-shadow-inset: false;
+    --input-focus-shadow-color: rgba(0, 0, 0, 0.1);
+    --input-focus-shadow-width: 0px;
+    --input-focus-shadow-style: solid;
+    --input-focus-shadow-offset: 0px 0px;
+    --input-focus-shadow-blur: 0px;
+    --input-focus-shadow-spread: 0px;
+    --input-focus-shadow-inset: false;
+
+    --sidebar-user-bg: #70c9a6ce;
+    --all-header-bg: #bd76e4ce;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    background-color: #121212; 
+    color: #ffffff;
+    border-bottom-color:black;
+  }
 }

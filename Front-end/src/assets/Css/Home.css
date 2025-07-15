@@ -28,7 +28,8 @@
 } */
 .header-lest {
   /* This is my css for chat header */
-  padding: 11px 20px;
+  padding: 11px 38px;
+  /* padding: 11px 20px; */
 }
 .lest-apply {
   height: 50px;

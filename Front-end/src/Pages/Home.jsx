@@ -36,7 +36,7 @@ const Home = () => {
   }, [socket]);
 
   return (
-    <div className="main-root ">
+    <div className="main-root bg-base-300">
       <div className="hidden sm:flex w-full max-h-svh h-full absolute text-white flex-row overflow-hidden" >
         <div className="w-full h-full flex flex-row align-center overflow-hidden">
           <LeftBox />
