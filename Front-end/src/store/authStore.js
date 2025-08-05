@@ -6,6 +6,7 @@ import { io } from "socket.io-client";
 // const BASE_URL = "https://localhost:5001";
 const BASE_URL = "https://blather.onrender.com";
 
+
 export const authStore = create((set, get) => ({
   authUser: null,
   onlineUser: [],
@@ -19,8 +20,15 @@ export const authStore = create((set, get) => ({
   checkAuth: async () => {
     set({ isCheckingAuth: true });
     try {
-      const res = await axiosInstance.get("/auth/check-auth");
-      set({ authUser: res.data.user });
+      const jo = {
+        first_name: "Piyush ",
+        last_name:  "Shah",
+        profile_url: null,       
+
+      };
+      // const res = await axiosInstance.get("/auth/check-auth");
+      set({ authUser: jo });
+      // set({ authUser: res.data.user });
       get().connectSocket();
     } catch (error) {
       // toast.error("Auth check failed: " + error.message);

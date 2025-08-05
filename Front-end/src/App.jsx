@@ -26,7 +26,7 @@ function App() {
   }, [checkAuth]);
 
   // useEffect(() => {
-  //   const delayTimer = setTimeout(() => {
+  //   const delayTimer = setTimeout(()9 => {
   //     setMinDelayPassed(true);
   //   }, 8000);
   //   return () => clearTimeout(delayTimer);
@@ -51,6 +51,7 @@ function App() {
   // if (shouldShowLoader) {
   //   return <Loader />;
   // }
+  
 
 
 
@@ -73,7 +74,7 @@ function App() {
   // console.log(window.__themes);data-theme={theme} 
 
   return (
-    <>
+    <div data-theme = "love">
       <Routes>
         <Route
           path="/"
@@ -99,7 +100,7 @@ function App() {
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
       <Toaster position="bottom-right" reverseOrder={true} />
-    </>
+    </div>
   );
 }
 

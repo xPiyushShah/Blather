@@ -37,7 +37,7 @@ export default function Lister() {
   useEffect(() => { }, [socket]);
   return (
     <>
-      <div className="border-b-[1px] border-b-[#dddddd35]  flex-row-reverse align-center text-center items-center  h-[12%]  justify-between w-full  hidden md:flex" style={{ padding: "12px 16px" }}>
+      <div className="border-b-[1px] bg-[var(--header-bg)] border-b-[#dddddd35]  flex-row-reverse align-center text-center items-center  h-[12%]  justify-between w-full  hidden md:flex" style={{ padding: "12px 16px" }}>
         <div className="w-10 h-10">
           <ProfileAvatar onGen={authUser} />
         </div>

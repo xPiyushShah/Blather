@@ -185,10 +185,19 @@
   /* align-self: end; */
   cursor: pointer;
   /* border-top: 1px solid#dddddd35; */
+  transition: all ease-in-out 3s;
+}
+.pk :hover{
+  opacity: 1;
+  scale: 1;
+  color: white;
 }
 .pk > svg{
   width: 18px;
   height: 18px;
+  color: var(--tool-icon);
+  opacity: 0.6;
+  scale: 0.9;
 
 }
 .stoper {

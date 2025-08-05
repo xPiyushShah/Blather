@@ -9,7 +9,7 @@ import CallProfile from "./Extra/CallProfile";
 import { callStore } from "../store/callStore";
 import { functionStore } from "../store/functionStore";
 
-const LeftBox = () => {
+const  LeftBox = () => {
   const { selectedUser } = useChatStore();
   const { isProfile , isRoom , usrID} = functionStore();
   const { getModal,callEstablished} = callStore();

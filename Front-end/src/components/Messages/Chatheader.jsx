@@ -14,7 +14,7 @@ function Chatheader() {
     const { setModal } = callStore();
     return (
         <>
-            <div className="bg-[var(--all-header-bg)] flex shadow-lg flex-row justify-between w-full border-b-[1px] border-b-[#dddddd35] min-h-[73px] header-lest align-center text-center items-center overflow-hidden">
+            <div className="bg-[var(--header-bg) flex shadow-lg flex-row justify-between w-full border-b-[1px] border-b-[#dddddd35] min-h-[73px] header-lest align-center text-center items-center overflow-hidden">
                 <div className={`hidden md:flex mt-15 w-12 h-12 rounded-full hover:cursor-pointer`}>
                     <ProfileAvatar onGen={selectedUser} /> </div>
                 <div className={`flex items-center  align-center text-center opacity-85 ${!selectedUser ? "skeleton" : ""} relative`}>
