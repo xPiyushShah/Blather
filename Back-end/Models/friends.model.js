@@ -20,8 +20,8 @@ const FriendSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["pending", "accepted", "rejected"],
-      default: "pending",
+      enum: ["not","pending", "accepted", "rejected", "block" ],
+      default: "not",
     },
   },
   { timestamps: true }

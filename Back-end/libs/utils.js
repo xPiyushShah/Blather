@@ -23,8 +23,8 @@ export const gToken = (userId, res) => {
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
   });
   
-  return token;
   console.log("token for user:", userId, "is generated successfully", token);
+  return token;
 };
 
 export const generateSession = async (userId, res) => {

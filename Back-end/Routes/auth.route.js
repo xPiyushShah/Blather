@@ -10,7 +10,8 @@ import {
   acceptRequest,
   updateImage,
   cookie,
-  userData
+  userData,
+  checkFunction
 } from "../Controllers/auth.controller.js";
 import upload from "../middleware/multer.middleware.js";
 import { protectAuth } from "../middleware/auth.middleware.js";
@@ -22,7 +23,7 @@ router.post("/login", login);
 
 router.post("/register", signup);
 
-router.get("/logout", protectAuth, logout);
+router.get("/logout", logout);
 
 // router.get("/v1/health-check", (req, res) => {
 //   res.status(200).json({
@@ -33,7 +34,7 @@ router.get("/logout", protectAuth, logout);
 
 router.get("/cookie", cookie);
 
-router.get("/find-user:id", protectAuth, userData);
+router.get("/find-user/:id", protectAuth, userData);
 
 router.put("/update-profile", protectAuth, updateProfile);
 
@@ -46,4 +47,6 @@ router.post("/addfriend/:id", protectAuth, addFriend);
 router.get("/friendlist", protectAuth, friendlist);
 
 router.get("/accept_reqst/:id", protectAuth, acceptRequest);
+
+router.get("/getfunction", protectAuth, checkFunction);
 export default router;

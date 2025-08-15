@@ -34,18 +34,18 @@ export const signup = async (req, res) => {
 
     await newUser.save();
 
-    const session = await generateSession(user._id, res);
+    // const session = await generateSession(user._id, res);
 
     // console.log(session);
 
     // Generate token
-    // gToken(newUser._id, res);
-    const token = gToken(newUser._id, res);
+    gToken(newUser._id, res);
+    // const token = gToken(newUser._id, res);
 
-    await User.findByIdAndUpdate(newUser._id, { token: token }, { new: true });
+    // await User.findByIdAndUpdate(newUser._id, { token: token }, { new: true });
 
-    // res.status(201).json({ message: "User created successfully" });
-    res.status(201).json({ message: "User created successfully", token  , status: true  });
+    res.status(201).json({ message: "User created successfully" });
+    // res.status(201).json({ message: "User created successfully", token  , status: true  });
   } catch (err) {
     console.error("Error to Integrate with data:", err.message);
     res.status(500).json({ message: "Internal Server Error", status: false });
@@ -62,17 +62,17 @@ export const login = async (req, res) => {
     if (!isMatch)
       return res.status(400).json({ message: "Invalid email or password", status: false });
 
-    const session = await generateSession(user._id, res);
+    // const session = await generateSession(user._id, res);
 
     // console.log(session);
 
-    // gToken(user._id, res);
+    gToken(user._id, res);
 
-    const token = gToken(user._id, res);
-    await User.findByIdAndUpdate(user._id, { token: token }, { new: true });
+    // const token = gToken(user._id, res);
+    // await User.findByIdAndUpdate(user._id, { token: token }, { new: true });
 
-    // res.status(200).json({ message: "You are logged in..!" });
-    res.status(200).json({ message: "You are logged in..!", token   , status: false  });
+    res.status(200).json({ message: "You are logged in..!" });
+    // res.status(200).json({ message: "You are logged in..!", token   , status: false  });
 
     // res.status(200).json({
     //   _id: user._id,
@@ -82,17 +82,17 @@ export const login = async (req, res) => {
     // });
   } catch (err) {
     // console.error("Login Error:", err.message);
-    res.status(500).json({ message: "Server error", status: false,d:err.message });
+    res.status(500).json({ message: "Server error", status: false, d: err.message });
   }
 };
 export const logout = async (req, res) => {
-  const sessionId = req.cookies.sessionId;
+  // const sessionId = req.cookies.sessionId;
 
-  if (sessionId) {
-    await redisClient.del(sessionId); // delete session from Redis
-  }
-  const userID = req.user._id;
-  await User.findByIdAndUpdate(userID, { token: "" }, { new: true });
+  // if (sessionId) {
+  //   await redisClient.del(sessionId); // delete session from Redis
+  // }
+  // const userID = req.user._id;
+  // await User.findByIdAndUpdate(userID, { token: "" }, { new: true });
 
   res.cookie("auth_token", "", {
     httpOnly: true,
@@ -181,10 +181,9 @@ export const addFriend = async (req, res) => {
   const friendID = req.params.id;
   try {
     if (userID.toString() === friendID.toString()) {
-      return res
-        .status(400)
-        .json({ message: "You cannot add yourself as a friend." });
+      return res.status(400).json({ message: "You cannot add yourself as a friend." });
     }
+
     const existingFriend = await Friend.findOne({
       $or: [
         { userId: userID, friendId: friendID },
@@ -211,36 +210,57 @@ export const addFriend = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+export const removeFriend = async (req, res) => {
+  const myId = req.user._id;
+  const friendId = req.params.id;
 
-export const friendlist = async (req, res) => {
+  try {
+    // Prevent self-removal
+    if (myId.toString() === friendId.toString()) {
+      return res.status(400).json({ message: "You cannot remove yourself." });
+    }
+
+    // Check for existing friendship (either direction)
+    const deleted = await Friend.findOneAndDelete({
+      $or: [
+        { userId: myId, friendId: friendId },
+        { userId: friendId, friendId: myId }
+      ],
+      status: "accepted"
+    });
+
+    if (!deleted) {
+      return res.status(404).json({ message: "Friendship not found." });
+    }
+
+    return res.status(200).json({ message: "Friend removed successfully." });
+  } catch (error) {
+    console.error("Error removing friend:", error.message);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+export const rejectRequest = async (req, res) => {
   try {
     const myId = req.user._id;
+    const { rqstID } = req.body;
 
-    // const friends = await Friend.find({
-    //   $and: [
-    //     {
-    //       $or: [{ userId: myId }, { friendId: myId }],
-    //     },
-    //     { status: "accepted" },
-    //   ],
-    // });
+    const updatedRequest = await Friend.findOneAndUpdate(
+      { userId: rqstID, friendId: myId, status: "pending" },
+      { status: "rejected" },
+      { new: true }
+    );
 
-    // const friendIds = friends.map((f) =>
-    //   f.userId.toString() === myId.toString() ? f.friendId : f.userId
-    // );
+    if (!updatedRequest) {
+      return res.status(404).json({ message: "Friend request not found or already accepted." });
+    }
 
-    // const friendDetails = await User.find({ _id: { $in: friendIds } });
-
-    const users = await User.find({
-      _id: { $nin: myId },
-    }).select("-password");
-
-    res.status(200).json(users);
+    res.status(200).json({ message: "Friend request rejected." });
   } catch (error) {
-    console.error("Error fetching friend list:", error.message);
+    console.error("Error accepting friend request:", error.message);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
 
 export const acceptRequest = async (req, res) => {
   try {
@@ -254,9 +274,7 @@ export const acceptRequest = async (req, res) => {
     );
 
     if (!updatedRequest) {
-      return res
-        .status(404)
-        .json({ message: "Friend request not found or already accepted." });
+      return res.status(404).json({ message: "Friend request not found or already accepted." });
     }
 
     res.status(200).json({ message: "Friend request accepted." });
@@ -265,6 +283,36 @@ export const acceptRequest = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
+
+export const friendlist = async (req, res) => {
+  try {
+    const myId = req.user._id;
+
+    const friends = await Friend.find({
+      $and: [
+        {
+          $or: [{ userId: myId }, { friendId: myId }],
+        },
+        { status: "accepted" },
+      ],
+    });
+
+    const friendIds = friends.map((f) =>
+      f.userId.toString() === myId.toString() ? f.friendId : f.userId
+    );
+
+    const users = await User.find({
+      _id: { $in: friendIds },
+    }).select("-password -token");
+
+    res.status(200).json(users);
+  } catch (error) {
+    console.error("Error fetching friend list:", error.message);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 
 export const userData = async (req, res) => {
   try {
@@ -279,5 +327,47 @@ export const userData = async (req, res) => {
     }
   } catch (err) {
     console.error("Error to get  data:", err.message);
+  }
+};
+export const checkFunction = async (req, res) => {
+  const id = req.params.userId; // The ID of the user you want to check against
+  const myId = req.user._id;    // The ID of the currently logged-in user
+
+  try {
+    // Find the friendship between the two users
+    const friendship = await Friend.findOne({
+      $or: [
+        { userId: myId, friendId: id },
+        { userId: id, friendId: myId },
+      ],
+    });
+
+    // If no friendship found
+    if (!friendship) {
+      return res.status(200).json({ message: "Friendship not found", status: false });
+    }
+
+    // Determine who is the "other" user (not the logged-in user)
+    const otherUserId = friendship.userId.equals(myId)
+      ? friendship.friendId
+      : friendship.userId;
+
+    // Fetch the other user's metadata, excluding the password
+    const otherUser = await User.findById(otherUserId).select("-password token");
+
+    // If user doesn't exist
+    if (!otherUser) {
+      return res.status(200).json({ message: "User not found", status: false });
+    }
+
+    // Respond with the other user's data and the friendship status
+    return res.status(200).json({
+      user: { u_data: otherUser, friendship: friendship },
+      status: true,
+    });
+
+  } catch (error) {
+    console.error("Error checking friendship:", error.message);
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 };

@@ -1,248 +1,39 @@
 import User from "../Models/user.model.js";
 import Message from "../Models/message.model.js";
 import Friend from "../Models/friends.model.js";
+import Action from "../Models/action.model.js";
 import { io, getReceiverSocketId } from "../socket.js";
 import cloudinary from "../libs/cloudinary.js";
 import streamifier from "streamifier";
 
-// export const getSideBarUsers = async (req, res) => {
-//   try {
-//     const userID = req.user._id;
 
-//     const friends = await Friend.find({
-//       $or: [{ userId: userID }, { friendId: userID }],
-//     });
-
-//     const friendIds = friends
-//       .filter((f) => f.status === "accepted")
-//       .map((f) =>
-//         f.userId.toString() === userID.toString() ? f.friendId : f.userId
-//       );
-
-//     const excludedIds = [userID, ...friendIds];
-
-//     const users = await User.find({
-//       _id: { $nin: excludedIds },
-//     }).select("-password");
-
-//     const main_user = users.map((user) => {
-//       return {
-//         ...user._doc,
-//         status: "none",
-//       };
-//     });
-
-//     const pendingRequests = friends.filter(
-//       (f) =>
-//         f.status === "pending" && f.friendId.toString() === userID.toString()
-//     );
-
-//     const waitUserIds = pendingRequests.map((f) => f.userId);
-
-//     const waitUsersRaw = await User.find({
-//       _id: { $in: waitUserIds },
-//     }).select("-password");
-
-//     const wait_user = waitUsersRaw.map((user) => {
-//       const friendData = pendingRequests.find(
-//         (f) => f.userId.toString() === user._id.toString()
-//       );
-//       return {
-//         ...user._doc,
-//         status: friendData?.status || "pending",
-//       };
-//     });
-
-//     res.status(200).json({ main_user, wait_user });
-//   } catch (error) {
-//     console.error("Error fetching users:", error.message);
-//     res.status(500).json({ message: "Internal Server Error" });
-//   }
-// };
 export const getSideBarUsers = async (req, res) => {
+  const myId = req.user._id;
+
   try {
-    const userID = req.user._id.toString();
-
-    // Step 1: Fetch all friend relationships involving current user
+    // Step 1: Find all friendships involving me
     const friends = await Friend.find({
-      $or: [{ userId: userID }, { friendId: userID }],
+      $or: [{ userId: myId }, { friendId: myId }],
+      status: { $in: ["accepted", "pending"] }, // optional
     });
 
-    const acceptedFriendIds = new Set();
-    const pendingSentIds = new Set();
-    const pendingReceivedIds = new Set();
-
-    for (const f of friends) {
-      const userIdStr = f.userId.toString();
-      const friendIdStr = f.friendId.toString();
-
-      if (f.status === "accepted") {
-        const otherId = userIdStr === userID ? friendIdStr : userIdStr;
-        acceptedFriendIds.add(otherId);
-      } else if (f.status === "pending") {
-        if (userIdStr === userID) {
-          pendingSentIds.add(friendIdStr);
-        } else if (friendIdStr === userID) {
-          pendingReceivedIds.add(userIdStr);
-        }
-      }
-    }
-
-    // Step 2: Determine main_user (wait_user) IDs
-    const excludedIds = new Set([
-      userID,
-      ...acceptedFriendIds,
-      ...pendingSentIds,
-    ]);
-
-    // Get all user IDs excluding current user and relevant friend statuses
-    const allUserIds = await User.find({ _id: { $ne: userID } }).select("_id");
-
-    const waitUserIds = allUserIds
-      .map((u) => u._id.toString())
-      .filter((uid) => !excludedIds.has(uid));
-
-    // Step 3: Combine both ID sets
-    const userIdsToFetch = [
-      ...new Set([...pendingReceivedIds, ...waitUserIds]),
-    ];
-
-    const usersMeta = await User.find({
-      _id: { $in: userIdsToFetch },
-    }).select("first_name last_name profile_url");
-
-    // Step 4: Organize into pend_user and main_user
-    const usersMap = new Map();
-    usersMeta.forEach((user) => {
-      usersMap.set(user._id.toString(), {
-        _id: user._id,
-        first_name: user.first_name,
-        last_name: user.last_name,
-        profile_url: user.profile_url,
-      });
-    });
-
-    const pend_user = Array.from(pendingReceivedIds)
-      .map((uid) => usersMap.get(uid))
-      .filter(Boolean);
-
-    const main_user = waitUserIds
-      .map((uid) => usersMap.get(uid))
-      .filter(Boolean);
-
-    // Step 5: Send response
-    res.status(200).json({
-      pend_user,
-      main_user,
-    });
-  } catch (error) {
-    console.error("Error fetching sidebar users:", error.message);
-    res.status(500).json({ message: "Internal Server Error" });
-  }
-};
-
-export const getSideBarUsersd = async (req, res) => {
-  try {
-    const userID = req.user._id.toString();
-
-    // Get all friend relationships involving the user
-    const friends = await Friend.find({
-      $or: [{ userId: userID }, { friendId: userID }],
-    });
-
-    // Track accepted friends to exclude from main_user
-    const acceptedFriendIds = new Set();
-    const pendingStatusMap = new Map(); // userId <-> status "pending"
-
-    // Determine status for each friend relation
-    for (const f of friends) {
-      const otherId =
-        f.userId.toString() === userID
-          ? f.friendId.toString()
-          : f.userId.toString();
-
-      if (f.status === "accepted") {
-        acceptedFriendIds.add(otherId); // exclude from sidebar
-      } else if (f.status === "pending") {
-        pendingStatusMap.set(otherId, "pending");
-      }
-    }
-
-    // Get all users except the current user and accepted friends
-    const excludedIds = [userID, ...Array.from(acceptedFriendIds)];
-    const allUsers = await User.find({
-      _id: { $nin: excludedIds },
-    }).select("first_name last_name profile_url");
-
-    // Format main_user list with status
-    const mainUsers = allUsers.map((user) => {
-      const uid = user._id.toString();
-      const status = pendingStatusMap.has(uid) ? "pending" : "none";
-      return {
-        _id: user._id,
-        first_name: user.first_name,
-        last_name: user.last_name,
-        profile_url: user.profile_url,
-        status,
-      };
-    });
-
-    // Get users who sent you a friend request (pend_user)
-    const pendRequests = friends.filter(
-      (f) => f.status === "pending" && f.friendId.toString() === userID
+    // Step 2: Get list of all friend IDs (regardless of who initiated)
+    const friendIds = friends.map((f) =>
+      f.userId.toString() === myId.toString() ? f.friendId : f.userId
     );
-    const pendSenderIds = pendRequests.map((f) => f.userId);
 
-    const pendUsers = await User.find({
-      _id: { $in: pendSenderIds },
-    }).select("first_name last_name profile_url");
-
-    res.status(200).json({
-      main_user: mainUsers,
-      pend_user: pendUsers,
-    });
-  } catch (error) {
-    console.error("Error fetching sidebar users:", error.message);
-    res.status(500).json({ message: "Internal Server Error" });
-  }
-};
-
-export const getSideBarUserss = async (req, res) => {
-  try {
-    const userID = req.user._id;
-
-    const friends = await Friend.find({
-      $or: [{ userId: userID }, { friendId: userID }],
-    });
-
-    const friendIds = friends
-      .filter((f) => f.status === "accepted")
-      .map((f) =>
-        f.userId.toString() === userID.toString() ? f.friendId : f.userId
-      );
-
-    const excludedIds = [userID, ...friendIds];
-
+    // Step 3: Find all users excluding me and my friends
     const users = await User.find({
-      _id: { $nin: excludedIds },
+      _id: { $nin: [...friendIds, myId] }, // exclude friends and myself
     }).select("-password");
 
-    const pendingRequests = friends.filter(
-      (f) =>
-        f.status === "pending" && f.friendId.toString() === userID.toString()
-    );
-
-    const pendingUserIds = pendingRequests.map((f) => f.userId);
-    const waitUsers = await User.find({
-      _id: { $in: pendingUserIds },
-    }).select("-password");
-
-    res.status(200).json({ main_user: users, wait_user: waitUsers });
+    res.status(200).json(users);
   } catch (error) {
-    console.error("Error fetching users:", error.message);
+    console.error("Error fetching sidebar users:", error.message);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
 
 export const getMessages = async (req, res) => {
   try {
@@ -365,5 +156,62 @@ export const deleteMessage = async (req, res) => {
   } catch (error) {
     console.error("Error to delete message:", error.message);
     res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+export const likeMessage = (req, res) => performAction(req, res, "like", true);
+
+export const unlikeMessage = (req, res) => performAction(req, res, "like", false);
+
+export const starMessage = (req, res) => performAction(req, res, "star", true);
+
+export const unstarMessage = (req, res) => performAction(req, res, "star", false);
+
+export const getMessageActions = async (req, res) => {
+  const { messageId } = req.params;
+
+  try {
+    const actions = await Action.find({ messageId })
+      .populate("userId", "first_name last_name _id")
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({ actions });
+  } catch (error) {
+    console.error("Error fetching actions:", error.message);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+const performAction = async (req, res, actionType, isAdding) => {
+  const userId = req.user._id;
+  const messageId = req.body.messageId || req.params.messageId;
+
+  try {
+    if (!messageId) {
+      return res.status(400).json({ message: "Message ID is required." });
+    }
+
+    if (isAdding) {
+      const exists = await Action.findOne({ messageId, userId, actionType });
+      if (exists) {
+        return res.status(409).json({ message: `Message already ${actionType}ed.` });
+      }
+
+      const newAction = new Action({ messageId, userId, actionType });
+      await newAction.save();
+
+      return res.status(201).json({ message: `Message ${actionType}ed successfully.` });
+    } else {
+      // Remove the action
+      const deleted = await Action.findOneAndDelete({ messageId, userId, actionType });
+
+      if (!deleted) {
+        return res.status(404).json({ message: `Message not ${actionType}ed.` });
+      }
+
+      return res.status(200).json({ message: `${actionType.charAt(0).toUpperCase() + actionType.slice(1)} removed.` });
+    }
+  } catch (error) {
+    console.error(`Error performing ${actionType}:`, error.message);
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 };
