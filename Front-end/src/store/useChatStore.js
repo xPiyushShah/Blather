@@ -17,35 +17,46 @@ export const useChatStore = create((set, get) => ({
   isFriendLoading: false,
   count: 0,
   key: "LUABI-BLATHER",
+  MyFrnd: false,
+  MyFrndStat: null,
 
   getUsers: async () => {
     // this is for load frnd rqst and send rqst - gloabl user
     set({ isUserLoading: true });
     try {
       const res = await axiosInstance.post("/messages/users");
-      set({ users: res.data.main_user });
-      set({ pend_users: res.data.wait_user });
+      // console.log(res)
+      set({ users: res.data });
     } catch (error) {
-      toast.error("Failed to fetch user");
+      // toast.error("Failed to fetch user");
     } finally {
       set({ isUserLoading: false });
     }
   },
 
   getfriend: async () => {
-    // set({ isFriendLoading: true });
-    set({ isUserLoading: true });
+    set({ isFriendLoading: true });
+    // set({ isUserLoading: true });
     try {
       const response = await axiosInstance.get("/auth/friendlist");
       set({ friendList: response.data });
     } catch (error) {
-      toast.error("Failed to fetch user");
+      // toast.error("Failed to fetch user");
     } finally {
-      // set({ isFriendLoading: false });
-      set({ isUserLoading: false });
+      set({ isFriendLoading: false });
+      // set({ isUserLoading: false });
     }
   },
 
+  getFriendStatus: async (userId) => {
+    try {
+      const response = await axiosInstance.get(`/auth/getfunction`, { userId });
+      set({ MyFrnd: response.data.status, MyFrndStat: response.data });
+    } catch (error) {
+      // toast.error("Failed to fetch messages");
+      set({ MyFrnd: false });
+    }
+  },
   getMessages: async (userId) => {
     set({ isMessageLoading: true });
     try {
@@ -139,8 +150,14 @@ export const useChatStore = create((set, get) => ({
   },
 
   setSelctedUser: (selectedUser) => {
-    set({ selectedUser });
-    // getMessages(selectedUser._id);
+    // const id = selectedUser;
+    // if(id === get().selectedUser) {
+    //   set({ selectedUser: null }); // Step 1: reset to null
+    //   return;    }
+    // set({ messages: [], }); // Step 1: reset to null
+    set({ selectedUser });     // Step 2: update with new value
+    setTimeout(() => {
+    }, 2000);
   },
 
   subScribeMessages: (userId) => {

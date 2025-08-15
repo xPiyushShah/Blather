@@ -3,8 +3,9 @@ import { axiosInstance } from "../libs/axios.js";
 import toast from "react-hot-toast";
 import { io } from "socket.io-client";
 
-// const BASE_URL = "https://localhost:5001";
+// const BASE_URL = "http://localhost:5001";
 const BASE_URL = "https://blather.onrender.com";
+
 
 export const authStore = create((set, get) => ({
   authUser: null,
@@ -25,7 +26,7 @@ export const authStore = create((set, get) => ({
     } catch (error) {
       // toast.error("Auth check failed: " + error.message);
       set({ authUser: null, err: error.response?.data?.status });
-      console.error("Error checking authentication:", error.message);
+      // console.error("Error checking authentication:", error.message);
     } finally {
       set({ isCheckingAuth: false });
     }
@@ -78,7 +79,7 @@ export const authStore = create((set, get) => ({
       get().connectSocket();
     } catch (error) {
       toast.error("Profile update failed: " + error.message);
-      console.error("Error updating profile:", error.message);
+      // console.error("Error updating profile:", error.message);
     } finally {
       set({ isUpdatingProfile: false });
     }
@@ -90,8 +91,8 @@ export const authStore = create((set, get) => ({
       const res = await axiosInstance.put("/auth/update-image", data);
       toast.success("Image updated successfully");
     } catch (error) {
-      toast.error("Image update failed: " + error.message);
-      console.error("Error updating image:", error.message);
+      // toast.error("Image update failed: " + error.message);
+      // console.error("Error updating image:", error.message);
     } finally {
       set({ isUpdatingProfile: false });
     }
@@ -105,7 +106,7 @@ export const authStore = create((set, get) => ({
       localStorage.removeItem("auth_token");
       toast.success("You have logged out");
     } catch (error) {
-      toast.error("Logout failed: " + error.message);
+      // toast.error("Logout failed: " + error.message);
       // console.error("Error logging out:", error.message);
     }
   },
@@ -125,7 +126,7 @@ export const authStore = create((set, get) => ({
       const res = await axiosInstance.post(`/auth/accept_reqst/${id}`);
       toast.success(res.message);
     } catch (error) {
-      toast.error("Failed to add friend");
+      // toast.error("Failed to add friend");
       // console.error("Error adding friend:", error.message);
     }
   },

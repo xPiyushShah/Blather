@@ -182,11 +182,11 @@ export default function Profile() {
           </div>
           {/* style={{ marginTop: "4px" }} */}
           <div
-            className={`collapse border border-base-300 ${activeAccordion === 'personal' ? 'collapse-open bg-red-500' : 'collapse-close bg-green-300'} `}
+            className={`collapse border border-base-300 ${activeAccordion === 'personal' ? 'collapse-open ' : 'collapse-close bg-base-300'} `}
             style={{ marginTop: '12px', padding: '16px' }}
             onClick={() => toggleAccordion('personal')}
           >
-            <div className="collapse-title font-semibold text-black">Personal Info:</div>
+            <div className="collapse-title font-semibold text-white">Personal Info:</div>
             <div className="collapse-content text-sm">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-12" style={{ marginTop: "12px" }}>
                 <div>

@@ -1,16 +1,181 @@
 @import "tailwindcss";
 @plugin "daisyui";
+
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  /* color: white;
+  background-color: black; */
+  /* text-shadow: 0px 1px 2px 3px #91eb13,0px 10px 20px 33px #91eb13,0px 1px 12px 36px #91eb13,0px 1px 2px 3px #91eb13; */
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* --all-header-bg: #bd76e4ce; */
 }
+
+[data-theme="dark"] {
+  --main-bg: black;
+  --header-bg: transparent;
+  --tool-icon: rgb(137, 127, 160);
+  --border-color: rgba(232, 22, 22, 0.498);
+  --msg-select: #1b34e129;
+  --msg-bg: #5aadd629;
+  --slct-user: #916767;
+
+  /* Chat box */
+  --chat-box-main: #d12ab5;
+  --chat-box-bg: radial-gradient(
+    circle,
+    rgba(209, 42, 181, 1) 0%,
+    rgba(224, 49, 219, 1) 22%,
+    rgba(217, 62, 220, 1) 29%,
+    rgba(163, 159, 230, 1) 84%,
+    rgba(148, 187, 233, 1) 100%
+  );
+
+  /* Input Styles - Updated for Dark Theme */
+  --ip-box-bg: #1e1e1e; /* Dark background for input */
+  --input-border: #3a3a3a; /* Subtle border */
+  --input-text: #eaeaea; /* Light gray text */
+  --input-placeholder: #888888; /* Dimmed placeholder text */
+  --input-focus-border: #a970ff; /* Soft purple focus border */
+  --input-focus-shadow: 0 0 0 2px rgba(169, 112, 255, 0.5);
+
+  * > img {
+    border: 1px solid #91eb13;
+    box-shadow: inset;
+  }
+
+  ::selection {
+    background-color: rgb(173, 206, 208);
+    filter: drop-shadow(2px);
+    color: black;
+    cursor:vertical-text;
+  }
+}
+
+[data-theme="love"] {
+  --main-bg: rgb(237, 145, 160);
+  --header-bg: rgb(186, 112, 112);
+  --tool-icon: rgb(137, 127, 160);
+  --border-color: rgba(232, 22, 22, 0.498);
+  --msg-select: #1b34e129;
+  --msg-bg: #e11ba629;
+  --slct-user: #916767;
+
+  /* Chat box */
+  --chat-box-main: #d12ab5;
+  --chat-box-bg: radial-gradient(
+    circle,
+    rgba(209, 42, 181, 1) 0%,
+    rgba(224, 49, 219, 1) 22%,
+    rgba(217, 62, 220, 1) 29%,
+    rgba(163, 159, 230, 1) 84%,
+    rgba(148, 187, 233, 1) 100%
+  );
+  /* Chat box */
+  --ip-box-bg: #d12ab5;
+  --input-border: #d12ab5;
+  --input-text: #ffffff;
+  --input-placeholder: #ffffff;
+  --input-focus-border: #ffffff;
+  /* box-shadow: 0px 1px 2px 3px #91eb13,0px 10px 20px 33px #91eb13,0px 1px 12px 36px #91eb13,0px 1px 2px 3px #91eb13; */
+  * > img {
+    /* background-color: #91eb13; */
+    border: 1px solid #91eb13;
+    box-shadow: inset;
+  }
+
+  /* background-color: red; */
+  ::selection {
+    background-color: rgb(173, 206, 208);
+    filter: drop-shadow(2px);
+    color: black;
+  }
+}
+[data-theme="lock"] {
+  --main-bg: black;
+  --header-bg: transparent;
+  --tool-icon: rgb(137, 127, 160);
+  --border-color: rgba(232, 22, 22, 0.498);
+  --msg-select: #1b34e129;
+  --msg-bg: #e11ba629;
+  --slct-user: #916767;
+
+  /* Chat box */
+  --chat-box-main: #d12ab5;
+  --chat-box-bg: radial-gradient(
+    circle,
+    rgba(209, 42, 181, 1) 0%,
+    rgba(224, 49, 219, 1) 22%,
+    rgba(217, 62, 220, 1) 29%,
+    rgba(163, 159, 230, 1) 84%,
+    rgba(148, 187, 233, 1) 100%
+  );
+  /* Chat box */
+  --ip-box-bg: #d12ab5;
+  --input-border: #d12ab5;
+  --input-text: #ffffff;
+  --input-placeholder: #ffffff;
+  --input-focus-border: #ffffff;
+  box-shadow: 0px 1px 2px 3px #91eb13, 0px 10px 20px 33px #91eb13,
+    0px 1px 12px 36px #91eb13, 0px 1px 2px 3px #91eb13;
+  * > img {
+    /* background-color: #91eb13; */
+    border: 1px solid #91eb13;
+    box-shadow: inset;
+  }
+
+  /* background-color: red; */
+  ::selection {
+    background-color: rgb(173, 206, 208);
+    filter: drop-shadow(2px);
+    color: black;
+  }
+}
+
+/* 
+@media (prefers-color-scheme: light) {
+  :root {
+    --chat-box-bg: #dedc67ce;
+    --input-bg: #dedc67ce;
+    --input-border: #dedc67ce;
+    --input-text: #000000;
+    --input-placeholder: #000000;
+    --input-focus-border: #000000;
+    --input-focus-bg: #dedc67ce;
+    --input-focus-text: #000000;
+    --input-focus-placeholder: #000000;
+    --input-focus-shadow: rgba(0, 0, 0, 0 1);
+    --input-focus-shadow-color: rgba(0, 0, 0, 0.1);
+    --input-focus-shadow-width: 0px;
+    --input-focus-shadow-style: solid;
+    --input-focus-shadow-offset: 0px 0px;
+    --input-focus-shadow-blur: 0px;
+    --input-focus-shadow-spread: 0px;
+    --input-focus-shadow-inset: false;
+    --input-focus-shadow-color: rgba(0, 0, 0, 0.1);
+    --input-focus-shadow-width: 0px;
+    --input-focus-shadow-style: solid;
+    --input-focus-shadow-offset: 0px 0px;
+    --input-focus-shadow-blur: 0px;
+    --input-focus-shadow-spread: 0px;
+    --input-focus-shadow-inset: false;
+
+    --sidebar-user-bg: #70c9a6ce;
+    --all-header-bg: #bd76e4ce;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    background-color: #121212; 
+    color: #ffffff;
+    border-bottom-color:black;
+  }
+} */

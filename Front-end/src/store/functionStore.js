@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { useChatStore } from "./useChatStore";
 import toast from "react-hot-toast";
+import { axiosInstance } from "../libs/axios.js";
 
 export const functionStore = create((set, get) => ({
   isNotify: false,
@@ -10,10 +11,16 @@ export const functionStore = create((set, get) => ({
   isRoom: false,
   isFriend: false,
   isUsrProfile: false,
+  isNarrow: false,
 
   usrID: null,
   starredMessages: [],
+  myFrnd: null,
 
+  setNarrow: () =>
+    set((state) => ({
+      isNarrow: !state.isNarrow,
+    })),
   setNotify: () =>
     set((state) => ({
       isNotify: !state.isNotify,
@@ -138,4 +145,7 @@ export const functionStore = create((set, get) => ({
 
   //   return () => clearInterval(interval); // cleanup on unmount
   // }, [updateLocalStarMessages]);
+
+  // checker
+
 }));

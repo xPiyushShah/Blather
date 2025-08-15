@@ -11,12 +11,12 @@ import { functionStore } from "../store/functionStore";
 
 const LeftBox = () => {
   const { selectedUser } = useChatStore();
-  const { isProfile , isRoom , usrID} = functionStore();
-  const { getModal,callEstablished} = callStore();
+  const { isProfile, isRoom, usrID, isNarrow } = functionStore();
+  const { getModal, callEstablished } = callStore();
 
   return (
-    <div className="flex flex-col max-h-full w-4/5  bg-[rgba(0,0,0,0.6)]  border-r-[1px] border-r-[#dddddd35]">
-      {!isProfile  && (
+    <div className={`flex flex-col max-h-full transition-transform duration-400 ${isNarrow ? 'w-[100%] transition-transform duration-400' : 'w-4/5'}  bg-[rgba(0,0,0,0.6)]  border-r-[1px] border-r-[#dddddd35] ddbox2`}>
+      {!isProfile && (
         <>
           {!selectedUser && (!getModal && !callEstablished) ? <BlankMessage /> : <ChatContainer />}
         </>
