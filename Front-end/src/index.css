@@ -17,47 +17,126 @@
   -moz-osx-font-smoothing: grayscale;
   /* --all-header-bg: #bd76e4ce; */
 }
-::selection {
-  background-color: #91eb13; /* Indigo background */
-  color: #ffffff;            /* White text */
 
-}
+[data-theme="dark"] {
+  --main-bg: black;
+  --header-bg: transparent;
+  --tool-icon: rgb(137, 127, 160);
+  --border-color: rgba(232, 22, 22, 0.498);
+  --msg-select: #1b34e129;
+  --msg-bg: #5aadd629;
+  --slct-user: #916767;
 
-[data-theme = "love"]{
-  --main-bg:rgb(237, 145, 160);
-  --header-bg:rgb(186, 112, 112);
-  --tool-icon:rgb(137, 127, 160);
-    /* box-shadow: 0px 1px 2px 3px #91eb13,0px 10px 20px 33px #91eb13,0px 1px 12px 36px #91eb13,0px 1px 2px 3px #91eb13; */
-    * > img {
-      /* background-color: #91eb13; */
-      border: 1px solid #91eb13;
-      box-shadow: inset;
-    }
-  
-   /* background-color: red; */
-   ::selection{
+  /* Chat box */
+  --chat-box-main: #d12ab5;
+  --chat-box-bg: radial-gradient(
+    circle,
+    rgba(209, 42, 181, 1) 0%,
+    rgba(224, 49, 219, 1) 22%,
+    rgba(217, 62, 220, 1) 29%,
+    rgba(163, 159, 230, 1) 84%,
+    rgba(148, 187, 233, 1) 100%
+  );
+
+  /* Input Styles - Updated for Dark Theme */
+  --ip-box-bg: #1e1e1e; /* Dark background for input */
+  --input-border: #3a3a3a; /* Subtle border */
+  --input-text: #eaeaea; /* Light gray text */
+  --input-placeholder: #888888; /* Dimmed placeholder text */
+  --input-focus-border: #a970ff; /* Soft purple focus border */
+  --input-focus-shadow: 0 0 0 2px rgba(169, 112, 255, 0.5);
+
+  * > img {
+    border: 1px solid #91eb13;
+    box-shadow: inset;
+  }
+
+  ::selection {
     background-color: rgb(173, 206, 208);
     filter: drop-shadow(2px);
-    color:black;
-   }
+    color: black;
+    cursor:vertical-text;
+  }
 }
-[data-theme = "black"]{
-  --main-bg:black;
-  --header-bg:transparent;
-  --tool-icon:rgb(137, 127, 160);
-    box-shadow: 0px 1px 2px 3px #91eb13,0px 10px 20px 33px #91eb13,0px 1px 12px 36px #91eb13,0px 1px 2px 3px #91eb13;
-    * > img {
-      /* background-color: #91eb13; */
-      border: 1px solid #91eb13;
-      box-shadow: inset;
-    }
-  
-   /* background-color: red; */
-   ::selection{
+
+[data-theme="love"] {
+  --main-bg: rgb(237, 145, 160);
+  --header-bg: rgb(186, 112, 112);
+  --tool-icon: rgb(137, 127, 160);
+  --border-color: rgba(232, 22, 22, 0.498);
+  --msg-select: #1b34e129;
+  --msg-bg: #e11ba629;
+  --slct-user: #916767;
+
+  /* Chat box */
+  --chat-box-main: #d12ab5;
+  --chat-box-bg: radial-gradient(
+    circle,
+    rgba(209, 42, 181, 1) 0%,
+    rgba(224, 49, 219, 1) 22%,
+    rgba(217, 62, 220, 1) 29%,
+    rgba(163, 159, 230, 1) 84%,
+    rgba(148, 187, 233, 1) 100%
+  );
+  /* Chat box */
+  --ip-box-bg: #d12ab5;
+  --input-border: #d12ab5;
+  --input-text: #ffffff;
+  --input-placeholder: #ffffff;
+  --input-focus-border: #ffffff;
+  /* box-shadow: 0px 1px 2px 3px #91eb13,0px 10px 20px 33px #91eb13,0px 1px 12px 36px #91eb13,0px 1px 2px 3px #91eb13; */
+  * > img {
+    /* background-color: #91eb13; */
+    border: 1px solid #91eb13;
+    box-shadow: inset;
+  }
+
+  /* background-color: red; */
+  ::selection {
     background-color: rgb(173, 206, 208);
     filter: drop-shadow(2px);
-    color:black;
-   }
+    color: black;
+  }
+}
+[data-theme="lock"] {
+  --main-bg: black;
+  --header-bg: transparent;
+  --tool-icon: rgb(137, 127, 160);
+  --border-color: rgba(232, 22, 22, 0.498);
+  --msg-select: #1b34e129;
+  --msg-bg: #e11ba629;
+  --slct-user: #916767;
+
+  /* Chat box */
+  --chat-box-main: #d12ab5;
+  --chat-box-bg: radial-gradient(
+    circle,
+    rgba(209, 42, 181, 1) 0%,
+    rgba(224, 49, 219, 1) 22%,
+    rgba(217, 62, 220, 1) 29%,
+    rgba(163, 159, 230, 1) 84%,
+    rgba(148, 187, 233, 1) 100%
+  );
+  /* Chat box */
+  --ip-box-bg: #d12ab5;
+  --input-border: #d12ab5;
+  --input-text: #ffffff;
+  --input-placeholder: #ffffff;
+  --input-focus-border: #ffffff;
+  box-shadow: 0px 1px 2px 3px #91eb13, 0px 10px 20px 33px #91eb13,
+    0px 1px 12px 36px #91eb13, 0px 1px 2px 3px #91eb13;
+  * > img {
+    /* background-color: #91eb13; */
+    border: 1px solid #91eb13;
+    box-shadow: inset;
+  }
+
+  /* background-color: red; */
+  ::selection {
+    background-color: rgb(173, 206, 208);
+    filter: drop-shadow(2px);
+    color: black;
+  }
 }
 
 /* 

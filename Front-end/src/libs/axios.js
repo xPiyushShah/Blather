@@ -10,15 +10,14 @@ export const axiosInstance = axios.create({
 // Track ongoing abort controllers by endpoint key
 const abortControllers = {};
 
-// Helper to normalize URL (remove ID, query params, etc.)
+// Normalize URL to base path (e.g., strip IDs, query params)
 function getBaseUrlKey(url = "") {
   try {
-    const cleanUrl = url.split("?")[0];        // remove query params
+    const cleanUrl = url.split("?")[0];
     const parts = cleanUrl.split("/").filter(Boolean);
 
     if (!parts.length) return cleanUrl;
 
-    // Remove last segment if it's a likely dynamic ID (numeric or UUID-like)
     const lastPart = parts[parts.length - 1];
     if (/^\d+$/.test(lastPart) || /^[a-f0-9-]{8,}$/.test(lastPart)) {
       parts.pop();
@@ -30,9 +29,10 @@ function getBaseUrlKey(url = "") {
   }
 }
 
+// ====== REQUEST INTERCEPTOR ======
 axiosInstance.interceptors.request.use(
   (config) => {
-    // Auth token
+    // Attach auth token
     const token = localStorage.getItem("auth_token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -44,14 +44,11 @@ axiosInstance.interceptors.request.use(
       useNetworkStore.getState().setAxiosSent(size);
     }
 
-    // Only apply cancel logic to mutation requests (POST, PUT, PATCH, DELETE)
-    const method = config.method?.toLowerCase();
-    const cancelableMethods = ["post", "put", "patch", "delete"];
-
-    if (cancelableMethods.includes(method) && config.url) {
+    // Apply cancellation for all requests
+    if (config.url) {
       const urlKey = getBaseUrlKey(config.url);
 
-      // Cancel previous request if one exists
+      // Cancel previous request to the same endpoint
       if (abortControllers[urlKey]) {
         abortControllers[urlKey].abort();
       }
@@ -67,16 +64,25 @@ axiosInstance.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+// ====== RESPONSE INTERCEPTOR ======
 axiosInstance.interceptors.response.use(
   (response) => {
+    // Cleanup controller after success
+    if (response.config && response.config.url) {
+      const urlKey = getBaseUrlKey(response.config.url);
+      delete abortControllers[urlKey];
+    }
+
+    // Track received data size
     if (response.data) {
       const size = JSON.stringify(response.data).length;
       useNetworkStore.getState().setAxiosReceived(size);
     }
+
     return response;
   },
   (error) => {
-    // Optional: Clean up controller if cancelled
+    // Cleanup controller on error (including cancel)
     if (error.config && error.config.url) {
       const urlKey = getBaseUrlKey(error.config.url);
       delete abortControllers[urlKey];

@@ -32,8 +32,8 @@ function Theme() {
             <label htmlFor="name" className='flex self-start'>Combo's From Blather </label>
             <span className='w-60 h-1 bg-amber-700 rounded-r-sm '></span>
           </div>
-          <div className='grid grid-cols-5 gap-8 mb-16'>
-            {[...Array(10)].map((_, index) => (
+          <div className='grid grid-cols-5 gap-8 mb-16 sm:grid-cols-3'>
+            {[...Array(8)].map((_, index) => (
               <div className='skeleton w-60 h-40 flex rounded-sm shadow-lg'></div>
             ))}
           </div>

@@ -221,7 +221,7 @@ export default function InputArea() {
             </button>
           </div>
         )}
-        <div className="w-full h-full">
+        <div className="w-full h-full ">
           <input
             type="text"
             placeholder="Type a text..."
@@ -233,7 +233,7 @@ export default function InputArea() {
                 sendMsg();
               }
             }}
-            className="text-box-input w-full input-borderd round-lg input-sm sm:input-md"
+            className="text-box-input w-full input-borderd round-lg input-sm sm:input-md "
           />
         </div>
       </div>

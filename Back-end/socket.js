@@ -21,8 +21,8 @@ export function getReceiverSocketId(userId) {
 
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:5173"],
-    // origin: ["https://blather.onrender.com"],
+    // origin: ["http://localhost:5173"],
+    origin: ["https://blather.onrender.com"],
     methods: ["GET", "POST"],
     credentials: true,
   },

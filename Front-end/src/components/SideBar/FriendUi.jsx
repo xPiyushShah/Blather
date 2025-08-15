@@ -1,22 +1,25 @@
-import React from "react";
+import React, { useEffect } from 'react'
 import { authStore } from "../../store/authStore";
 import { useChatStore } from "../../store/useChatStore";
 import ListSkelecton from "./ListSkelecton";
 import ProfileAvatar from "../ProfileAvatar";
 
 function FriendUi() {
-  const { users, friendList, selectedUser, setSelctedUser } = useChatStore();
+  const { users, friendList, selectedUser, setSelctedUser, getfriend } = useChatStore();
   const { onlineUser, authUser, socket, addfriend } = authStore();
-  // console.log(friendList);
+  useEffect(() => {
+    getfriend();
+  }, []);
   return (
     <>
       {friendList && (
-        <div className="part-cont w-full h-full overflow-auto transition-all duration-500 ease-in-out">
+        <div className="part-cont w-full h-full overflow-hidden transition-all duration-500 ease-in-out">
+          {friendList.length === 0 && (<ListSkelecton />)}
           {friendList?.map((item) => (
             <div
               key={item._id}
-              className={` h-[4rem] border-b-[1px] border-b-[#dddddd35] w-full flex flex-row justify-between items-center text-center ${selectedUser?._id === item._id
-                ? "bg-[#916767] opacity-80 border-0 outline-0 text-base-content"
+              className={` h-[4rem] truncate  border-b-[1px] border-b-[#dddddd35] w-full flex flex-row justify-between items-center text-center ${selectedUser?._id === item._id
+                ? "bg-[var(--slct-user)] opacity-80 border-0 outline-0 text-base-content border-t-amber-200"
                 : ""
                 } mb-4`}
               style={{ cursor: "pointer", padding: "2px 16px" }}
@@ -45,7 +48,7 @@ function FriendUi() {
                   </div>
                 </div>
               </div>
-              <div className="icom">{`${item.first_name} ${item.last_name}`}</div>
+              <div className="icom ">{`${item.first_name} ${item.last_name}`}</div>
             </div>
           ))}
         </div>

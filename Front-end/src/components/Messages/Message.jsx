@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar } from "@fortawesome/free-solid-svg-icons";
+import MessageFe from "../Chopper/MessageFe.jsx";
 
 //store for management
 import { useChatStore } from "../../store/useChatStore.js";
@@ -28,8 +29,11 @@ export default function Message() {
     deleteMessage,
     isMessageLoading,
     isTyping,
+    MyFrnd,
+    getFriendStatus,
+    addfriend
   } = useChatStore();
-  const { starredMessages, saveStarMessae,loadStarMessages } = functionStore();
+  const { starredMessages, saveStarMessae, loadStarMessages} = functionStore();
   const { authUser } = authStore();
 
   const bottomRef = useRef(null);
@@ -64,10 +68,13 @@ export default function Message() {
   }, [messages]);
 
   useEffect(() => {
-    getMessages(selectedUser._id);
+    getFriendStatus();
+    if (MyFrnd) {
+      getMessages(selectedUser._id);
+    }
     subScribeMessages();
     return () => unSubscribeMessages();
-  }, [getMessages, selectedUser._id, subScribeMessages, unSubscribeMessages]);
+  }, [getMessages, selectedUser._id, subScribeMessages, unSubscribeMessages, MyFrnd,]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -109,22 +116,22 @@ export default function Message() {
     setMessageOption(null);
   };
 
-  if (isMessageLoading) {
-    return (
-      <div className="flex flex-row items-end justify-center h-full mb-12">
-        <span className="loading loading-spinner loading-xl"></span>
-      </div>
-    );
-  }
+  // if (isMessageLoading) {
+  //   return (
+  //     <div className="flex flex-row items-end justify-center h-full mb-12">
+  //       <span className="loading loading-spinner loading-xl"></span>
+  //     </div>
+  //   );
+  // }
 
-  if (!messages || messages.length === 0) {
-    return <MessageSkeleton />;
-  }
+  // if (!messages || messages.length === 0) {
+  //   return <MessageSkeleton />;
+  // }
 
   return (
     <>
       <div
-        className="chat-show content-end scroll-smooth snap-y overflow-y-auto h-screen relative"
+        className="chat-show content-end scroll-smooth snap-y overflow-y-auto h-screen relative "
         onContextMenu={(e) => {
           e.preventDefault();
           setContext(true);
@@ -140,7 +147,7 @@ export default function Message() {
             return (
               <div
                 key={messageId}
-                className={`chat space-y-4 ${isSender ? "chat-end" : "chat-start"} rounded-lg mb-8 relative ${isSelected ? "bg-[#1b34e129]" : ""}`}
+                className={`chat  space-y-4 ${isSender ? "chat-end" : "chat-start"} rounded-lg mb-8 relative ${isSelected ? "bg-[var(--msg-select)]" : ""}`}
                 onDoubleClick={() =>
                   setMessageOption((prev) => (prev === messageId ? null : messageId))
                 }
@@ -162,7 +169,7 @@ export default function Message() {
                   )}
                 </div>
 
-                <div className="chat-bubble bg-base-300 text-white max-w-xs w-fit flex flex-col gap-2 p-14 relative truncate">
+                <div className="chat-bubble  text-white max-w-xs w-fit flex flex-col gap-2 p-14 relative truncate bg-[var(--msg-bg)]">
                   {msg.text && <Text msg={msgCheck(msg.text)} />}
 
                   {msg.image && (
@@ -236,6 +243,8 @@ export default function Message() {
               <span className="loading loading-dots loading-md"></span>
             </div>
           )}
+
+          {!MyFrnd && <MessageFe props={"add_frnd"} fun={addfriend} />}
           <div ref={bottomRef} />
         </div>
       </div>

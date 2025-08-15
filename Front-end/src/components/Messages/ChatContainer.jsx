@@ -1,16 +1,19 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, Suspense } from "react";
 
 // Importing Store for State 
 import { callStore } from "../../store/callStore.js";
 // Importing Component
-import Message from "./Message";
+// import Message from "./Message";
 import InputArea from "./InputArea";
 import CallProfile from "../Extra/CallProfile.jsx";
 import Chatheader from "./Chatheader.jsx";
 
+import MessageLoading from "./Blank/MessageLoading.jsx";
+const Message = React.lazy(() => import("./Message"));
+
 export default function ChatContainer() {
   const { callModal, incomingCall } = callStore();
-  
+
   if (callModal || incomingCall) {
     return <CallProfile />;
   }
@@ -19,7 +22,9 @@ export default function ChatContainer() {
     <>
       <div className="flex flex-col h-full w-full justify-between relative" >
         <Chatheader />
-        <Message />
+        <Suspense fallback={<MessageLoading />}>
+          <Message />
+        </Suspense>
         <InputArea />
       </div>
     </>

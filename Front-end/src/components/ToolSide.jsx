@@ -27,7 +27,7 @@ export default function ToolSide() {
     isStar,
     isNotify,
     isProfile,
-    isSetting,
+    setNarrow,
     isRoom,
     isFriend,
     setFriend,
@@ -51,9 +51,19 @@ export default function ToolSide() {
   //   document.addEventListener("click", handleClickOutside);
   //   return () => document.removeEventListener("click", handleClickOutside);
   // }, []);
+  const [rotated, setRotated] = useState(false);
+
+  const clickerhidder = () => {
+    setRotated(prev => !prev);
+    setNarrow(prev => !prev);
+  };
 
   return (
-    <div className="flex flex-column relative h-full w-[10%] border-l-[1px] border-l-[#dddddd35]" style={{ padding: "13px" }}>
+    <div className="flex ddbox3 flex-column relative h-full w-[10%] border-l-[1px] border-l-[#dddddd35]" style={{ padding: "13px" }}>
+      <div className=" pk rounded-xl flex  text-center items-center absolute t-0  mb-6 *:sm:mb-0  sm:left-0 sm:right-0 sm:flex-col sm:justify-between  sm:absolute sm:b-0">
+        <div onClick={clickerhidder} className={`back-arrow transition-transform duration-300 ${rotated ? 'rotate-[270deg]' : 'rotate-0'}`}>
+        </div>
+      </div>
       <div className="flex flex-col gap-6 align-end text-center items-center absolute b-0 self-end-safe mb-6 *:sm:mb-0  sm:left-0 sm:right-0 sm:flex-col sm:justify-between  sm:absolute sm:b-0">
         {/* <div className=" pk rounded-xl">
           <FontAwesomeIcon icon={faThumbsUp} onClick={() => onClicked("theme")} />

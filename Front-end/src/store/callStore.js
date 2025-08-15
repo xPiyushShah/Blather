@@ -46,17 +46,17 @@ export const callStore = create((set, get) => ({
   initializeMedia: async () => {
     const callModal = get().callModal;
     try {
-      console.log("[Media] Requesting user media...");
+      // console.log("[Media] Requesting user media...");
       const stream = await navigator.mediaDevices.getUserMedia({
         video: callModal === "video",
         audio: true,
       });
-      console.log("[Media] Local media stream obtained.");
+      // console.log("[Media] Local media stream obtained.");
       set({ localStream: stream });
       get().makeCall();
       set({ callInProgress: true });
     } catch (error) {
-      console.error("[Media] Error accessing media devices:", error);
+      // console.error("[Media] Error accessing media devices:", error);
     }
   },
 
@@ -65,7 +65,7 @@ export const callStore = create((set, get) => ({
     const socket = authStore.getState().socket;
 
     if (!socket) {
-      alert("❌ Socket not connected. Cannot make call.");
+      // alert("❌ Socket not connected. Cannot make call.");
       return;
     }
 
@@ -74,7 +74,7 @@ export const callStore = create((set, get) => ({
       return;
     }
 
-    console.log("[Call] Creating initiator peer...");
+    // console.log("[Call] Creating initiator peer...");
 
     const peer = new Peer({
       initiator: true,
@@ -83,10 +83,10 @@ export const callStore = create((set, get) => ({
       config: ICE_SERVERS,
     });
 
-    console.log("peer inticalized", peer);
+    // console.log("peer inticalized", peer);
 
     peer.on("signal", (signal) => {
-      console.log("[Peer] Generated signal:", signal);
+      // console.log("[Peer] Generated signal:", signal);
       socket.emit("call-user", {
         signal,
         to: targetSocketId,
@@ -95,24 +95,24 @@ export const callStore = create((set, get) => ({
     });
 
     peer.on("stream", (remoteStream) => {
-      console.log("[Peer] Remote stream received.");
+      // console.log("[Peer] Remote stream received.");
       set({ remoteStream, callEstablished: true });
       logPublicIPFromPeer(peer);
     });
 
     peer.on("connect", () => {
-      console.log("✅ [Peer] Connection established!");
+      // console.log("✅ [Peer] Connection established!");
       if (callTimeout) clearTimeout(callTimeout);
     });
 
     peer.on("error", (err) => {
-      console.error("❌ [Peer] Error:", err);
-      alert("Connection error. Check TURN server or network.");
+      // console.error("❌ [Peer] Error:", err);
+      // alert("Connection error. Check TURN server or network.");
       get().endCall();
     });
 
     peer.on("close", () => {
-      console.log("🔌 [Peer] Connection closed.");
+      // console.log("🔌 [Peer] Connection closed.");
       get().endCall();
     });
 
@@ -141,8 +141,8 @@ export const callStore = create((set, get) => ({
 
     setTimeout(() => {
       if (!get().callEstablished) {
-        alert("Call failed to connect. Please check your network or TURN server.");
-        console.log("[Call] Timeout: connection not established.");
+        // alert("Call failed to connect. Please check your network or TURN server.");
+        // console.log("[Call] Timeout: connection not established.");
         get().endCall();
       }
     }, 60000);
@@ -154,16 +154,16 @@ export const callStore = create((set, get) => ({
     const socket = authStore.getState().socket;
     const localStream = get().localStream;
 
-    if (!socket) {
-      alert("Socket not connected.");
-      return;
-    }
+    // if (!socket) {
+    //   alert("Socket not connected.");
+    //   return;
+    // }
     if (!localStream) {
       alert("No local stream. Can't answer call.");
       return;
     }
 
-    console.log("[Call] Answering call... Creating peer (not initiator)");
+    // console.log("[Call] Answering call... Creating peer (not initiator)");
 
     const peer = new Peer({
       initiator: false,
@@ -172,35 +172,35 @@ export const callStore = create((set, get) => ({
       config: ICE_SERVERS,
     });
 
-    console.log("peer inticalized", peer);
+    // console.log("peer inticalized", peer);
 
     peer.on("signal", (signal) => {
-      console.log("[Peer] Answer signal created:", signal);
+      // console.log("[Peer] Answer signal created:", signal);
       socket.emit("answer-call", { signal, to: callerSocketId, type });
       logPublicIPFromPeer(peer);
     });
 
     peer.on("connect", () => {
-      console.log("✅ [Peer] Connection established on answer side!");
+      // console.log("✅ [Peer] Connection established on answer side!");
     });
 
     peer.on("stream", (remoteStream) => {
-      console.log("[Peer] Remote stream received on answer side.");
+      // console.log("[Peer] Remote stream received on answer side.");
       set({ remoteStream, callEstablished: true });
     });
 
     peer.on("error", (err) => {
-      console.error("❌ [Peer] Error on answer side:", err);
-      alert("Failed to answer call due to connection issue.");
+      // console.error("❌ [Peer] Error on answer side:", err);
+      // alert("Failed to answer call due to connection issue.");
       get().endCall();
     });
 
     peer.on("close", () => {
-      console.log("🔌 [Peer] Connection closed (answer side).");
+      // console.log("🔌 [Peer] Connection closed (answer side).");
       get().endCall();
     });
 
-    console.log("[Peer] Applying incoming signal...");
+    // console.log("[Peer] Applying incoming signal...");
     peer.signal(incomingSignal);
 
     set({ peer, callInProgress: true, callEstablished: true });
@@ -210,20 +210,21 @@ export const callStore = create((set, get) => ({
     const { peer, localStream, incomingCall, callTimeout } = get();
     const socket = authStore.getState().socket;
 
-    console.log("[Call] Ending call...");
+    // console.log("[Call] Ending call...");
 
     if (socket && incomingCall.from) {
-      console.log("[Socket] Emitting reject-call to:", incomingCall.from);
+      // console.log("[Socket] Emitting reject-call to:", incomingCall.from);
       socket.emit("reject-call", { to: incomingCall.from, from: authStore.getState().authUser._id });
     }
 
     if (peer) {
-      console.log("[Peer] Destroying peer...");
+      // console.log("[Peer] Destroying peer...");
       peer.destroy();
     }
+    localStream.getTracks().forEach((track) => track.stop());
 
     if (localStream) {
-      console.log("[Media] Stopping local media tracks...");
+      // console.log("[Media] Stopping local media tracks...");
       localStream.getTracks().forEach((track) => track.stop());
     }
 

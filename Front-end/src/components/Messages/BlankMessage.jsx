@@ -4,8 +4,8 @@ import { faMessage } from "@fortawesome/free-solid-svg-icons";
 
 export default function BlankMessage() {
   return (
-    <div className="flex flex-col justify-center items-center h-full text-white-400 gap-4">
-      <div className="rounded-xl align-center">
+    <div className="flex flex-col justify-center items-center h-full text-white-400 gap-4 opacity-45">
+      <div className="rounded-xl align-center ">
         <FontAwesomeIcon
           icon={faMessage}
           size="2x"

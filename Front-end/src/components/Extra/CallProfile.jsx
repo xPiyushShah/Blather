@@ -11,6 +11,7 @@ import { callStore } from "../../store/callStore.js";
 import { useChatStore } from "../../store/useChatStore.js";
 import { authStore } from "../../store/authStore.js";
 import CallModal from "./CallModal";
+import CallButton from "./CallButton.jsx";
 
 function CallProfile() {
   const {
@@ -38,9 +39,7 @@ function CallProfile() {
   const remoteVideoRef = useRef(null);
   const mediaStreamRef = useRef(null);
 
-  const [isCameraOn, setIsCameraOn] = useState(callModal === "video");
-  const [isMicOn, setIsMicOn] = useState(true);
-  const [isSpeakerOn, setIsSpeakerOn] = useState(true);
+
 
   // For dragging the local video
   const [position, setPosition] = useState({ x: 20, y: 20 });
@@ -88,7 +87,6 @@ function CallProfile() {
 
   useEffect(() => {
     if (!incomingCall && !callEstablished) {
-      startMedia();
       initializeMedia();
     }
     return () => stopAllMedia();
@@ -98,7 +96,6 @@ function CallProfile() {
     if (incomingCall && callEstablished) {
       setModal(incomingCall.type);
       initializeMedia();
-      startMedia();
     }
     return () => stopAllMedia();
   }, [incomingCall, callEstablished]);
@@ -149,74 +146,12 @@ function CallProfile() {
     }
   }, [remoteStream]);
 
-  const startMedia = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: callModal === "video",
-        audio: true,
-      });
-      mediaStreamRef.current = stream;
-      setlocalStream(stream);
-      if (!incomingCall) {
-        setTargetSocketId(selectedUser);
-      }
-    } catch (err) {
-      console.error("Failed to access media devices:", err);
-    }
-  };
 
   const stopAllMedia = () => {
     if (mediaStreamRef.current) {
       mediaStreamRef.current.getTracks().forEach((track) => track.stop());
       mediaStreamRef.current = null;
     }
-  };
-
-  const toggleCamera = async () => {
-    if (!mediaStreamRef.current) return;
-    const videoTrack = mediaStreamRef.current.getVideoTracks()[0];
-    handleMediaToggle(true, videoTrack?.enabled);
-
-    if (isCameraOn && videoTrack) {
-      videoTrack.stop();
-      setIsCameraOn(false);
-    } else {
-      try {
-        const newStream = await navigator.mediaDevices.getUserMedia({ video: true });
-        const newVideoTrack = newStream.getVideoTracks()[0];
-        if (newVideoTrack) {
-          mediaStreamRef.current.addTrack(newVideoTrack);
-          setIsCameraOn(true);
-        }
-      } catch (err) {
-        console.error("Error enabling camera:", err);
-      }
-    }
-  };
-
-  const toggleMic = () => {
-    const audioTrack = mediaStreamRef.current?.getAudioTracks()[0];
-    if (audioTrack) {
-      audioTrack.enabled = !audioTrack.enabled;
-      setIsMicOn(audioTrack.enabled);
-    }
-    handleMediaToggle(false, audioTrack.enabled);
-  };
-
-  const toggleSpeaker = () => {
-    setIsSpeakerOn((prev) => {
-      if (remoteVideoRef.current) {
-        remoteVideoRef.current.volume = !prev ? 1 : 0;
-      }
-      return !prev;
-    });
-  };
-
-  const handleEndCall = () => {
-    // stopAllMedia();
-    endCall();
-    setGetModal(false);
-    setModal(null);
   };
 
 
@@ -322,43 +257,7 @@ function CallProfile() {
           Calling...
         </div>
       )} */}
-
-      <div className="absolute  bottom-4 left-1/2 transform -translate-x-1/2 flex gap-4 opacity-90 z-20 rounded-lg bg-base-200   w-fit" style={{ padding: "12px" }}>
-        {/* <div className=""> */}
-        <button
-          onClick={toggleMic}
-          className={`p-3 rounded-lg shadow-md w-16 border h-10 ${isMicOn ? "bg-transparent hover:bg-green-600 border-white text-white" : "bg-red-800 border-red-500 text-white"
-            }`}
-        >
-          <FontAwesomeIcon icon={faMicrophone} />
-        </button>
-
-        {callModal === "video" && (
-          <button
-            onClick={toggleCamera}
-            className={`p-3 rounded-lg shadow-md w-16 border h-10 ${isCameraOn ? "bg-transparent hover:bg-blue-600 border-white text-white" : "bg-red-800 border-red-500 text-white"
-              }`}
-          >
-            <FontAwesomeIcon icon={faVideo} />
-          </button>
-        )}
-
-        <button
-          onClick={toggleSpeaker}
-          className={`p-3 rounded-lg shadow-md w-16 border h-10 ${isSpeakerOn ? "bg-transparent hover:bg-purple-600 border-white text-white" : "bg-red-800 border-red-500 text-white"
-            }`}
-        >
-          <FontAwesomeIcon icon={isSpeakerOn ? faVolumeUp : faVolumeMute} />
-        </button>
-
-        <button
-          onClick={handleEndCall}
-          className="bg-transparent hover:bg-red-700 text-white p-3 rounded-lg shadow-md w-16 border border-white h-10"
-        >
-          <FontAwesomeIcon icon={faPhoneSlash} />
-        </button>
-        {/* </div> */}
-      </div>
+      <CallButton />
     </div>
   );
 }

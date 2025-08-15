@@ -39,13 +39,13 @@ export const signup = async (req, res) => {
     // console.log(session);
 
     // Generate token
-    gToken(newUser._id, res);
-    // const token = gToken(newUser._id, res);
+    // gToken(newUser._id, res);
+    const token = gToken(newUser._id, res);
 
     // await User.findByIdAndUpdate(newUser._id, { token: token }, { new: true });
 
-    res.status(201).json({ message: "User created successfully" });
-    // res.status(201).json({ message: "User created successfully", token  , status: true  });
+    // res.status(201).json({ message: "User created successfully" });
+    res.status(201).json({ message: "User created successfully", token, status: true });
   } catch (err) {
     console.error("Error to Integrate with data:", err.message);
     res.status(500).json({ message: "Internal Server Error", status: false });
@@ -66,13 +66,13 @@ export const login = async (req, res) => {
 
     // console.log(session);
 
-    gToken(user._id, res);
+    // gToken(user._id, res);
 
-    // const token = gToken(user._id, res);
+    const token = gToken(user._id, res);
     // await User.findByIdAndUpdate(user._id, { token: token }, { new: true });
 
-    res.status(200).json({ message: "You are logged in..!" });
-    // res.status(200).json({ message: "You are logged in..!", token   , status: false  });
+    // res.status(200).json({ message: "You are logged in..!" });
+    res.status(200).json({ message: "You are logged in..!", token, status: true });
 
     // res.status(200).json({
     //   _id: user._id,
