@@ -17,8 +17,8 @@ function FrndStatus() {
         status: "not", // default status
         created_by: ""
     });
-    const { selectedUser, MyFrndStatus, getFriendStatus, addfriend } = useChatStore();
-    const { authUser, acceptfriend } = authStore();
+    const { selectedUser, MyFrndStatus, getFriendStatus } = useChatStore();
+    const { authUser, acceptfriend, addfriend } = authStore();
 
     useEffect(() => {
         if (MyFrndStatus?.friendship && MyFrndStatus?.u_data) {
