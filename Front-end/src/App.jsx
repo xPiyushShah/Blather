@@ -32,32 +32,32 @@ function App() {
     checkAuth();
   }, [checkAuth]);
 
-  // useEffect(() => {
-  //   const delayTimer = setTimeout(() => {
-  //     setMinDelayPassed(true);
-  //   }, 8000);
-  //   return () => clearTimeout(delayTimer);
-  // }, []);
+  useEffect(() => {
+    const delayTimer = setTimeout(() => {
+      setMinDelayPassed(true);
+    }, 8000);
+    return () => clearTimeout(delayTimer);
+  }, []);
 
-  // useEffect(() => {
-  //   if (!isCheckingAuth && authUser && minDelayPassed) {
-  //     setShouldShowLoader(false);
-  //   }
-  //   if (err == false && minDelayPassed) {
-  //     setShouldShowLoader(false);
-  //   }
-  //   // console.log(err);
-  // }, [isCheckingAuth, authUser, minDelayPassed, err]);
+  useEffect(() => {
+    if (!isCheckingAuth && authUser && minDelayPassed) {
+      setShouldShowLoader(false);
+    }
+    if (err == false && minDelayPassed) {
+      setShouldShowLoader(false);
+    }
+    // console.log(err);
+  }, [isCheckingAuth, authUser, minDelayPassed, err]);
 
-  // useEffect(() => {
-  //   if (authUser?.status === false) {
-  //     setShouldShowLoader(false);
-  //   }
-  // }, [authUser?.status]);
+  useEffect(() => {
+    if (authUser?.status === false) {
+      setShouldShowLoader(false);
+    }
+  }, [authUser?.status]);
 
-  // if (shouldShowLoader) {
-  //   return <Loader />;
-  // }
+  if (shouldShowLoader) {
+    return <Loader />;
+  }
 
 
 
