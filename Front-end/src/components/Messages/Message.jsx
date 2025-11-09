@@ -31,8 +31,9 @@ export default function Message() {
     isTyping,
     MyFrnd,
     getFriendStatus,
-    addfriend
+    // addfriend
   } = useChatStore();
+  const { addfriend } = authStore();
   const { starredMessages, saveStarMessae, loadStarMessages} = functionStore();
   const { authUser } = authStore();
 

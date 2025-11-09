@@ -40,7 +40,7 @@ function WithAccordion() {
           <div key={index} className={`border-b border-gray-200 dark:border-gray-700 ${isOpen ? "bg-gray-100 dark:bg-gray-800" : ""}`}>
             <button
               onClick={() => handleToggle(index)}
-              style={{ padding: "6px" }}
+              style={{ padding: "6px 16px" }}
               className={`flex opacity-42 ${isOpen ? "border-gray-200 dark:border-gray-200" : ""} hover:cursor-pointer overflow-auto justify-between border-b-0 flex-row-reverse items-center w-full  text-left hover:bg-transparent focus:outline-none  transition-colors duration-200`}
             >
               <span className="mr-2 text-xl font-mono">
