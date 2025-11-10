@@ -32,6 +32,7 @@ function App() {
     checkAuth();
   }, [checkAuth]);
 
+<<<<<<< HEAD
   // useEffect(() => {
   //   const delayTimer = setTimeout(() => {
   //     setMinDelayPassed(true);
@@ -60,6 +61,8 @@ function App() {
   // }
 
 
+=======
+>>>>>>> 7216bcb7d0831c347965005ed669afcfdd37aa02
 
 
 
