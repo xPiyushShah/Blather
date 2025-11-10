@@ -15,39 +15,39 @@ function Chatheader() {
     const { setModal } = callStore();
 
 
-    const extracter = (data) => {
-        if (!data) {
-            return {
-                name: "",
-                id: "",
-                status: "not_found",
-                created_by: ""
-            };
-        }
-        // Extract relevant information from the data
-        const friend_status = data.friendship.status;
-        const friend_id = data.u_data._id;
-        const friend_name = `${data.u_data.first_name} ${data.u_data.last_name}`;
-        return {
-            name: friend_name,
-            id: friend_id,
-            status: friend_status.status,
-            created_by: data.u_data.createdBy
-        }
-    };
+    // const extracter = (data) => {
+    //     if (!data) {
+    //         return {
+    //             name: "",
+    //             id: "",
+    //             status: "not_found",
+    //             created_by: ""
+    //         };
+    //     }
+    //     // Extract relevant information from the data
+    //     const friend_status = data.friendship.status;
+    //     const friend_id = data.u_data._id;
+    //     const friend_name = `${data.u_data.first_name} ${data.u_data.last_name}`;
+    //     return {
+    //         name: friend_name,
+    //         id: friend_id,
+    //         status: friend_status.status,
+    //         created_by: data.u_data.createdBy
+    //     }
+    // };
     // let rv_data = null;
-    useEffect(() => {
-        const rv_data = extracter(MyFrndStatus);
-    }, [MyFrndStatus]);
-    const add_friend = async (id) => {
-        await addfriend(id)
-            .then(() => {
-                getFriendStatus(id);
-            })
-            .catch((error) => {
-                console.error("Error adding friend:", error.message);
-            });
-    };
+    // useEffect(() => {
+    //     const rv_data = extracter(MyFrndStatus);
+    // }, [MyFrndStatus]);
+    // const add_friend = async (id) => {
+    //     await addfriend(id)
+    //         .then(() => {
+    //             getFriendStatus(id);
+    //         })
+    //         .catch((error) => {
+    //             console.error("Error adding friend:", error.message);
+    //         });
+    // };
     return (
         <>
             <div className="bg-[var(--header-bg)] flex shadow-lg flex-row justify-between w-full border-b-[1px] z-[1px] border-b-[#dddddd35] min-h-[72px] header-lest align-center text-center items-center overflow-hidden">
@@ -59,7 +59,14 @@ function Chatheader() {
                 </div>
                 {/* Friend Action Buttons */}
                 <div className={`lest-3 lest-apply ${!selectedUser ? "skeleton" : ""}`}>
-                    <FrndStatus />
+                    {/* <FrndStatus /> */}
+                    {/* Tmp addded */}
+                    <div className="opt rounded-r-lg">
+                        <FontAwesomeIcon icon={faVideoCamera} onClick={() => setModal("video")} title="Video Call" />
+                    </div>
+                    <div className="opt rounded-l-lg">
+                        <FontAwesomeIcon icon={faPhone} onClick={() => setModal("audio")} title="Voice Call" />
+                    </div>
                 </div>
             </div>
         </>

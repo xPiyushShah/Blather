@@ -7,26 +7,26 @@ import cloudinary from "../libs/cloudinary.js";
 import streamifier from "streamifier";
 
 
-export const getSideBarUsers = async (req, res) => {
+export const getAllUsers = async (req, res) => {
   const myId = req.user._id;
 
   try {
     // Step 1: Find all friendships involving me
-    const friends = await Friend.find({
-      $or: [{ userId: myId }, { friendId: myId }],
-      status: { $in: ["accepted", "pending"] }, // optional
-    });
+    // const friends = await Friend.find({
+    //   $or: [{ userId: myId }, { friendId: myId }],
+    //   // status: { $in: ["accepted", "pending"] }, // optional
+    // });
 
-    // Step 2: Get list of all friend IDs (regardless of who initiated)
-    const friendIds = friends.map((f) =>
-      f.userId.toString() === myId.toString() ? f.friendId : f.userId
-    );
+    // // Step 2: Get list of all friend IDs (regardless of who initiated)
+    // const friendIds = friends.map((f) =>
+    //   f.userId.toString() === myId.toString() ? f.friendId : f.userId
+    // );
 
-    // Step 3: Find all users excluding me and my friends
-    const users = await User.find({
-      _id: { $nin: [...friendIds, myId] }, // exclude friends and myself
-    }).select("-password");
-
+    // // Step 3: Find all users excluding me and my friends
+    // const users = await User.find({
+    //   _id: { $nin: [...friendIds, myId] }, // exclude friends and myself
+    // }).select("-password");
+    const users = await User.find({ _id: { $ne: myId } }).select("-password -token"); // Exclude password & token
     res.status(200).json(users);
   } catch (error) {
     console.error("Error fetching sidebar users:", error.message);

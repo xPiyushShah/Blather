@@ -69,7 +69,6 @@ export default function Message() {
   }, [messages]);
 
   useEffect(() => {
-    getFriendStatus();
     if (MyFrnd) {
       getMessages(selectedUser._id);
     }

@@ -17,15 +17,15 @@ function FrndStatus() {
         status: "not", // default status
         created_by: ""
     });
-    const { selectedUser, MyFrndStatus, getFriendStatus } = useChatStore();
+    const { selectedUser, MyFrndStat, getFriendStatus } = useChatStore();
     const { authUser, acceptfriend, addfriend } = authStore();
 
     useEffect(() => {
-        if (MyFrndStatus?.friendship && MyFrndStatus?.u_data) {
-            const friend_status = MyFrndStatus.friendship.status;
-            const friend_id = MyFrndStatus.u_data._id;
-            const friend_name = `${MyFrndStatus.u_data.first_name} ${MyFrndStatus.u_data.last_name}`;
-            const created_by = MyFrndStatus.friendship.createdBy;
+        if (MyFrndStat?.friendship && MyFrndStat?.u_data) {
+            const friend_status = MyFrndStat.friendship.status;
+            const friend_id = MyFrndStat.u_data._id;
+            const friend_name = `${MyFrndStat.u_data.first_name} ${MyFrndStat.u_data.last_name}`;
+            const created_by = MyFrndStat.friendship.createdBy;
 
             setFriendData({
                 name: friend_name,
@@ -42,8 +42,10 @@ function FrndStatus() {
                 created_by: ""
             });
         }
-    }, [MyFrndStatus, selectedUser]);
-
+        // console.log(MyFrndStat)
+    }, [MyFrndStat, selectedUser]);
+    getFriendStatus(selectedUser._id);
+        // console.log(MyFrndStat)
     const add_friend = async (id) => {
         try {
             await addfriend(id);

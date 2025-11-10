@@ -1,6 +1,6 @@
 import express from "express";
 import {
-  getSideBarUsers, getMessages, sendMessage, sendMedia
+  getAllUsers, getMessages, sendMessage, sendMedia
   , likeMessage,
   unlikeMessage,
   starMessage,
@@ -14,7 +14,7 @@ const router = express.Router();
 // Import routes
 
 // Register routes
-router.post("/users", protectAuth, getSideBarUsers);
+router.post("/users", protectAuth, getAllUsers);
 
 router.post("/:id", protectAuth, getMessages); //getting conversations by user id
 

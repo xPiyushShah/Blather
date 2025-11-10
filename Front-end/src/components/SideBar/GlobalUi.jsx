@@ -13,7 +13,7 @@ function GlobalUi() {
             {users && (
                 <div className="part-cont w-full h-full overflow-hidden transition-all duration-500 ease-in-out">
                     {users.length === 0 && (<div className='flex items-center justify-center h-full text-sm'>
-                        <p>No users found</p>
+                        {/* <p>No users found</p> */}
                     </div>)}
                     {users?.map((item) => (
                         <div
