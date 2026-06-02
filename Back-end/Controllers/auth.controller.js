@@ -332,9 +332,16 @@ export const userData = async (req, res) => {
     console.error("Error to get  data:", err.message);
   }
 };
+<<<<<<< HEAD
 // export const  checkFunction= async (req, res) => {
 //   const id = req.params.userId; // The ID of the user you want to check against
 //   const myId = req.user._id;    // The ID of the currently logged-in user
+=======
+export const checkFunction = async (req, res) => {
+  const id = req.params.userId;
+  const myId = req.user._id;
+  console.log("Inside checkFunction", id, myId);
+>>>>>>> 2a58ee04ba9bcba102f9d9f50f5fac92a924ca0e
 
 //   try {
 //     // Find the friendship between the two users
@@ -378,6 +385,7 @@ export const userData = async (req, res) => {
 
 export const checkFunction = async (req, res) => {
   try {
+<<<<<<< HEAD
     const otherUserId = req.params?.userId;
     const myId = req.user._id;
     return res.status(400).json({ message: otherUserId, id: myId });
@@ -390,6 +398,8 @@ export const checkFunction = async (req, res) => {
       return res.status(400).json({ message: "Invalid request" });
     }
 
+=======
+>>>>>>> 2a58ee04ba9bcba102f9d9f50f5fac92a924ca0e
     const friendship = await Friend.findOne({
       $or: [
         { userId: myId, friendId: otherUserId },
@@ -397,6 +407,7 @@ export const checkFunction = async (req, res) => {
       ],
     });
 
+<<<<<<< HEAD
     if (!friendship) {
       return res.status(200).json({
         status: "not",
@@ -430,6 +441,33 @@ export const checkFunction = async (req, res) => {
     return res.status(200).json({
       status: friendship.status,
       friendship,
+=======
+    // ✅ Handle case where no friendship exists
+    if (!friendship) {
+      const otherUser = await User.findById(id).select("-password -token");
+      if (!otherUser) {
+        return res.status(200).json({ message: "User not found", status: false });
+      }
+      return res.status(200).json({
+        user: { u_data: otherUser, friendship: null },
+        status: false,
+      });
+    }
+
+    const otherUserId = friendship.userId.equals(myId)
+      ? friendship.friendId
+      : friendship.userId;
+
+    const otherUser = await User.findById(otherUserId).select("-password -token");
+
+    if (!otherUser) {
+      return res.status(200).json({ message: "User not found", status: false });
+    }
+
+    return res.status(200).json({
+      user: { u_data: otherUser, friendship },
+      status: true,
+>>>>>>> 2a58ee04ba9bcba102f9d9f50f5fac92a924ca0e
     });
 
   } catch (error) {
@@ -438,6 +476,7 @@ export const checkFunction = async (req, res) => {
   }
 };
 
+<<<<<<< HEAD
 
 export const searchFrnd = async (req, res) => {
   try {
@@ -476,3 +515,40 @@ export const searchFrnd = async (req, res) => {
     return res.status(500).json({ message: "Server error", error });
   }
 };
+=======
+// export const checkFunction = async (req, res) => {
+//   const id = req.params.userId; 
+//   const myId = req.user._id;    
+//   console.log("Inside checkFunction", id, myId);
+
+//   try {
+//     const friendship = await Friend.findOne({
+//       $or: [
+//         { userId: myId, friendId: id },
+//         { userId: id, friendId: myId },
+//       ],
+//     });
+
+//     const otherUserId = friendship.userId.equals(myId)
+//       ? friendship.friendId
+//       : friendship.userId;
+
+//     const otherUser = await User.findById(otherUserId).select("-password token");
+
+//     // If user doesn't exist
+//     if (!otherUser) {
+//       return res.status(200).json({ message: "User not found", status: false });
+//     }
+
+//     // Respond with the other user's data and the friendship status
+//     return res.status(200).json({
+//       user: { u_data: otherUser, friendship: friendship },
+//       status: true,
+//     });
+
+//   } catch (error) {
+//     console.error("Error checking friendship:", error.message);
+//     return res.status(500).json({ message: "Internal Server Error" });
+//   }
+// };
+>>>>>>> 2a58ee04ba9bcba102f9d9f50f5fac92a924ca0e

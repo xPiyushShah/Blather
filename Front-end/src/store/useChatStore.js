@@ -17,7 +17,8 @@ export const useChatStore = create((set, get) => ({
   isFriendLoading: false,
   count: 0,
   key: "LUABI-BLATHER",
-  MyFrnd: false,
+  MyFrnd: true,
+  // MyFrnd: false,
   MyFrndStat: null,
 
   getUsers: async () => {
@@ -48,6 +49,7 @@ export const useChatStore = create((set, get) => ({
     }
   },
 
+<<<<<<< HEAD
   getFrndStatus: async (userId) => {
     try {
       const response = await axiosInstance.get(`/auth/getfunction`, { params: { userId } });
@@ -57,6 +59,17 @@ export const useChatStore = create((set, get) => ({
       // toast.error("Failed to fetch messages");
       set({ MyFrnd: false });
     }
+=======
+  getFriendStatus: async (userId) => {
+    // try {
+    //   console.log("User id is :", userId);
+    //   const response = await axiosInstance.post(`/auth/getfunction/${userId}`);
+    //   set({ MyFrnd: response.data.status, MyFrndStat: response.data });
+    // } catch (error) {
+    //   // toast.error("Failed to fetch messages");
+    //   set({ MyFrnd: false });
+    // }
+>>>>>>> 2a58ee04ba9bcba102f9d9f50f5fac92a924ca0e
   },
   getMessages: async (userId) => {
     set({ isMessageLoading: true });

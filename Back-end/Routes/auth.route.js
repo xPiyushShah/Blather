@@ -51,5 +51,5 @@ router.get("/friendlist", protectAuth, friendlist);
 
 router.get("/accept_reqst/:id", protectAuth, acceptRequest);
 
-router.get("/getfunction", protectAuth, checkFunction);
+router.post("/getfunction/:userId", protectAuth, checkFunction);
 export default router;

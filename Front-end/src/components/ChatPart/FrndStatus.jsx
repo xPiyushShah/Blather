@@ -138,6 +138,7 @@ function FrndStatus() {
         status: "not", // default status
         created_by: ""
     });
+<<<<<<< HEAD
     const [loading, setLoading] = useState(false);
 
     const { selectedUser, getFrndStatus } = useChatStore();
@@ -146,6 +147,17 @@ function FrndStatus() {
     const getFriendStatus = async (id) => {
         try {
             const data = await getFrndStatus(id);
+=======
+    const { selectedUser, MyFrndStat, getFriendStatus } = useChatStore();
+    const { authUser, acceptfriend, addfriend } = authStore();
+
+    useEffect(() => {
+        if (MyFrndStat?.friendship && MyFrndStat?.u_data) {
+            const friend_status = MyFrndStat.friendship.status;
+            const friend_id = MyFrndStat.u_data._id;
+            const friend_name = `${MyFrndStat.u_data.first_name} ${MyFrndStat.u_data.last_name}`;
+            const created_by = MyFrndStat.friendship.createdBy;
+>>>>>>> 2a58ee04ba9bcba102f9d9f50f5fac92a924ca0e
 
             if (data.status && data.user?.friendship && data.user?.u_data) {
                 const { friendship, u_data } = data.user;
@@ -167,12 +179,19 @@ function FrndStatus() {
         } catch (error) {
             console.error("Error fetching friend status:", error.message);
         }
+<<<<<<< HEAD
     };
 
     useEffect(() => {
         if (selectedUser) getFrndStatus(selectedUser._id);
     }, [selectedUser]);
 
+=======
+        // console.log(MyFrndStat)
+    }, [MyFrndStat, selectedUser]);
+    getFriendStatus(selectedUser._id);
+        // console.log(MyFrndStat)
+>>>>>>> 2a58ee04ba9bcba102f9d9f50f5fac92a924ca0e
     const add_friend = async (id) => {
         setLoading(true);
         try {
