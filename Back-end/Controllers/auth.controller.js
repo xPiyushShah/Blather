@@ -11,8 +11,10 @@ export const cookie = (req, res) => {
   }
   res.status(200).json({ message: "Authenticated" });
 };
+
 export const signup = async (req, res) => {
   const { first_name, last_name, email, password } = req.body;
+  // console.log(req.body);return;
 
   try {
     const existingUser = await User.findOne({ email });
@@ -53,14 +55,14 @@ export const signup = async (req, res) => {
 };
 export const login = async (req, res) => {
   const { email, password } = req.body;
-
+  // console.log(req.body);return;
   try {
     const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ message: "User not found", status: false });
+    if (!user) return res.status(404).json({ message: "User not found", status: false });
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch)
-      return res.status(400).json({ message: "Invalid email or password", status: false });
+      return res.status(404).json({ message: "Invalid email or password", status: false });
 
     // const session = await generateSession(user._id, res);
 
@@ -85,6 +87,7 @@ export const login = async (req, res) => {
     res.status(500).json({ message: "Server error", status: false, d: err.message });
   }
 };
+
 export const logout = async (req, res) => {
   // const sessionId = req.cookies.sessionId;
 
@@ -329,45 +332,147 @@ export const userData = async (req, res) => {
     console.error("Error to get  data:", err.message);
   }
 };
-export const checkFunction = async (req, res) => {
-  const id = req.params.userId; // The ID of the user you want to check against
-  const myId = req.user._id;    // The ID of the currently logged-in user
+// export const  checkFunction= async (req, res) => {
+//   const id = req.params.userId; // The ID of the user you want to check against
+//   const myId = req.user._id;    // The ID of the currently logged-in user
 
+//   try {
+//     // Find the friendship between the two users
+//     const friendship = await Friend.findOne({
+//       $or: [
+//         { userId: myId, friendId: id },
+//         { userId: id, friendId: myId },
+//       ],
+//     });
+
+//     // If no friendship found
+//     if (!friendship) {
+//       return res.status(200).json({ message: "Friendship not found", status: false });
+//     }
+
+//     // Determine who is the "other" user (not the logged-in user)
+//     const otherUserId = friendship.userId.equals(myId)
+//       ? friendship.friendId
+//       : friendship.userId;
+
+//     // Fetch the other user's metadata, excluding the password
+//     const otherUser = await User.findById(otherUserId).select("-password token");
+
+//     // If user doesn't exist
+//     if (!otherUser) {
+//       return res.status(200).json({ message: "User not found", status: false });
+//     }
+
+//     // Respond with the other user's data and the friendship status
+//     return res.status(200).json({
+//       user: { u_data: otherUser, friendship: friendship },
+//       status: true,
+//     });
+
+//   } catch (error) {
+//     console.error("Error checking friendship:", error.message);
+//     return res.status(500).json({ message: "Internal Server Error" });
+//   }
+// };
+
+
+export const checkFunction = async (req, res) => {
   try {
-    // Find the friendship between the two users
+    const otherUserId = req.params?.userId;
+    const myId = req.user._id;
+    return res.status(400).json({ message: otherUserId, id: myId });
+    // Safety checks
+    if (!myId || !otherUserId) {
+      return res.status(400).json({ message: "Invalid user data" });
+    }
+
+    if (myId.toString() === otherUserId.toString()) {
+      return res.status(400).json({ message: "Invalid request" });
+    }
+
     const friendship = await Friend.findOne({
       $or: [
-        { userId: myId, friendId: id },
-        { userId: id, friendId: myId },
+        { userId: myId, friendId: otherUserId },
+        { userId: otherUserId, friendId: myId },
       ],
     });
 
-    // If no friendship found
     if (!friendship) {
-      return res.status(200).json({ message: "Friendship not found", status: false });
+      return res.status(200).json({
+        status: "not",
+      });
     }
 
-    // Determine who is the "other" user (not the logged-in user)
-    const otherUserId = friendship.userId.equals(myId)
-      ? friendship.friendId
-      : friendship.userId;
-
-    // Fetch the other user's metadata, excluding the password
-    const otherUser = await User.findById(otherUserId).select("-password token");
-
-    // If user doesn't exist
-    if (!otherUser) {
-      return res.status(200).json({ message: "User not found", status: false });
+    // ACCEPTED
+    if (friendship.status === "accepted") {
+      return res.status(200).json({
+        status: "accepted",
+        friendship,
+      });
     }
 
-    // Respond with the other user's data and the friendship status
+    // PENDING
+    if (friendship.status === "pending") {
+      // Use userId instead of createdBy (more reliable)
+      if (friendship.userId.toString() === myId.toString()) {
+        return res.status(200).json({
+          status: "pending_sent",
+          friendship,
+        });
+      } else {
+        return res.status(200).json({
+          status: "pending_received",
+          friendship,
+        });
+      }
+    }
+
     return res.status(200).json({
-      user: { u_data: otherUser, friendship: friendship },
-      status: true,
+      status: friendship.status,
+      friendship,
     });
 
   } catch (error) {
-    console.error("Error checking friendship:", error.message);
+    console.error("Error checking friendship:", error);
     return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+
+export const searchFrnd = async (req, res) => {
+  try {
+    const { query } = req.body;
+
+    if (!query) {
+      return res.status(400).json({ message: "Query is required" });
+    }
+
+    const users = await User.find({
+      $or: [
+        {
+          first_name: {
+            $regex: query,
+            $options: "i",
+          },
+        },
+        {
+          last_name: {
+            $regex: query,
+            $options: "i",
+          },
+        },
+        {
+          email: {
+            $regex: query,
+            $options: "i",
+          },
+        },
+      ],
+    }).select("-password -token -last_login");
+
+    return res.status(200).json(users);
+
+  } catch (error) {
+    return res.status(500).json({ message: "Server error", error });
   }
 };

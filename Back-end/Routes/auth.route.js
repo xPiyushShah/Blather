@@ -11,7 +11,8 @@ import {
   updateImage,
   cookie,
   userData,
-  checkFunction
+  checkFunction,
+  searchFrnd
 } from "../Controllers/auth.controller.js";
 import upload from "../middleware/multer.middleware.js";
 import { protectAuth } from "../middleware/auth.middleware.js";
@@ -43,6 +44,8 @@ router.put("/update-image", protectAuth, upload.single('image'), updateImage);
 router.get("/check-auth", protectAuth, checkUser);
 
 router.post("/addfriend/:id", protectAuth, addFriend);
+
+router.post("/gSearch/", protectAuth, searchFrnd);
 
 router.get("/friendlist", protectAuth, friendlist);
 
