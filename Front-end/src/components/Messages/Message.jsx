@@ -30,9 +30,10 @@ export default function Message() {
     isMessageLoading,
     isTyping,
     MyFrnd,
-    getFriendStatus,
-    addfriend
+    getFrndStatus,
+    // addfriend
   } = useChatStore();
+  const { addfriend } = authStore();
   const { starredMessages, saveStarMessae, loadStarMessages} = functionStore();
   const { authUser } = authStore();
 
@@ -68,7 +69,7 @@ export default function Message() {
   }, [messages]);
 
   useEffect(() => {
-    getFriendStatus();
+    getFrndStatus(selectedUser._id);
     if (MyFrnd) {
       getMessages(selectedUser._id);
     }

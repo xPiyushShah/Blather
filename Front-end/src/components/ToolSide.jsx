@@ -41,16 +41,7 @@ export default function ToolSide() {
     logOut("ok");
     navigate("/");
   };
-  // useEffect(() => {
-  //   const handleClickOutside = (e) => {
-  //     if (!e.target.closest(".ntwrk-bx")) {
-  //       setNetWork(null);
-  //     }
-  //   };
 
-  //   document.addEventListener("click", handleClickOutside);
-  //   return () => document.removeEventListener("click", handleClickOutside);
-  // }, []);
   const [rotated, setRotated] = useState(false);
 
   const clickerhidder = () => {

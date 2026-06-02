@@ -60,33 +60,37 @@ io.on("connection", (socket) => {
   });
 
   // call feature
-  socket.on("call-user", ({ signal, dataPack }) => {
-    //an dataPack varriable that contacints type of call and which user is calling and which user is receiving the call
-    const receiverId = getReceiverSocketId(dataPack.to);
+  socket.on("call-user", ({ signal, to, type }) => {
+    const receiverId = getReceiverSocketId(to);
 
     if (userStatusMap[receiverId]) {
-      io.emit("busy", { to: dataPack.to, packet: dataPack });
+      io.emit(" ", { to });
     }
 
     userStatusMap[userId] = receiverId;
     io.emit("statusList", Object.keys(userStatusMap)); // for callig event whenever busy
 
-    //  do dataPack.data then u will get actual  packet with caller id and other data 
-    //  on above socket even already have to thats's why that is working 
-
-    io.to(receiverId).emit("incoming-call", { from: socket.id, signal, dataPack });
+    io.to(receiverId).emit("incoming-call", {
+      from: socket.id,
+      signal,
+      type,
+    });
   });
 
-  socket.on("answer-call", ({ signal, to, data }) => {
+  socket.on("answer-call", ({ signal, to, type }) => {
     userStatusMap[userId] = to;
     io.emit("statusList", Object.keys(userStatusMap));
 
-    io.to(to).emit("call-accepted", { from: socket.id, signal, data });
+    io.to(to).emit("call-accepted", {
+      from: socket.id,
+      signal,
+      type,
+    });
   });
 
   socket.on("reject-call", ({ to, from }) => {
 
-    delete userStatusMap[from];
+    delete userStatusMap[socket.id];
     io.emit("statusList", Object.keys(userStatusMap));
 
     io.to(to).emit("reject-call", {

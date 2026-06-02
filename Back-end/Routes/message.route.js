@@ -30,9 +30,16 @@ router.delete("/star/:messageId", protectAuth, unstarMessage);
 // 🔍 Get all actions on a message
 router.get("/actions/:messageId", protectAuth, getMessageActions);
 
-router.post("/send-media/:id", protectAuth, upload.fields([
-  { name: 'audio', maxCount: 1 },
-  { name: 'video', maxCount: 1 },
-]), sendMedia);
+// router.post("/send-media/:id", protectAuth, upload.fields([{ name: "file", maxCount: 1 }]), sendMedia);
+router.post(
+  "/send-media/:id",
+  upload.single("file"),
+  (req, res, next) => {
+    console.log("FILE:", req.file);
+    console.log("BODY:", req.body);
+    next();
+  },
+  sendMedia
+);
 // router.post("/send-call/:id", protectAuth, sendMessage);
 export default router;

@@ -11,28 +11,57 @@ export const getSideBarUsers = async (req, res) => {
   const myId = req.user._id;
 
   try {
-    // Step 1: Find all friendships involving me
-    const friends = await Friend.find({
-      $or: [{ userId: myId }, { friendId: myId }],
-      status: { $in: ["accepted", "pending"] }, // optional
-    });
+    // // Step 1: Find all friendships involving me
+    // const friends = await Friend.find({
+    //   $or: [{ userId: myId }, { friendId: myId }],
+    //   status: { $in: ["rejected", "pending"] }, // optional
+    // });
 
-    // Step 2: Get list of all friend IDs (regardless of who initiated)
-    const friendIds = friends.map((f) =>
-      f.userId.toString() === myId.toString() ? f.friendId : f.userId
-    );
+    // // Step 2: Get list of all friend IDs (regardless of who initiated)
+    // const friendIds = friends.map((f) =>
+    //   f.userId.toString() === myId.toString() ? f.friendId : f.userId
+    // );
 
-    // Step 3: Find all users excluding me and my friends
+    // // Step 3: Find all users excluding me and my friends
+    // const users = await User.find({
+    //   _id: { $nin: [...friendIds, myId] }, // exclude friends and myself
+    // }).select("-password");
+
     const users = await User.find({
-      _id: { $nin: [...friendIds, myId] }, // exclude friends and myself
+      _id: { $nin: myId }, // exclude myself
     }).select("-password");
-
     res.status(200).json(users);
   } catch (error) {
     console.error("Error fetching sidebar users:", error.message);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+// export const getSideBarUsers = async (req, res) => {
+//   const myId = req.user._id;
+
+//   try {
+//     // Step 1: Find all friendships involving me
+//     const friends = await Friend.find({
+//       $or: [{ userId: myId }, { friendId: myId }],
+//       status: { $in: ["rejected", "pending"] }, // optional
+//     });
+
+//     // Step 2: Get list of all friend IDs (regardless of who initiated)
+//     const friendIds = friends.map((f) =>
+//       f.userId.toString() === myId.toString() ? f.friendId : f.userId
+//     );
+
+//     // Step 3: Find all users excluding me and my friends
+//     const users = await User.find({
+//       _id: { $nin: [...friendIds, myId] }, // exclude friends and myself
+//     }).select("-password");
+
+//     res.status(200).json(users);
+//   } catch (error) {
+//     console.error("Error fetching sidebar users:", error.message);
+//     res.status(500).json({ message: "Internal Server Error" });
+//   }
+// };
 
 
 export const getMessages = async (req, res) => {
@@ -83,60 +112,185 @@ export const sendMessage = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+// export const sendMedia = async (req, res) => {
+//   try {
+//     const senderId = req.user._id;
+//     const receiverId = req.params.id;
+//   const { text } = req.body;
+//     const audioFile = req.files?.audio?.[0];
+//     const videoFile = req.files?.video?.[0];
+//     const imageFile = req.files?.image?.[0];
+//     const normalFile = req.files?.file?.[0];
+
+
+//     if ( !audioFile && !videoFile && !imageFile && !normalFile && !text) {
+//       return res.status(400).json({
+//         message: "No media or text provided",
+//       });
+//     }
+
+//     let audioUrl = "";
+//     let videoUrl = "";
+
+
+//     const uploadToCloudinary = (fileBuffer, resource_type) => {
+//       return new Promise((resolve, reject) => {
+//         const uploadStream = cloudinary.uploader.upload_stream(
+//           { resource_type },
+//           (error, result) => {
+//             if (error) return reject(error);
+//             resolve(result.secure_url);
+//           }
+//         );
+//         streamifier.createReadStream(fileBuffer).pipe(uploadStream);
+//       });
+//     };
+
+//     if (audioFile) {
+//       audioUrl = await uploadToCloudinary(audioFile.buffer, "raw");
+//     }
+
+//     if (videoFile) {
+//       videoUrl = await uploadToCloudinary(videoFile.buffer, "video");
+//     }
+
+//     const message = new Message({
+//       senderId,
+//       receiverId,
+//       audio: audioUrl,
+//       video: videoUrl,
+//     });
+
+//     await message.save();
+
+//     // const receiverSocketId = getReceiverSocketId(receiverId);
+//     // if (receiverSocketId) {
+//     //   io.to(receiverSocketId).emit("receive-message", message);
+//     // }
+
+//     res.status(201).json(message);
+//   } catch (error) {
+//     console.error("Error to send message:", error.message);
+//     res.status(500).json({ message: "Internal Server Error" });
+//   }
+// };
+
 export const sendMedia = async (req, res) => {
   try {
     const senderId = req.user._id;
     const receiverId = req.params.id;
 
-    const audioFile = req.files?.audio?.[0];
-    const videoFile = req.files?.video?.[0];
+    // TEXT
+    const { text } = req.body;
 
-    if (!audioFile && !videoFile) {
-      return res.status(400).json({ message: "No media provided" });
+    // SINGLE FILE
+    const mediaFile = req.file; // FIXED
+    console.log("hreo :", mediaFile)
+
+    if (!mediaFile) {
+      return res.status(400).json({
+        message: "No file or text provided",
+      });
     }
 
-    let audioUrl = "";
-    let videoUrl = "";
+    let fileUrl = "";
+    let mediaType = "";
 
+    // CLOUDINARY UPLOAD
     const uploadToCloudinary = (fileBuffer, resource_type) => {
       return new Promise((resolve, reject) => {
         const uploadStream = cloudinary.uploader.upload_stream(
           { resource_type },
           (error, result) => {
             if (error) return reject(error);
+
             resolve(result.secure_url);
           }
         );
-        streamifier.createReadStream(fileBuffer).pipe(uploadStream);
+
+        streamifier
+          .createReadStream(fileBuffer)
+          .pipe(uploadStream);
       });
     };
 
-    if (audioFile) {
-      audioUrl = await uploadToCloudinary(audioFile.buffer, "raw");
+    // FILE EXISTS
+    if (mediaFile) {
+      const mimeType = mediaFile.mimetype;
+
+      // DETECT TYPE
+      if (mimeType.startsWith("image/")) {
+        mediaType = "image";
+
+        fileUrl = await uploadToCloudinary(
+          mediaFile.buffer,
+          "image"
+        );
+      }
+
+      else if (mimeType.startsWith("video/")) {
+        mediaType = "video";
+
+        fileUrl = await uploadToCloudinary(
+          mediaFile.buffer,
+          "video"
+        );
+      }
+
+      else if (mimeType.startsWith("audio/")) {
+        mediaType = "audio";
+
+        fileUrl = await uploadToCloudinary(
+          mediaFile.buffer,
+          "video"
+        );
+      }
+
+      else if (mimeType === "application/pdf") {
+        mediaType = "pdf";
+
+        fileUrl = await uploadToCloudinary(
+          mediaFile.buffer,
+          "raw"
+        );
+      }
+
+      else {
+        mediaType = "file";
+
+        fileUrl = await uploadToCloudinary(
+          mediaFile.buffer,
+          "raw"
+        );
+      }
     }
 
-    if (videoFile) {
-      videoUrl = await uploadToCloudinary(videoFile.buffer, "video");
-    }
-
+    // CREATE MESSAGE
     const message = new Message({
       senderId,
       receiverId,
-      audio: audioUrl,
-      video: videoUrl,
+
+      text: text || "",
+
+      file: fileUrl || "",
+      mediaType,
     });
 
+    // SAVE
     await message.save();
 
-    // const receiverSocketId = getReceiverSocketId(receiverId);
-    // if (receiverSocketId) {
-    //   io.to(receiverSocketId).emit("receive-message", message);
-    // }
-
+    // RESPONSE
     res.status(201).json(message);
+
   } catch (error) {
-    console.error("Error to send message:", error.message);
-    res.status(500).json({ message: "Internal Server Error" });
+    console.error(
+      "Error sending media:",
+      error.message
+    );
+
+    res.status(500).json({
+      message: "Internal Server Error",
+    });
   }
 };
 

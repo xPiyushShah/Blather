@@ -26,7 +26,7 @@ const Home = () => {
       if (peer) peer.signal(data.signal);
     });
 
-    socket.on("reject-call", (data) => { endCall() });
+    socket.on("reject-call", (data) => { endCall() });6
 
     return () => {
       socket.off("incoming-call");
@@ -36,18 +36,12 @@ const Home = () => {
   }, [socket]);
 
   return (
-    <div className="main-root bg-[var(--main-bg)]">
+    <div className="main-root bg-[var(--main-bg)] *:select-none">
       <div className="hidden sm:flex w-full max-h-svh h-full absolute text-white flex-row overflow-hidden bg-[var(--main-bg)]" >
         <div className="w-full h-full flex flex-row align-center overflow-hidden">
           <LeftBox />
           <SideBox />
         </div>
-      </div>
-      {/* Only visible on screens < 640px */}
-      <div className="flex  flex-col  gap-6 sm:hidden justify-center items-center h-screen bg-black text-white text-center px-4">
-        <Loader />
-        {/* <p className="text-lg font-semibold">Not available on this device</p>
-        <p className="text-lg font-semibold">Try in Mobile application</p> */}
       </div>
     </div>
   );

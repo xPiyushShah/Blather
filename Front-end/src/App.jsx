@@ -81,7 +81,7 @@ function App() {
   // console.log(window.__themes);data-theme={theme} 
 
   return (
-    <div data-theme="dark">
+    <div >
       <Suspense fallback={<Loader2 />}>
         <Routes>
           <Route

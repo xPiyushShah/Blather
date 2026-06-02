@@ -9,6 +9,7 @@ import CallProfile from "../Extra/CallProfile.jsx";
 import Chatheader from "./Chatheader.jsx";
 
 import MessageLoading from "./Blank/MessageLoading.jsx";
+import { useChatStore } from "../../store/useChatStore.js";
 const Message = React.lazy(() => import("./Message"));
 
 export default function ChatContainer() {
@@ -18,6 +19,8 @@ export default function ChatContainer() {
     return <CallProfile />;
   }
 
+  const { MyFrnd } = useChatStore();
+
   return (
     <>
       <div className="flex flex-col h-full w-full justify-between relative" >
@@ -25,7 +28,9 @@ export default function ChatContainer() {
         <Suspense fallback={<MessageLoading />}>
           <Message />
         </Suspense>
-        <InputArea />
+        { MyFrnd &&
+          <InputArea />
+        }
       </div>
     </>
   );
