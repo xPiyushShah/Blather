@@ -8,11 +8,11 @@ export const protectAuths = async (req, res, next) => {
   try {
     const token = req.headers.authorization;
 
-    if (!token || !token.startsWith("Bearer ")) {
+    if (!token || !token.startsWith("Bearer-")) {
       return res.status(401).json({ message: "Not authorized, token missing", status : false });
     }
 
-    const decoded = jwt.verify(token.split(" ")[1], process.env.JWT_PVTKEY);
+    const decoded = jwt.verify(token.split("-")[1], process.env.JWT_PVTKEY);
 
     const user = await User.findById(decoded.userId).select("-password");
     if (!user) {
