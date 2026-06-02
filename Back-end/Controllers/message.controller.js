@@ -38,7 +38,8 @@ export const getAllUsers = async (req, res) => {
       _id: { $nin: myId }, // exclude myself
     }).select("-password");
 
-    const users = await User.find({ _id: { $ne: myId } }).select("-password -token"); // Exclude password & token
+    const users = await User.find({ _id: { $ne: myId } }).select("-password -token");
+    // Exclude password & token
 
     res.status(200).json(users);
   } catch (error) {
