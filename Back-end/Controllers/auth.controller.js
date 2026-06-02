@@ -337,50 +337,50 @@ export const userData = async (req, res) => {
 //   const id = req.params.userId; // The ID of the user you want to check against
 //   const myId = req.user._id;    // The ID of the currently logged-in user
 // =======
-// export const checkFunction = async (req, res) => {
-//   const id = req.params.userId;
-//   const myId = req.user._id;
-//   console.log("Inside checkFunction", id, myId);
-// >>>>>>> 2a58ee04ba9bcba102f9d9f50f5fac92a924ca0e
+export const checkFunction = async (req, res) => {
+  const id = req.params.userId;
+  const myId = req.user._id;
+  //   console.log("Inside checkFunction", id, myId);
+  // >>>>>>> 2a58ee04ba9bcba102f9d9f50f5fac92a924ca0e
 
-//   try {
-//     // Find the friendship between the two users
-//     const friendship = await Friend.findOne({
-//       $or: [
-//         { userId: myId, friendId: id },
-//         { userId: id, friendId: myId },
-//       ],
-//     });
+  try {
+    // Find the friendship between the two users
+    const friendship = await Friend.findOne({
+      $or: [
+        { userId: myId, friendId: id },
+        { userId: id, friendId: myId },
+      ],
+    });
 
-//     // If no friendship found
-//     if (!friendship) {
-//       return res.status(200).json({ message: "Friendship not found", status: false });
-//     }
+    // If no friendship found
+    if (!friendship) {
+      return res.status(200).json({ message: "Friendship not found", status: false });
+    }
 
-//     // Determine who is the "other" user (not the logged-in user)
-//     const otherUserId = friendship.userId.equals(myId)
-//       ? friendship.friendId
-//       : friendship.userId;
+    // Determine who is the "other" user (not the logged-in user)
+    const otherUserId = friendship.userId.equals(myId)
+      ? friendship.friendId
+      : friendship.userId;
 
-//     // Fetch the other user's metadata, excluding the password
-//     const otherUser = await User.findById(otherUserId).select("-password token");
+    // Fetch the other user's metadata, excluding the password
+    const otherUser = await User.findById(otherUserId).select("-password token");
 
-//     // If user doesn't exist
-//     if (!otherUser) {
-//       return res.status(200).json({ message: "User not found", status: false });
-//     }
+    // If user doesn't exist
+    if (!otherUser) {
+      return res.status(200).json({ message: "User not found", status: false });
+    }
 
-//     // Respond with the other user's data and the friendship status
-//     return res.status(200).json({
-//       user: { u_data: otherUser, friendship: friendship },
-//       status: true,
-//     });
+    // Respond with the other user's data and the friendship status
+    return res.status(200).json({
+      user: { u_data: otherUser, friendship: friendship },
+      status: true,
+    });
 
-//   } catch (error) {
-//     console.error("Error checking friendship:", error.message);
-//     return res.status(500).json({ message: "Internal Server Error" });
-//   }
-// };
+  } catch (error) {
+    console.error("Error checking friendship:", error.message);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
 
 
 // export const checkFunction = async (req, res) => {
