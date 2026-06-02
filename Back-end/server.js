@@ -17,8 +17,8 @@ const PORT = process.env.PORT;
 app.use(
   cors({
     origin: "https://blathers.onrender.com",
-    origin: "http://localhost:5173",
-    origin: "http://localhost:4000",
+    // origin: "http://localhost:5173",
+    // origin: "http://localhost:4000",
     credentials: true,
   })
 );
