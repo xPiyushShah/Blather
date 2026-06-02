@@ -10,7 +10,7 @@ import ProfileAvatar from "../ProfileAvatar";
 import FrndStatus from '../ChatPart/FrndStatus.jsx';
 
 function Chatheader() {
-    const { selectedUser, MyFrndStatus, getFriendStatus, addfriend } = useChatStore();
+    const { selectedUser, MyFrndStatus, getFrndStatus, addfriend } = useChatStore();
     const { onlineUser, authUser } = authStore();
     const { setModal } = callStore();
 
@@ -18,7 +18,7 @@ function Chatheader() {
     const extracter = (data) => {
         if (!data) {
             return {
-                name: "",
+                name: "", 
                 id: "",
                 status: "not_found",
                 created_by: ""
@@ -42,7 +42,7 @@ function Chatheader() {
     const add_friend = async (id) => {
         await addfriend(id)
             .then(() => {
-                getFriendStatus(id);
+                getFrndStatus(id);
             })
             .catch((error) => {
                 console.error("Error adding friend:", error.message);

@@ -30,7 +30,7 @@ export default function Message() {
     isMessageLoading,
     isTyping,
     MyFrnd,
-    getFriendStatus,
+    getFrndStatus,
     // addfriend
   } = useChatStore();
   const { addfriend } = authStore();
@@ -69,7 +69,7 @@ export default function Message() {
   }, [messages]);
 
   useEffect(() => {
-    getFriendStatus();
+    getFrndStatus(selectedUser._id);
     if (MyFrnd) {
       getMessages(selectedUser._id);
     }

@@ -2,7 +2,7 @@ import React from 'react'
 
 function Footer() {
     return (
-        <div className='flex flex-row  p-12 space-x-1 w-full h-6   text-[12px] bg-transparent'>
+        <div className='fixed bottom-0 left-0 w-full bg-transparent'>
             <div className='flex flex-row  p-12 space-x-1 w-full h-6  justify-between text-[12px] bg-transparent align-end items-end'>
                 <div className='text-white '>Copyright @2025</div>
                 <div>

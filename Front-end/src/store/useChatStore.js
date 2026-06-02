@@ -48,10 +48,11 @@ export const useChatStore = create((set, get) => ({
     }
   },
 
-  getFriendStatus: async (userId) => {
+  getFrndStatus: async (userId) => {
     try {
-      const response = await axiosInstance.get(`/auth/getfunction`, { userId });
-      set({ MyFrnd: response.data.status, MyFrndStat: response.data });
+      const response = await axiosInstance.get(`/auth/getfunction`, { params: { userId } });
+      console.log("User ID:", userId);
+      set({ MyFrnd: response.data.status, MyFrndStat: response.data.user });
     } catch (error) {
       // toast.error("Failed to fetch messages");
       set({ MyFrnd: false });
