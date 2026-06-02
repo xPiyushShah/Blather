@@ -332,16 +332,16 @@ export const userData = async (req, res) => {
     console.error("Error to get  data:", err.message);
   }
 };
-<<<<<<< HEAD
+
 // export const  checkFunction= async (req, res) => {
 //   const id = req.params.userId; // The ID of the user you want to check against
 //   const myId = req.user._id;    // The ID of the currently logged-in user
-=======
-export const checkFunction = async (req, res) => {
-  const id = req.params.userId;
-  const myId = req.user._id;
-  console.log("Inside checkFunction", id, myId);
->>>>>>> 2a58ee04ba9bcba102f9d9f50f5fac92a924ca0e
+// =======
+// export const checkFunction = async (req, res) => {
+//   const id = req.params.userId;
+//   const myId = req.user._id;
+//   console.log("Inside checkFunction", id, myId);
+// >>>>>>> 2a58ee04ba9bcba102f9d9f50f5fac92a924ca0e
 
 //   try {
 //     // Find the friendship between the two users
@@ -383,100 +383,100 @@ export const checkFunction = async (req, res) => {
 // };
 
 
-export const checkFunction = async (req, res) => {
-  try {
-<<<<<<< HEAD
-    const otherUserId = req.params?.userId;
-    const myId = req.user._id;
-    return res.status(400).json({ message: otherUserId, id: myId });
-    // Safety checks
-    if (!myId || !otherUserId) {
-      return res.status(400).json({ message: "Invalid user data" });
-    }
+// export const checkFunction = async (req, res) => {
+//   try {
+// <<<<<<< HEAD
+//     const otherUserId = req.params?.userId;
+//     const myId = req.user._id;
+//     return res.status(400).json({ message: otherUserId, id: myId });
+//     // Safety checks
+//     if (!myId || !otherUserId) {
+//       return res.status(400).json({ message: "Invalid user data" });
+//     }
 
-    if (myId.toString() === otherUserId.toString()) {
-      return res.status(400).json({ message: "Invalid request" });
-    }
+//     if (myId.toString() === otherUserId.toString()) {
+//       return res.status(400).json({ message: "Invalid request" });
+//     }
 
-=======
->>>>>>> 2a58ee04ba9bcba102f9d9f50f5fac92a924ca0e
-    const friendship = await Friend.findOne({
-      $or: [
-        { userId: myId, friendId: otherUserId },
-        { userId: otherUserId, friendId: myId },
-      ],
-    });
+// =======
+// >>>>>>> 2a58ee04ba9bcba102f9d9f50f5fac92a924ca0e
+//     const friendship = await Friend.findOne({
+//       $or: [
+//         { userId: myId, friendId: otherUserId },
+//         { userId: otherUserId, friendId: myId },
+//       ],
+//     });
 
-<<<<<<< HEAD
-    if (!friendship) {
-      return res.status(200).json({
-        status: "not",
-      });
-    }
+// <<<<<<< HEAD
+//     if (!friendship) {
+//       return res.status(200).json({
+//         status: "not",
+//       });
+//     }
 
-    // ACCEPTED
-    if (friendship.status === "accepted") {
-      return res.status(200).json({
-        status: "accepted",
-        friendship,
-      });
-    }
+//     // ACCEPTED
+//     if (friendship.status === "accepted") {
+//       return res.status(200).json({
+//         status: "accepted",
+//         friendship,
+//       });
+//     }
 
-    // PENDING
-    if (friendship.status === "pending") {
-      // Use userId instead of createdBy (more reliable)
-      if (friendship.userId.toString() === myId.toString()) {
-        return res.status(200).json({
-          status: "pending_sent",
-          friendship,
-        });
-      } else {
-        return res.status(200).json({
-          status: "pending_received",
-          friendship,
-        });
-      }
-    }
+//     // PENDING
+//     if (friendship.status === "pending") {
+//       // Use userId instead of createdBy (more reliable)
+//       if (friendship.userId.toString() === myId.toString()) {
+//         return res.status(200).json({
+//           status: "pending_sent",
+//           friendship,
+//         });
+//       } else {
+//         return res.status(200).json({
+//           status: "pending_received",
+//           friendship,
+//         });
+//       }
+//     }
 
-    return res.status(200).json({
-      status: friendship.status,
-      friendship,
-=======
-    // ✅ Handle case where no friendship exists
-    if (!friendship) {
-      const otherUser = await User.findById(id).select("-password -token");
-      if (!otherUser) {
-        return res.status(200).json({ message: "User not found", status: false });
-      }
-      return res.status(200).json({
-        user: { u_data: otherUser, friendship: null },
-        status: false,
-      });
-    }
+//     return res.status(200).json({
+//       status: friendship.status,
+//       friendship,
+// =======
+//     // ✅ Handle case where no friendship exists
+//     if (!friendship) {
+//       const otherUser = await User.findById(id).select("-password -token");
+//       if (!otherUser) {
+//         return res.status(200).json({ message: "User not found", status: false });
+//       }
+//       return res.status(200).json({
+//         user: { u_data: otherUser, friendship: null },
+//         status: false,
+//       });
+//     }
 
-    const otherUserId = friendship.userId.equals(myId)
-      ? friendship.friendId
-      : friendship.userId;
+//     const otherUserId = friendship.userId.equals(myId)
+//       ? friendship.friendId
+//       : friendship.userId;
 
-    const otherUser = await User.findById(otherUserId).select("-password -token");
+//     const otherUser = await User.findById(otherUserId).select("-password -token");
 
-    if (!otherUser) {
-      return res.status(200).json({ message: "User not found", status: false });
-    }
+//     if (!otherUser) {
+//       return res.status(200).json({ message: "User not found", status: false });
+//     }
 
-    return res.status(200).json({
-      user: { u_data: otherUser, friendship },
-      status: true,
->>>>>>> 2a58ee04ba9bcba102f9d9f50f5fac92a924ca0e
-    });
+//     return res.status(200).json({
+//       user: { u_data: otherUser, friendship },
+//       status: true,
+// >>>>>>> 2a58ee04ba9bcba102f9d9f50f5fac92a924ca0e
+//     });
 
-  } catch (error) {
-    console.error("Error checking friendship:", error);
-    return res.status(500).json({ message: "Internal Server Error" });
-  }
-};
+//   } catch (error) {
+//     console.error("Error checking friendship:", error);
+//     return res.status(500).json({ message: "Internal Server Error" });
+//   }
+// };
 
-<<<<<<< HEAD
+
 
 export const searchFrnd = async (req, res) => {
   try {
@@ -515,7 +515,7 @@ export const searchFrnd = async (req, res) => {
     return res.status(500).json({ message: "Server error", error });
   }
 };
-=======
+
 // export const checkFunction = async (req, res) => {
 //   const id = req.params.userId; 
 //   const myId = req.user._id;    
@@ -551,4 +551,5 @@ export const searchFrnd = async (req, res) => {
 //     return res.status(500).json({ message: "Internal Server Error" });
 //   }
 // };
->>>>>>> 2a58ee04ba9bcba102f9d9f50f5fac92a924ca0e
+
+//
