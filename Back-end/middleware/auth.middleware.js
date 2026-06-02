@@ -4,7 +4,7 @@ import User from "../Models/user.model.js";
 
 
 
-export const protectAuths = async (req, res, next) => {
+export const protectAuth = async (req, res, next) => {
   try {
     const token = req.headers.authorization;
 
@@ -31,7 +31,7 @@ export const protectAuths = async (req, res, next) => {
 };
 
 // this one for cookie
-export const protectAuth = async (req, res, next) => {
+export const protectAuths = async (req, res, next) => {
   try {
     const token = req.cookies.auth_token;
 
